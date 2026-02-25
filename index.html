@@ -91,7 +91,7 @@
     .star      { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: violet; }
     .diamond   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); background: teal; }
 
-    .hole { background: rgba(0,0,0,0.1); border-radius: 12px; }
+    .hole { border-radius: 12px; background: rgba(0,0,0,0.1); }
     .square-hole { background: rgba(40,40,40,0.2); }
     .hole.reject { animation: shake 0.4s; }
     @keyframes shake { 0%,100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
@@ -112,13 +112,25 @@
       cursor: grab;
     }
     #achievement-popup.show { display: block; }
+
+    .achievement-item {
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: #f5f5f5;
+    }
+    .achievement-item.unlocked {
+      background: #fff9e6;
+      border-color: #ff6b9d;
+    }
   </style>
 </head>
 <body>
 
 <header id="drag-header">
   <h1>It Goes In The Square Hole</h1>
-  <p>Drag shapes — into their hole </p>
+  <p>Drag shapes to the holes — only one actually works (trust the title)</p>
 </header>
 
 <div class="tabs">
@@ -134,9 +146,7 @@
 
   <div id="game">
     <div id="shapes"></div>
-    <div id="holes">
-      <div class="hole square-hole" data-type="square"></div>
-    </div>
+    <div id="holes"></div>
   </div>
 </div>
 
@@ -172,14 +182,14 @@
   let unlocked = new Set();
 
   const achievements = [
-    {id:'10', name:"10 Squares – Baby Steps", desc:"You placed 10 shapes.", check:()=>placed>=10},
-    {id:'50', name:"50 Squares – Getting Serious", desc:"50 shapes. This is now a lifestyle.", check:()=>placed>=50},
-    {id:'100', name:"100 Squares – Square Obsession", desc:"100 shapes.", check:()=>placed>=100},
-    {id:'500', name:"500 Squares – Halfway to Madness", desc:"500 shapes.", check:()=>placed>=500},
-    {id:'1000', name:"1000 Squares – Why Though?", desc:"1000 shapes.", check:()=>placed>=1000},
-    {id:'title-square', name:"Title Goes In The Square Hole", desc:"You dragged the title into the square.", check:()=>false},
-    {id:'ach-tab-square', name:"Achievements Go In The Square Hole Too", desc:"You dragged the achievements tab into the square.", check:()=>false},
-    {id:'hole-square', name:"Hole-ception", desc:"You dragged a wrong hole into the square.", check:()=>false}
+    {id:'10', name:"10 Squares", desc:"Placed 10 shapes.", check:()=>placed>=10},
+    {id:'50', name:"50 Squares", desc:"Placed 50 shapes.", check:()=>placed>=50},
+    {id:'100', name:"100 Squares", desc:"Placed 100 shapes.", check:()=>placed>=100},
+    {id:'500', name:"500 Squares", desc:"Placed 500 shapes.", check:()=>placed>=500},
+    {id:'1000', name:"1000 Squares", desc:"Placed 1000 shapes.", check:()=>placed>=1000},
+    {id:'title-square', name:"Title Goes In The Square Hole", desc:"Dragged the title into the square.", check:()=>false},
+    {id:'ach-tab-square', name:"Achievements Go In The Square Hole", desc:"Dragged the achievements tab into the square.", check:()=>false},
+    {id:'hole-square', name:"Hole-ception", desc:"Dragged a shaped hole into the square.", check:()=>false}
   ];
 
   function unlock(ach) {
@@ -194,18 +204,16 @@
   }
 
   function checkAchievements() {
-    achievements.forEach(a => { if (a.check && a.check()) unlock(a); });
+    achievements.forEach(a => {
+      if (a.check && a.check()) unlock(a);
+    });
   }
 
   function renderAchievements() {
     achList.innerHTML = '';
     achievements.forEach(a => {
       const div = document.createElement('div');
-      div.style.padding = '12px';
-      div.style.margin = '10px 0';
-      div.style.border = '2px solid #ccc';
-      div.style.borderRadius = '8px';
-      div.style.background = unlocked.has(a.id) ? '#fff9e6' : '#f5f5f5';
+      div.className = 'achievement-item' + (unlocked.has(a.id) ? ' unlocked' : '');
       div.innerHTML = `<strong>${a.name}</strong><br>${a.desc}`;
       achList.appendChild(div);
     });
@@ -222,7 +230,7 @@
     });
   });
 
-  // Draggable header and achievements tab
+  // Draggable header + achievements tab
   function makeDraggable(el, achId) {
     let dragging = false, offsetX, offsetY, origLeft, origTop;
 
@@ -238,7 +246,7 @@
       el.style.left = rect.left + 'px';
       el.style.top = rect.top + 'px';
       el.style.width = rect.width + 'px';
-      el.classList.add(el === document.getElementById('drag-header') ? 'dragging-header' : 'dragging-tab');
+      el.classList.add(el.id === 'drag-header' ? 'dragging-header' : 'dragging-tab');
       e.preventDefault();
     });
 
@@ -265,7 +273,7 @@
         if (ach) {
           ach.check = () => true;
           checkAchievements();
-          msgEl.textContent = `The ${el === document.getElementById('drag-header') ? 'title' : 'achievements tab'} went in the square hole.`;
+          msgEl.textContent = `The ${el.id === 'drag-header' ? 'title' : 'achievements tab'} went in the square hole.`;
           setTimeout(() => msgEl.textContent = '', 4000);
         }
       }
@@ -286,21 +294,21 @@
   makeDraggable(document.getElementById('drag-header'), 'title-square');
   makeDraggable(document.getElementById('achievements-tab'), 'ach-tab-square');
 
-  // Shape creation + drag (mouse + touch)
+  // Shape creation + drag
   function createShape(type) {
     const div = document.createElement('div');
     div.className = `shape ${type}`;
     div.draggable = true;
     div.dataset.type = type;
 
-    // Mouse
+    // Mouse drag
     div.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', type);
       div.classList.add('dragging');
     });
     div.addEventListener('dragend', () => div.classList.remove('dragging'));
 
-    // Touch
+    // Touch drag
     let clone = null;
     div.addEventListener('touchstart', e => {
       const touch = e.touches[0];
@@ -342,9 +350,9 @@
           wrongEl.textContent = wrongs;
           hole.classList.add('reject');
           setTimeout(() => hole.classList.remove('reject'), 400);
-          msgEl.textContent = "❌ Nope — only the square hole";
+          msgEl.textContent = "❌ Nope";
           setTimeout(() => msgEl.textContent = '', 2000);
-          shapesEl.appendChild(div); // return to palette
+          shapesEl.appendChild(div);
         }
       }
     });
@@ -361,8 +369,15 @@
   }
 
   function populateHoles() {
-    holesEl.innerHTML = '<div class="hole square-hole" data-type="square"></div>';
-    const shuffled = [...holeTypes].sort(() => Math.random() - 0.5);
+    holesEl.innerHTML = '';
+    // Always add the real square hole
+    const sq = document.createElement('div');
+    sq.className = 'hole square-hole';
+    sq.dataset.type = 'square';
+    holesEl.appendChild(sq);
+
+    // Add 4 fake shaped holes to throw people off
+    const shuffled = [...holeTypes].sort(() => Math.random() - 0.5).slice(0, 4);
     shuffled.forEach(type => {
       const h = document.createElement('div');
       h.className = `hole ${type}-hole`;
