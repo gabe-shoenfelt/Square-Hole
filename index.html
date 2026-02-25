@@ -64,7 +64,7 @@
         </div>
         <div id="holes" aria-label="holes for shapes">
             <!-- square hole stays constant -->
-            <div class="hole square-hole" data-type="square">⬜</div>
+            <div class="hole square-hole" data-type="square"></div>
         </div>
     </div>
     <script>
@@ -93,7 +93,7 @@
             });
         }
 
-        function populateShapes(count=6) {
+        function populateShapes(count=5) {
             for (let i=0;i<count;i++) {
                 const type = shapeTypes[Math.floor(Math.random()*shapeTypes.length)];
                 shapesContainer.appendChild(makeShape(type));
@@ -167,8 +167,8 @@
             holes = Array.from(holesContainer.querySelectorAll('.hole'));
         }
     </script>
-    <footer style="margin:20px; text-align:center; font-size:0.9em; color:#000;">
+    <div class="footer" style="margin:20px; text-align:center; font-size:0.9em; color:#000;">
         <p>It belongs in the square Hole</p>
-    </footer>
+    </div>
 </body>
 </html>
