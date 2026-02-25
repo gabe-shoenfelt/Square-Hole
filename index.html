@@ -36,7 +36,14 @@
         #game { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
         #shapes { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; border: 2px dashed #666; }
         #holes { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; }
-        .hole { width: 100px; height: 100px; border: 3px dashed #333; display: flex; align-items: center; justify-content: center; }
+        .hole { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); }
+        /* shape-specific hole clip-paths */
+        .circle-hole { clip-path: circle(50% at 50% 50%); }
+        .triangle-hole { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .pentagon-hole { clip-path: polygon(50% 0%, 0% 38%, 19% 100%, 81% 100%, 100% 38%); }
+        .hexagon-hole { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+        .star-hole { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+        .square-hole { /* no clip needed, already square */ }
         .hole.reject { animation: shake 0.3s; }
         @keyframes shake { 0% { transform: translateX(0);} 25% {transform: translateX(-5px);} 50% {transform: translateX(5px);} 75% {transform: translateX(-5px);} 100% {transform: translateX(0);} }
     </style>
@@ -56,19 +63,27 @@
             <div class="shape diamond" draggable="true" id="shape-diamond"></div>
         </div>
         <div id="holes" aria-label="holes for shapes">
-            <div class="hole circle-hole" data-type="circle"></div>
-            <div class="hole triangle-hole" data-type="triangle"></div>
-            <div class="hole pentagon-hole" data-type="pentagon"></div>
-            <div class="hole hexagon-hole" data-type="hexagon"></div>
-            <div class="hole star-hole" data-type="star"></div>
+            <!-- square hole stays constant -->
             <div class="hole square-hole" data-type="square">⬜</div>
         </div>
     </div>
     <script>
-        const shapes = document.querySelectorAll('#shapes .shape');
-        const holes = document.querySelectorAll('#holes .hole');
+        const shapeTypes = ['circle','triangle','pentagon','hexagon','star','diamond'];
+        const holeTypes = ['circle','triangle','pentagon','hexagon','star'];
+        const shapesContainer = document.getElementById('shapes');
+        const holesContainer = document.getElementById('holes');
+        let holes = [];
 
-        shapes.forEach(shape => {
+        function makeShape(type) {
+            const div = document.createElement('div');
+            div.className = 'shape ' + type;
+            div.id = 'shape-' + type + '-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+            div.draggable = true;
+            attachDragHandlers(div);
+            return div;
+        }
+
+        function attachDragHandlers(shape) {
             shape.addEventListener('dragstart', ev => {
                 ev.dataTransfer.setData('text/plain', shape.id);
                 shape.classList.add('dragging');
@@ -76,9 +91,20 @@
             shape.addEventListener('dragend', ev => {
                 shape.classList.remove('dragging');
             });
-        });
+        }
 
-        holes.forEach(hole => {
+        function populateShapes(count=6) {
+            for (let i=0;i<count;i++) {
+                const type = shapeTypes[Math.floor(Math.random()*shapeTypes.length)];
+                shapesContainer.appendChild(makeShape(type));
+            }
+        }
+
+        // start with initial shapes and holes
+        populateShapes();
+        populateHoles();
+
+        function attachHoleHandlers(hole) {
             hole.addEventListener('dragover', ev => {
                 ev.preventDefault();
             });
@@ -87,11 +113,14 @@
                 const id = ev.dataTransfer.getData('text/plain');
                 const dragged = document.getElementById(id);
                 const msg = document.getElementById('message');
+                if (!dragged) return; // safety
                 if (hole.dataset.type === 'square') {
                     hole.appendChild(dragged);
                     dragged.draggable = false;
                     dragged.style.cursor = 'default';
-                    msg.textContent = '✅ Thats right! It goesin the square hole!';
+                    dragged.style.visibility = 'hidden';
+                    msg.textContent = '✅ Thats right! It goes in the square hole!';
+                    checkAndRefill();
                 } else {
                     hole.classList.add('reject');
                     setTimeout(() => hole.classList.remove('reject'), 300);
@@ -99,7 +128,44 @@
                     setTimeout(() => msg.textContent = '', 1500);
                 }
             });
-        });
+        }
+        // attach to existing square hole
+        holes = Array.from(holesContainer.querySelectorAll('.hole'));
+        holes.forEach(attachHoleHandlers);
+
+        function checkAndRefill() {
+            // if no draggable shapes remain, spawn new batch
+            const remaining = shapesContainer.querySelectorAll('.shape[draggable="true"]');
+            if (remaining.length === 0) {
+                const msg = document.getElementById('message');
+                msg.textContent = '🔁 New shapes incoming...';
+                setTimeout(() => { msg.textContent = ''; populateShapes(); populateHoles(); }, 1000);
+            }
+        }
+        
+        function populateHoles() {
+            // keep square hole, randomize the rest
+            // remove any non-square holes first
+            holesContainer.querySelectorAll('.hole').forEach(h => {
+                if (h.dataset.type !== 'square') h.remove();
+            });
+            // shuffle a copy of holeTypes
+            const types = holeTypes.slice();
+            for (let i = types.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [types[i], types[j]] = [types[j], types[i]];
+            }
+            // add five holes in random order
+            types.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'hole ' + type + '-hole';
+                div.dataset.type = type;
+                attachHoleHandlers(div);
+                holesContainer.appendChild(div);
+            });
+            // refresh holes array
+            holes = Array.from(holesContainer.querySelectorAll('.hole'));
+        }
     </script>
     <footer style="margin:20px; text-align:center; font-size:0.9em; color:#000;">
         <p>It belongs in the square Hole</p>
