@@ -1,95 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Square Hole – now with sound 😈</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Square Hole (the square edition)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;700&display=swap');
-
     body {
       font-family: 'Comic Neue', cursive, sans-serif;
       background: linear-gradient(45deg, #ffdd99, #99ccff);
       margin: 0;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: bgWiggle 12s infinite alternate;
-      touch-action: manipulation;
+      animation: wiggleBg 10s infinite alternate;
+      min-height: 100vh;
     }
-
-    @keyframes bgWiggle {
-      0%   { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
+    @keyframes wiggleBg { 0% {background: #ffdd99;} 100% {background: #99ccff;} }
 
     header {
       text-align: center;
-      padding: 1rem;
+      padding: 15px;
       width: 90%;
-      max-width: 900px;
       cursor: grab;
       user-select: none;
     }
-
-    h1 { margin: 0.4em 0 0.1em; font-size: clamp(1.8rem, 7vw, 3.2rem); }
-    .subtitle { margin: 0; font-size: clamp(1rem, 4vw, 1.4rem); opacity: 0.9; }
-
-    .tabs {
-      display: flex;
-      gap: 0.6rem;
-      margin: 1rem 0;
-      flex-wrap: wrap;
-      justify-content: center;
+    header.dragging-header {
+      opacity: 0.8;
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
+    .tabs { display: flex; gap: 10px; margin: 20px 0; }
     .tab-btn {
-      padding: 0.6rem 1.4rem;
-      font-size: 1.05rem;
-      background: rgba(255,255,255,0.5);
+      padding: 10px 20px;
+      font-size: 1.1em;
+      background: rgba(255,255,255,0.4);
       border: none;
       border-radius: 10px 10px 0 0;
       cursor: pointer;
     }
-
-    .tab-btn.active {
-      background: white;
-      font-weight: bold;
-    }
+    .tab-btn.active { background: white; font-weight: bold; }
 
     .tab-content {
-      width: 92%;
-      max-width: 820px;
-      background: rgba(255,255,255,0.75);
+      width: 90%;
+      max-width: 800px;
+      background: rgba(255,255,255,0.7);
       border-radius: 12px;
-      padding: 1.2rem;
-      margin-bottom: 2rem;
+      padding: 20px;
+      margin-bottom: 30px;
       display: none;
+      cursor: grab;
+      user-select: none;
     }
-
     .tab-content.active { display: block; }
-
-    #game {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2.5rem;
-      justify-content: center;
-      padding: 1rem;
+    .tab-content.dragging-tab {
+      opacity: 0.8;
+      transform: scale(1.03) rotate(1deg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
+    #game { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; padding: 20px; }
     #shapes, #holes {
       display: flex;
+      gap: 20px;
       flex-wrap: wrap;
-      gap: 1.4rem;
-      padding: 1.4rem;
+      padding: 20px;
       border-radius: 12px;
     }
-
-    #shapes {
-      border: 3px dashed #666;
-      background: rgba(255,255,255,0.18);
-    }
+    #shapes { border: 2px dashed #666; background: rgba(255,255,255,0.2); }
 
     .shape, .hole {
       width: 90px;
@@ -98,66 +77,40 @@
       user-select: none;
     }
 
-    .shape {
-      transition: transform 0.12s ease-out;
-    }
-
-    .shape.dragging,
-    .hole.dragging-hole {
-      transform: scale(1.18) rotate(5deg);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.38);
-      opacity: 0.86;
+    .shape.dragging, .hole.dragging-hole {
+      transform: scale(1.15) rotate(4deg);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      opacity: 0.9;
       z-index: 999;
     }
 
-    .circle    { clip-path: circle(50% at 50% 50%);   background: #c62828; }
-    .triangle  { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: #1565c0; }
-    .pentagon  { clip-path: polygon(50% 0%, 0% 38%, 19% 100%, 81% 100%, 100% 38%); background: #f9a825; }
-    .hexagon   { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); background: #2e7d32; }
-    .star      { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: #8e24aa; }
+    .circle    { clip-path: circle(50% at 50% 50%); background: crimson; }
+    .triangle  { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: royalblue; }
+    .pentagon  { clip-path: polygon(50% 0%, 0% 38%, 19% 100%, 81% 100%, 100% 38%); background: gold; }
+    .hexagon   { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); background: mediumseagreen; }
+    .star      { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: violet; }
     .diamond   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); background: teal; }
 
-    .hole {
-      background: rgba(0,0,0,0.08);
-      border-radius: 12px;
-    }
-
-    .square-hole { background: rgba(50,50,50,0.16); }
-
-    .hole.reject {
-      animation: shake 0.4s;
-    }
-
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      75% { transform: translateX(6px); }
-    }
-
-    #stats, #message {
-      text-align: center;
-      margin: 1rem 0;
-      font-size: 1.25rem;
-      color: #111;
-    }
+    .hole { background: rgba(0,0,0,0.1); border-radius: 12px; }
+    .square-hole { background: rgba(40,40,40,0.2); }
+    .hole.reject { animation: shake 0.4s; }
+    @keyframes shake { 0%,100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
 
     #achievement-popup {
       position: fixed;
-      inset: 50% auto auto 50%;
-      translate: -50% -50%;
-      background: linear-gradient(135deg, #ffeb3b, #ffd54f);
-      border: 5px solid #ff4081;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      border: 5px solid #ff6b9d;
       border-radius: 24px;
-      padding: 2rem 1.8rem;
+      padding: 40px;
       text-align: center;
       z-index: 10001;
-      box-shadow: 0 0 50px rgba(255,64,129,0.6);
+      box-shadow: 0 0 40px rgba(255,107,157,0.9);
       display: none;
       cursor: grab;
-      user-select: none;
-      max-width: 90%;
     }
-
     #achievement-popup.show { display: block; }
   </style>
 </head>
@@ -165,7 +118,7 @@
 
 <header id="drag-header">
   <h1>It Goes In The Square Hole</h1>
-  <p class="subtitle">Now with authentic sound on correct drop (phone + PC)</p>
+  <p>Drag shapes, holes, header, achievements tab — only square wins</p>
 </header>
 
 <div class="tabs">
@@ -174,11 +127,10 @@
 </div>
 
 <div id="game-tab" class="tab-content active">
-  <div id="stats">
-    Squared: <strong id="placed-count">0</strong>  
-    Wrong: <strong id="wrong-count">0</strong>
+  <div id="stats" style="text-align:center; font-size:1.3em; margin:1em 0;">
+    Squared: <strong id="placed">0</strong> | Wrong: <strong id="wrong">0</strong>
   </div>
-  <div id="message"></div>
+  <div id="message" style="text-align:center; font-size:1.2em; min-height:1.8em; color:#222;"></div>
 
   <div id="game">
     <div id="shapes"></div>
@@ -190,156 +142,242 @@
 
 <div id="achievements-tab" class="tab-content">
   <h2>Achievements</h2>
-  <div id="achievements-list"></div>
+  <div id="ach-list"></div>
 </div>
 
-<audio id="square-sound" preload="auto">
-  <source src="https://assets.codepen.io/605876/it-goes-in-the-square-hole.mp3" type="audio/mpeg">
-</audio>
+<div id="achievement-popup">
+  <div style="font-size:5em;">🏆</div>
+  <h2 id="ach-title">ACHIEVEMENT UNLOCKED!</h2>
+  <p id="ach-name"></p>
+  <p id="ach-desc"></p>
+</div>
 
 <script>
-// ───────────────────────────────────────────────
-//   Variables
-// ───────────────────────────────────────────────
+  const shapeTypes = ['circle','triangle','pentagon','hexagon','star','diamond'];
+  const holeTypes = ['circle','triangle','pentagon','hexagon','star'];
 
-const squareSound = document.getElementById('square-sound');
+  const shapesEl = document.getElementById('shapes');
+  const holesEl = document.getElementById('holes');
+  const msgEl = document.getElementById('message');
+  const placedEl = document.getElementById('placed');
+  const wrongEl = document.getElementById('wrong');
+  const popup = document.getElementById('achievement-popup');
+  const achTitle = document.getElementById('ach-title');
+  const achName = document.getElementById('ach-name');
+  const achDesc = document.getElementById('ach-desc');
+  const achList = document.getElementById('ach-list');
 
-const shapeTypes = ['circle','triangle','pentagon','hexagon','star','diamond'];
-const holeTypes  = ['circle','triangle','pentagon','hexagon','star'];
+  let placed = 0;
+  let wrongs = 0;
+  let unlocked = new Set();
 
-const shapesEl   = document.getElementById('shapes');
-const holesEl    = document.getElementById('holes');
-const msgEl      = document.getElementById('message');
-const placedEl   = document.getElementById('placed-count');
-const wrongEl    = document.getElementById('wrong-count');
+  const achievements = [
+    {id:'10', name:"10 Squares – Baby Steps", desc:"You placed 10 shapes. Gold star for effort.", check:()=>placed>=10},
+    {id:'50', name:"50 Squares – Getting Serious", desc:"50 shapes. This is now a lifestyle.", check:()=>placed>=50},
+    {id:'100', name:"100 Squares – Square Obsession", desc:"100 shapes. The square lives rent-free in your head.", check:()=>placed>=100},
+    {id:'500', name:"500 Squares – Halfway to Madness", desc:"500 shapes. No return ticket.", check:()=>placed>=500},
+    {id:'1000', name:"1000 Squares – Why Though?", desc:"1000 shapes. No one asked. No one will thank you.", check:()=>placed>=1000},
+    {id:'idle2m', name:"Pro Procrastinator", desc:"2 minutes idle. Peak performance.", check:()=>false},
+    {id:'title-square', name:"Title Goes In The Square Hole", desc:"You dragged the header into the square. Iconic.", check:()=>false},
+    {id:'ach-tab-square', name:"Achievements Go In The Square Hole Too", desc:"Dragged the achievements tab into the square. Maximum meta.", check:()=>false},
+    {id:'hole-square', name:"Hole-ception", desc:"Fake hole in real hole. Physics.exe has stopped.", check:()=>false}
+  ];
 
-let placed = 0;
-let wrongs = 0;
+  function unlock(ach) {
+    if (unlocked.has(ach.id)) return;
+    unlocked.add(ach.id);
+    achTitle.textContent = "ACHIEVEMENT UNLOCKED!";
+    achName.textContent = ach.name;
+    achDesc.textContent = ach.desc;
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 5000);
+    renderAchievements();
+  }
 
-// ───────────────────────────────────────────────
-//   Create & drag shape (PC + touch)
-// ───────────────────────────────────────────────
+  function checkAchievements() {
+    achievements.forEach(a => {
+      if (a.check && a.check()) unlock(a);
+    });
+  }
 
-function createShape(type) {
-  const div = document.createElement('div');
-  div.className = `shape ${type}`;
-  div.dataset.type = type;
+  function renderAchievements() {
+    achList.innerHTML = '';
+    achievements.forEach(a => {
+      const div = document.createElement('div');
+      div.style.padding = '10px';
+      div.style.margin = '10px 0';
+      div.style.border = '2px solid #ccc';
+      div.style.borderRadius = '8px';
+      div.style.background = unlocked.has(a.id) ? '#fff9e6' : '#f5f5f5';
+      div.innerHTML = `<strong>${a.name}</strong><br>${a.desc}`;
+      achList.appendChild(div);
+    });
+  }
 
-  // PC drag
-  div.draggable = true;
-  div.addEventListener('dragstart', e => {
-    e.dataTransfer.setData('text/plain', type);
-    div.classList.add('dragging');
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+      if (btn.dataset.tab === 'achievements') renderAchievements();
+    });
   });
-  div.addEventListener('dragend', () => div.classList.remove('dragging'));
 
-  // Touch drag with ghost
-  div.addEventListener('touchstart', e => {
-    e.stopPropagation();
-    const touch = e.touches[0];
-    const rect = div.getBoundingClientRect();
+  // Draggable header + achievements tab (snap back + achievement)
+  const header = document.getElementById('drag-header');
+  const achTab = document.getElementById('achievements-tab');
 
-    const clone = div.cloneNode(true);
-    clone.style.position = 'fixed';
-    clone.style.left = `${touch.clientX - rect.width / 2}px`;
-    clone.style.top  = `${touch.clientY - rect.height / 2}px`;
-    clone.style.opacity = '0.78';
-    clone.style.pointerEvents = 'none';
-    clone.style.zIndex = '9999';
-    document.body.appendChild(clone);
+  [header, achTab].forEach(el => {
+    let dragging = false, offsetX, offsetY, origLeft, origTop;
+    const achId = el === header ? 'title-square' : 'ach-tab-square';
 
-    div._touchClone = clone;
-    div._touchOffsetX = touch.clientX - rect.left;
-    div._touchOffsetY = touch.clientY - rect.top;
-  }, {passive: false});
+    el.addEventListener('mousedown', e => {
+      if (e.target.closest('button')) return;
+      dragging = true;
+      const rect = el.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      origLeft = rect.left;
+      origTop = rect.top;
+      el.style.position = 'fixed';
+      el.style.left = rect.left + 'px';
+      el.style.top = rect.top + 'px';
+      el.style.width = rect.width + 'px';
+      el.classList.add(el === header ? 'dragging-header' : 'dragging-tab');
+      e.preventDefault();
+    });
 
-  div.addEventListener('touchmove', e => {
-    if (!div._touchClone) return;
-    e.preventDefault();
-    const touch = e.touches[0];
-    div._touchClone.style.left = `${touch.clientX - div._touchOffsetX}px`;
-    div._touchClone.style.top  = `${touch.clientY - div._touchOffsetY}px`;
-  }, {passive: false});
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      el.style.left = (e.clientX - offsetX) + 'px';
+      el.style.top = (e.clientY - offsetY) + 'px';
+    });
 
-  div.addEventListener('touchend', e => {
-    if (div._touchClone) {
-      div._touchClone.remove();
-      delete div._touchClone;
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging-header', 'dragging-tab');
+
+      const sqRect = document.querySelector('.square-hole').getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const dist = Math.hypot(
+        elRect.left + elRect.width/2 - (sqRect.left + sqRect.width/2),
+        elRect.top + elRect.height/2 - (sqRect.top + sqRect.height/2)
+      );
+
+      if (dist < 140) {
+        const ach = achievements.find(a => a.id === achId);
+        if (ach) {
+          ach.check = () => true;
+          checkAchievements();
+          msgEl.textContent = `The ${el === header ? 'header' : 'achievements tab'} went in the square hole. Chaos achieved.`;
+          setTimeout(() => msgEl.textContent = '', 4000);
+        }
+      }
+
+      el.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.left = origLeft + 'px';
+      el.style.top = origTop + 'px';
+      setTimeout(() => {
+        el.style.position = '';
+        el.style.left = '';
+        el.style.top = '';
+        el.style.width = '';
+        el.style.transition = '';
+      }, 650);
+    });
+  });
+
+  // Shape creation + drag (mouse + touch)
+  function createShape(type) {
+    const div = document.createElement('div');
+    div.className = `shape ${type}`;
+    div.draggable = true;
+    div.dataset.type = type;
+
+    // Mouse
+    div.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', type);
+      div.classList.add('dragging');
+    });
+    div.addEventListener('dragend', () => div.classList.remove('dragging'));
+
+    // Touch
+    let clone = null;
+    div.addEventListener('touchstart', e => {
+      const touch = e.touches[0];
+      const rect = div.getBoundingClientRect();
+      clone = div.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.left = touch.clientX - rect.width/2 + 'px';
+      clone.style.top = touch.clientY - rect.height/2 + 'px';
+      clone.style.opacity = '0.8';
+      clone.style.pointerEvents = 'none';
+      clone.style.zIndex = '9999';
+      document.body.appendChild(clone);
+    });
+
+    div.addEventListener('touchmove', e => {
+      if (!clone) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      clone.style.left = touch.clientX - clone.offsetWidth/2 + 'px';
+      clone.style.top = touch.clientY - clone.offsetHeight/2 + 'px';
+    });
+
+    div.addEventListener('touchend', e => {
+      if (clone) clone.remove();
+      const touch = e.changedTouches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const hole = el?.closest('.hole');
+
+      if (hole) {
+        if (hole.dataset.type === 'square') {
+          placed++;
+          placedEl.textContent = placed;
+          msgEl.textContent = `✅ It goes in the square hole! (${placed})`;
+          setTimeout(() => msgEl.textContent = '', 2000);
+          checkAchievements();
+          checkRefill();
+        } else {
+          wrongs++;
+          wrongEl.textContent = wrongs;
+          hole.classList.add('reject');
+          setTimeout(() => hole.classList.remove('reject'), 400);
+          msgEl.textContent = "❌ Wrong hole!";
+          setTimeout(() => msgEl.textContent = '', 2000);
+          shapesEl.appendChild(div); // return to palette
+        }
+      }
+    });
+
+    return div;
+  }
+
+  function populateShapes(count = 5) {
+    shapesEl.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+      shapesEl.appendChild(createShape(type));
     }
-
-    const touch = e.changedTouches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const hole = el?.closest('.hole');
-
-    handleDrop(hole, div);
-  });
-
-  return div;
-}
-
-function handleDrop(hole, shapeElement) {
-  if (!hole) return;
-
-  if (hole.dataset.type === 'square') {
-    placed++;
-    placedEl.textContent = placed;
-    msgEl.textContent = `✅ It goes in the square hole! (${placed})`;
-    squareSound.currentTime = 0;
-    squareSound.play().catch(() => {}); // autoplay policy safe-guard
-    setTimeout(() => msgEl.textContent = '', 2200);
-  } else {
-    wrongs++;
-    wrongEl.textContent = wrongs;
-    hole.classList.add('reject');
-    setTimeout(() => hole.classList.remove('reject'), 450);
-    msgEl.textContent = "❌ Nope — square hole only";
-    setTimeout(() => msgEl.textContent = '', 1800);
   }
-}
 
-// ───────────────────────────────────────────────
-//   Square hole accepts PC drops
-// ───────────────────────────────────────────────
-
-const squareHole = document.querySelector('.square-hole');
-
-squareHole.addEventListener('dragover', e => e.preventDefault());
-
-squareHole.addEventListener('drop', e => {
-  e.preventDefault();
-  const type = e.dataTransfer.getData('text/plain');
-  if (type && shapeTypes.includes(type)) {
-    placed++;
-    placedEl.textContent = placed;
-    msgEl.textContent = `✅ It goes in the square hole! (${placed})`;
-    squareSound.currentTime = 0;
-    squareSound.play().catch(() => {});
-    setTimeout(() => msgEl.textContent = '', 2200);
+  function checkRefill() {
+    if (shapesEl.children.length === 0) {
+      msgEl.textContent = "New batch of 5 shapes incoming...";
+      setTimeout(() => {
+        msgEl.textContent = '';
+        populateShapes(5);
+      }, 1200);
+    }
   }
-});
 
-// ───────────────────────────────────────────────
-//   Populate initial shapes
-// ───────────────────────────────────────────────
-
-function populateShapes(count = 5) {
-  shapesEl.innerHTML = '';
-  for (let i = 0; i < count; i++) {
-    const type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
-    shapesEl.appendChild(createShape(type));
-  }
-}
-
-populateShapes();
-
-// Optional: auto-refill when empty
-setInterval(() => {
-  if (shapesEl.children.length === 0) {
-    populateShapes(4);
-    msgEl.textContent = "New shapes arrived...";
-    setTimeout(() => msgEl.textContent = '', 1800);
-  }
-}, 6000);
+  // Start with 5 shapes + holes
+  populateShapes(5);
+  populateHoles();
+  renderAchievements();
 </script>
 </body>
 </html>
