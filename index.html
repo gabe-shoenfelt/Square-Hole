@@ -49,6 +49,44 @@
         .hole.reject { animation: shake 0.3s; }
         @keyframes shake { 0% { transform: translateX(0);} 25% {transform: translateX(-5px);} 50% {transform: translateX(5px);} 75% {transform: translateX(-5px);} 100% {transform: translateX(0);} }
         
+        /* achievement styles */
+        #achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: 4px solid #ff6b9d;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            z-index: 10001;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            animation: achievementPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: none;
+        }
+        @keyframes achievementPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        #achievement-popup.show {
+            display: block;
+        }
+        #achievement-popup h2 {
+            margin: 0 0 10px 0;
+            color: #ff6b9d;
+            font-size: 1.8em;
+        }
+        #achievement-popup p {
+            margin: 5px 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+        #achievement-popup .trophy {
+            font-size: 4em;
+            margin: 15px 0;
+        }
+        
         /* Mobile responsive */
         @media (max-width: 768px) {
             body {
@@ -87,6 +125,12 @@
     <p>Drag a shape — you can just hover over the <strong>shape</strong> hole and it'll automatically fit!</p>
     <p class="instruction">(good luck)</p>
     <div id="message" style="min-height:1.2em; color:#333; margin-bottom:10px;"></div>
+    <div id="achievement-popup">
+        <div class="trophy">🏆</div>
+        <h2>ACHIEVEMENT UNLOCKED!</h2>
+        <p>this achievement goes in the square hole</p>
+        <p style="font-size: 1em; margin-top: 15px;">200 shapes successfully placed!</p>
+    </div>
     <div id="game">
         <div id="shapes" aria-label="shape palette">
             <!-- shapes will be created by JavaScript -->
@@ -102,6 +146,7 @@
         const shapesContainer = document.getElementById('shapes');
         const holesContainer = document.getElementById('holes');
         let holes = [];
+        let shapesPlaced = 0; // track shapes placed in square hole
 
         function makeShape(type) {
             const div = document.createElement('div');
@@ -110,6 +155,21 @@
             div.draggable = true;
             attachDragHandlers(div);
             return div;
+        }
+
+        function recordShapePlaced() {
+            shapesPlaced++;
+            if (shapesPlaced === 200) {
+                showAchievement();
+            }
+        }
+
+        function showAchievement() {
+            const popup = document.getElementById('achievement-popup');
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 4000);
         }
 
         let touchingShape = null;
@@ -170,6 +230,7 @@
                             touchingShape.style.cursor = 'default';
                             touchingShape.style.visibility = 'hidden';
                             msg.textContent = '✅ Thats right! It goes in the square hole!';
+                            recordShapePlaced();
                             checkAndRefill();
                         } else {
                             hole.classList.add('reject');
@@ -211,6 +272,7 @@
                         dragged.style.visibility = 'hidden';
                         const msg = document.getElementById('message');
                         msg.textContent = '✅ Thats right! It goes in the square hole!';
+                        recordShapePlaced();
                         checkAndRefill();
                     }
                 }
@@ -228,6 +290,7 @@
                     dragged.style.cursor = 'default';
                     dragged.style.visibility = 'hidden';
                     msg.textContent = '✅ Thats right! It goes in the square hole!';
+                    recordShapePlaced();
                     checkAndRefill();
                 } else {
                     hole.classList.add('reject');
