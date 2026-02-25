@@ -24,6 +24,8 @@
             width: 80px;
             height: 80px;
             cursor: grab;
+            touch-action: none;
+            user-select: none;
         }
         /* shapes using clip-path */
         .circle { clip-path: circle(50% at 50% 50%); background: crimson; }
@@ -46,6 +48,38 @@
         .square-hole { /* no clip needed, already square */ }
         .hole.reject { animation: shake 0.3s; }
         @keyframes shake { 0% { transform: translateX(0);} 25% {transform: translateX(-5px);} 50% {transform: translateX(5px);} 75% {transform: translateX(-5px);} 100% {transform: translateX(0);} }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5em;
+                margin: 10px 0;
+            }
+            p {
+                font-size: 0.9em;
+                margin: 5px 0;
+            }
+            #game {
+                gap: 20px;
+                flex-direction: column;
+            }
+            #shapes, #holes {
+                gap: 15px;
+                padding: 15px;
+                justify-content: center;
+            }
+            .shape {
+                width: 70px;
+                height: 70px;
+            }
+            .hole {
+                width: 90px;
+                height: 90px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -78,6 +112,11 @@
             return div;
         }
 
+        let touchingShape = null;
+        let touchOffsetX = 0;
+        let touchOffsetY = 0;
+        let touchClone = null;
+
         function attachDragHandlers(shape) {
             shape.addEventListener('dragstart', ev => {
                 ev.dataTransfer.setData('text/plain', shape.id);
@@ -85,6 +124,62 @@
             });
             shape.addEventListener('dragend', ev => {
                 shape.classList.remove('dragging');
+            });
+
+            // Touch handlers for mobile
+            shape.addEventListener('touchstart', ev => {
+                touchingShape = shape;
+                const touch = ev.touches[0];
+                const rect = shape.getBoundingClientRect();
+                touchOffsetX = touch.clientX - rect.left;
+                touchOffsetY = touch.clientY - rect.top;
+                
+                // Create a visual clone for dragging
+                touchClone = shape.cloneNode(true);
+                touchClone.style.position = 'fixed';
+                touchClone.style.opacity = '0.7';
+                touchClone.style.pointerEvents = 'none';
+                touchClone.style.zIndex = '10000';
+                document.body.appendChild(touchClone);
+            });
+
+            shape.addEventListener('touchmove', ev => {
+                if (touchingShape && touchClone) {
+                    const touch = ev.touches[0];
+                    touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+                    touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+                }
+            });
+
+            shape.addEventListener('touchend', ev => {
+                if (touchClone) {
+                    touchClone.remove();
+                    touchClone = null;
+                }
+                
+                if (touchingShape) {
+                    const touch = ev.changedTouches[0];
+                    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const hole = element?.closest('.hole');
+                    
+                    if (hole) {
+                        const msg = document.getElementById('message');
+                        if (hole.dataset.type === 'square') {
+                            hole.appendChild(touchingShape);
+                            touchingShape.draggable = false;
+                            touchingShape.style.cursor = 'default';
+                            touchingShape.style.visibility = 'hidden';
+                            msg.textContent = '✅ Thats right! It goes in the square hole!';
+                            checkAndRefill();
+                        } else {
+                            hole.classList.add('reject');
+                            setTimeout(() => hole.classList.remove('reject'), 300);
+                            msg.textContent = '❌ Nope, try again!';
+                            setTimeout(() => msg.textContent = '', 1500);
+                        }
+                    }
+                    touchingShape = null;
+                }
             });
         }
 
