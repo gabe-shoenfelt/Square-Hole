@@ -55,12 +55,7 @@
     <div id="message" style="min-height:1.2em; color:#333; margin-bottom:10px;"></div>
     <div id="game">
         <div id="shapes" aria-label="shape palette">
-            <div class="shape circle" draggable="true" id="shape-circle"></div>
-            <div class="shape triangle" draggable="true" id="shape-triangle"></div>
-            <div class="shape pentagon" draggable="true" id="shape-pentagon"></div>
-            <div class="shape hexagon" draggable="true" id="shape-hexagon"></div>
-            <div class="shape star" draggable="true" id="shape-star"></div>
-            <div class="shape diamond" draggable="true" id="shape-diamond"></div>
+            <!-- shapes will be created by JavaScript -->
         </div>
         <div id="holes" aria-label="holes for shapes">
             <!-- square hole stays constant -->
@@ -142,6 +137,8 @@
                     setTimeout(() => hole.classList.remove('reject'), 300);
                     msg.textContent = '❌ Nope, try again!';
                     setTimeout(() => msg.textContent = '', 1500);
+                    // move shape back to the palette so it doesn't get stuck
+                    shapesContainer.appendChild(dragged);
                 }
             });
         }
