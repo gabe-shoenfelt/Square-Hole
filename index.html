@@ -50,8 +50,8 @@
 </head>
 <body>
     <h1>It Goes In The Square Hole</h1>
-    <p>Drag a shape and drop it into a hole.</p>
-    <p class="instruction">(Good Luck)</p>
+    <p>Drag a shape — you can just hover over the <strong>square</strong> hole and it'll automatically fit!</p>
+    <p class="instruction">(other holes still reject)</p>
     <div id="message" style="min-height:1.2em; color:#333; margin-bottom:10px;"></div>
     <div id="game">
         <div id="shapes" aria-label="shape palette">
@@ -107,6 +107,21 @@
         function attachHoleHandlers(hole) {
             hole.addEventListener('dragover', ev => {
                 ev.preventDefault();
+                // if this is the square hole, accept immediately on hover
+                if (hole.dataset.type === 'square') {
+                    const id = ev.dataTransfer.getData('text/plain');
+                    const dragged = document.getElementById(id);
+                    if (dragged && dragged.draggable) {
+                        // perform same logic as drop
+                        hole.appendChild(dragged);
+                        dragged.draggable = false;
+                        dragged.style.cursor = 'default';
+                        dragged.style.visibility = 'hidden';
+                        const msg = document.getElementById('message');
+                        msg.textContent = '✅ Thats right! It goes in the square hole!';
+                        checkAndRefill();
+                    }
+                }
             });
             hole.addEventListener('drop', ev => {
                 ev.preventDefault();
@@ -115,6 +130,7 @@
                 const msg = document.getElementById('message');
                 if (!dragged) return; // safety
                 if (hole.dataset.type === 'square') {
+                    // normal drop handler (might duplicate auto-drop but safe)
                     hole.appendChild(dragged);
                     dragged.draggable = false;
                     dragged.style.cursor = 'default';
@@ -144,12 +160,19 @@
         }
         
         function populateHoles() {
-            // keep square hole, randomize the rest
-            // remove any non-square holes first
+            // empty out holes container except square; remove any shapes inside holes
             holesContainer.querySelectorAll('.hole').forEach(h => {
-                if (h.dataset.type !== 'square') h.remove();
+                // remove all shape children regardless of hole type
+                Array.from(h.children).forEach(child => {
+                    if (child.classList.contains('shape')) {
+                        child.remove();
+                    }
+                });
+                if (h.dataset.type !== 'square') {
+                    h.remove();
+                }
             });
-            // shuffle a copy of holeTypes
+            // shuffle a copy of holeTypes for the non-square holes
             const types = holeTypes.slice();
             for (let i = types.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
