@@ -89,6 +89,8 @@
         }
 
         function populateShapes(count=5) {
+            // clear any shapes currently in the palette (hidden or not)
+            shapesContainer.innerHTML = '';
             for (let i=0;i<count;i++) {
                 const type = shapeTypes[Math.floor(Math.random()*shapeTypes.length)];
                 shapesContainer.appendChild(makeShape(type));
