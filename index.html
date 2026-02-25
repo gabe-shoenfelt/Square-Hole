@@ -1,354 +1,345 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Hole (the square edition)</title>
-    <style>
-        /* slapdash clown font */
-        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;700&display=swap');
-        body {
-            font-family: 'Comic Neue', cursive, sans-serif;
-            background: linear-gradient(45deg, #ffdd99, #99ccff);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: wiggleBg 10s infinite alternate;
-        }
-        h1 {
-            margin: 20px 0;
-        }
-        @keyframes wiggleBg { 0% {background: #ffdd99;} 100% {background: #99ccff;} }
-        .shape {
-            width: 80px;
-            height: 80px;
-            cursor: grab;
-            touch-action: none;
-            user-select: none;
-        }
-        /* shapes using clip-path */
-        .circle { clip-path: circle(50% at 50% 50%); background: crimson; }
-        .triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: royalblue; }
-        .pentagon { clip-path: polygon(50% 0%, 0% 38%, 19% 100%, 81% 100%, 100% 38%); background: gold; }
-        .hexagon { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); background: mediumseagreen; }
-        .star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: violet; }
-        .diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); background: teal; }
-        /* game-specific styles */
-        #game { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
-        #shapes { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; border: 2px dashed #666; }
-        #holes { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; }
-        .hole { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); }
-        /* shape-specific hole clip-paths */
-        .circle-hole { clip-path: circle(50% at 50% 50%); }
-        .triangle-hole { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-        .pentagon-hole { clip-path: polygon(50% 0%, 0% 38%, 19% 100%, 81% 100%, 100% 38%); }
-        .hexagon-hole { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
-        .star-hole { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
-        .square-hole { /* no clip needed, already square */ }
-        .hole.reject { animation: shake 0.3s; }
-        @keyframes shake { 0% { transform: translateX(0);} 25% {transform: translateX(-5px);} 50% {transform: translateX(5px);} 75% {transform: translateX(-5px);} 100% {transform: translateX(0);} }
-        
-        /* achievement styles */
-        #achievement-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            border: 4px solid #ff6b9d;
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            z-index: 10001;
-            box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
-            animation: achievementPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: none;
-        }
-        @keyframes achievementPop {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-        #achievement-popup.show {
-            display: block;
-        }
-        #achievement-popup h2 {
-            margin: 0 0 10px 0;
-            color: #ff6b9d;
-            font-size: 1.8em;
-        }
-        #achievement-popup p {
-            margin: 5px 0;
-            color: #333;
-            font-size: 1.2em;
-        }
-        #achievement-popup .trophy {
-            font-size: 4em;
-            margin: 15px 0;
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 1.5em;
-                margin: 10px 0;
-            }
-            p {
-                font-size: 0.9em;
-                margin: 5px 0;
-            }
-            #game {
-                gap: 20px;
-                flex-direction: column;
-            }
-            #shapes, #holes {
-                gap: 15px;
-                padding: 15px;
-                justify-content: center;
-            }
-            .shape {
-                width: 70px;
-                height: 70px;
-            }
-            .hole {
-                width: 90px;
-                height: 90px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Square Hole – now with sound 😈</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;700&display=swap');
+
+    body {
+      font-family: 'Comic Neue', cursive, sans-serif;
+      background: linear-gradient(45deg, #ffdd99, #99ccff);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: bgWiggle 12s infinite alternate;
+      touch-action: manipulation;
+    }
+
+    @keyframes bgWiggle {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    header {
+      text-align: center;
+      padding: 1rem;
+      width: 90%;
+      max-width: 900px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    h1 { margin: 0.4em 0 0.1em; font-size: clamp(1.8rem, 7vw, 3.2rem); }
+    .subtitle { margin: 0; font-size: clamp(1rem, 4vw, 1.4rem); opacity: 0.9; }
+
+    .tabs {
+      display: flex;
+      gap: 0.6rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.4rem;
+      font-size: 1.05rem;
+      background: rgba(255,255,255,0.5);
+      border: none;
+      border-radius: 10px 10px 0 0;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: white;
+      font-weight: bold;
+    }
+
+    .tab-content {
+      width: 92%;
+      max-width: 820px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 2rem;
+      display: none;
+    }
+
+    .tab-content.active { display: block; }
+
+    #game {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #shapes, #holes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      padding: 1.4rem;
+      border-radius: 12px;
+    }
+
+    #shapes {
+      border: 3px dashed #666;
+      background: rgba(255,255,255,0.18);
+    }
+
+    .shape, .hole {
+      width: 90px;
+      height: 90px;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .shape {
+      transition: transform 0.12s ease-out;
+    }
+
+    .shape.dragging,
+    .hole.dragging-hole {
+      transform: scale(1.18) rotate(5deg);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.38);
+      opacity: 0.86;
+      z-index: 999;
+    }
+
+    .circle    { clip-path: circle(50% at 50% 50%);   background: #c62828; }
+    .triangle  { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: #1565c0; }
+    .pentagon  { clip-path: polygon(50% 0%, 0% 38%, 19% 100%, 81% 100%, 100% 38%); background: #f9a825; }
+    .hexagon   { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); background: #2e7d32; }
+    .star      { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: #8e24aa; }
+    .diamond   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); background: teal; }
+
+    .hole {
+      background: rgba(0,0,0,0.08);
+      border-radius: 12px;
+    }
+
+    .square-hole { background: rgba(50,50,50,0.16); }
+
+    .hole.reject {
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    #stats, #message {
+      text-align: center;
+      margin: 1rem 0;
+      font-size: 1.25rem;
+      color: #111;
+    }
+
+    #achievement-popup {
+      position: fixed;
+      inset: 50% auto auto 50%;
+      translate: -50% -50%;
+      background: linear-gradient(135deg, #ffeb3b, #ffd54f);
+      border: 5px solid #ff4081;
+      border-radius: 24px;
+      padding: 2rem 1.8rem;
+      text-align: center;
+      z-index: 10001;
+      box-shadow: 0 0 50px rgba(255,64,129,0.6);
+      display: none;
+      cursor: grab;
+      user-select: none;
+      max-width: 90%;
+    }
+
+    #achievement-popup.show { display: block; }
+  </style>
 </head>
 <body>
-    <h1>It Goes In The Square Hole</h1>
-    <p>Drag a shape — you can just hover over the <strong>shape</strong> hole and it'll automatically fit!</p>
-    <p class="instruction">(good luck)</p>
-    <div id="message" style="min-height:1.2em; color:#333; margin-bottom:10px;"></div>
-    <div id="achievement-popup">
-        <div class="trophy">🏆</div>
-        <h2>ACHIEVEMENT UNLOCKED!</h2>
-        <p>this achievement goes in the square hole</p>
-        <p style="font-size: 1em; margin-top: 15px;">50 shapes successfully placed!</p>
+
+<header id="drag-header">
+  <h1>It Goes In The Square Hole</h1>
+  <p class="subtitle">Now with authentic sound on correct drop (phone + PC)</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="game">Game</button>
+  <button class="tab-btn" data-tab="achievements">Achievements</button>
+</div>
+
+<div id="game-tab" class="tab-content active">
+  <div id="stats">
+    Squared: <strong id="placed-count">0</strong>  
+    Wrong: <strong id="wrong-count">0</strong>
+  </div>
+  <div id="message"></div>
+
+  <div id="game">
+    <div id="shapes"></div>
+    <div id="holes">
+      <div class="hole square-hole" data-type="square"></div>
     </div>
-    <div id="game">
-        <div id="shapes" aria-label="shape palette">
-            <!-- shapes will be created by JavaScript -->
-        </div>
-        <div id="holes" aria-label="holes for shapes">
-            <!-- square hole stays constant -->
-            <div class="hole square-hole" data-type="square"></div>
-        </div>
-    </div>
-    <script>
-        const shapeTypes = ['circle','triangle','pentagon','hexagon','star','diamond'];
-        const holeTypes = ['circle','triangle','pentagon','hexagon','star'];
-        const shapesContainer = document.getElementById('shapes');
-        const holesContainer = document.getElementById('holes');
-        let holes = [];
-        let shapesPlaced = 0; // track shapes placed in square hole
+  </div>
+</div>
 
-        function makeShape(type) {
-            const div = document.createElement('div');
-            div.className = 'shape ' + type;
-            div.id = 'shape-' + type + '-' + Date.now() + '-' + Math.floor(Math.random()*1000);
-            div.draggable = true;
-            attachDragHandlers(div);
-            return div;
-        }
+<div id="achievements-tab" class="tab-content">
+  <h2>Achievements</h2>
+  <div id="achievements-list"></div>
+</div>
 
-        function recordShapePlaced() {
-            shapesPlaced++;
-            if (shapesPlaced == 50) {
-                showAchievement();
-            }
-        }
+<audio id="square-sound" preload="auto">
+  <source src="https://assets.codepen.io/605876/it-goes-in-the-square-hole.mp3" type="audio/mpeg">
+</audio>
 
-        function showAchievement() {
-            const popup = document.getElementById('achievement-popup');
-            popup.classList.add('show');
-            setTimeout(() => {
-                popup.classList.remove('show');
-            }, 4000);
-        }
+<script>
+// ───────────────────────────────────────────────
+//   Variables
+// ───────────────────────────────────────────────
 
-        let touchingShape = null;
-        let touchOffsetX = 0;
-        let touchOffsetY = 0;
-        let touchClone = null;
+const squareSound = document.getElementById('square-sound');
 
-        function attachDragHandlers(shape) {
-            shape.addEventListener('dragstart', ev => {
-                ev.dataTransfer.setData('text/plain', shape.id);
-                shape.classList.add('dragging');
-            });
-            shape.addEventListener('dragend', ev => {
-                shape.classList.remove('dragging');
-            });
+const shapeTypes = ['circle','triangle','pentagon','hexagon','star','diamond'];
+const holeTypes  = ['circle','triangle','pentagon','hexagon','star'];
 
-            // Touch handlers for mobile
-            shape.addEventListener('touchstart', ev => {
-                touchingShape = shape;
-                const touch = ev.touches[0];
-                const rect = shape.getBoundingClientRect();
-                touchOffsetX = touch.clientX - rect.left;
-                touchOffsetY = touch.clientY - rect.top;
-                
-                // Create a visual clone for dragging
-                touchClone = shape.cloneNode(true);
-                touchClone.style.position = 'fixed';
-                touchClone.style.opacity = '0.7';
-                touchClone.style.pointerEvents = 'none';
-                touchClone.style.zIndex = '10000';
-                document.body.appendChild(touchClone);
-            });
+const shapesEl   = document.getElementById('shapes');
+const holesEl    = document.getElementById('holes');
+const msgEl      = document.getElementById('message');
+const placedEl   = document.getElementById('placed-count');
+const wrongEl    = document.getElementById('wrong-count');
 
-            shape.addEventListener('touchmove', ev => {
-                if (touchingShape && touchClone) {
-                    const touch = ev.touches[0];
-                    touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
-                    touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
-                }
-            });
+let placed = 0;
+let wrongs = 0;
 
-            shape.addEventListener('touchend', ev => {
-                if (touchClone) {
-                    touchClone.remove();
-                    touchClone = null;
-                }
-                
-                if (touchingShape) {
-                    const touch = ev.changedTouches[0];
-                    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                    const hole = element?.closest('.hole');
-                    
-                    if (hole) {
-                        const msg = document.getElementById('message');
-                        if (hole.dataset.type === 'square') {
-                            hole.appendChild(touchingShape);
-                            touchingShape.draggable = false;
-                            touchingShape.style.cursor = 'default';
-                            touchingShape.style.visibility = 'hidden';
-                            msg.textContent = '✅ Thats right! It goes in the square hole!';
-                            recordShapePlaced();
-                            checkAndRefill();
-                        } else {
-                            hole.classList.add('reject');
-                            setTimeout(() => hole.classList.remove('reject'), 300);
-                            msg.textContent = '❌ Nope, try again!';
-                            setTimeout(() => msg.textContent = '', 1500);
-                        }
-                    }
-                    touchingShape = null;
-                }
-            });
-        }
+// ───────────────────────────────────────────────
+//   Create & drag shape (PC + touch)
+// ───────────────────────────────────────────────
 
-        function populateShapes(count=5) {
-            // clear any shapes currently in the palette (hidden or not)
-            shapesContainer.innerHTML = '';
-            for (let i=0;i<count;i++) {
-                const type = shapeTypes[Math.floor(Math.random()*shapeTypes.length)];
-                shapesContainer.appendChild(makeShape(type));
-            }
-        }
+function createShape(type) {
+  const div = document.createElement('div');
+  div.className = `shape ${type}`;
+  div.dataset.type = type;
 
-        // start with initial shapes and holes
-        populateShapes();
-        populateHoles();
+  // PC drag
+  div.draggable = true;
+  div.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', type);
+    div.classList.add('dragging');
+  });
+  div.addEventListener('dragend', () => div.classList.remove('dragging'));
 
-        function attachHoleHandlers(hole) {
-            hole.addEventListener('dragover', ev => {
-                ev.preventDefault();
-                // if this is the square hole, accept immediately on hover
-                if (hole.dataset.type === 'square') {
-                    const id = ev.dataTransfer.getData('text/plain');
-                    const dragged = document.getElementById(id);
-                    if (dragged && dragged.draggable) {
-                        // perform same logic as drop
-                        hole.appendChild(dragged);
-                        dragged.draggable = false;
-                        dragged.style.cursor = 'default';
-                        dragged.style.visibility = 'hidden';
-                        const msg = document.getElementById('message');
-                        msg.textContent = '✅ Thats right! It goes in the square hole!';
-                        recordShapePlaced();
-                        checkAndRefill();
-                    }
-                }
-            });
-            hole.addEventListener('drop', ev => {
-                ev.preventDefault();
-                const id = ev.dataTransfer.getData('text/plain');
-                const dragged = document.getElementById(id);
-                const msg = document.getElementById('message');
-                if (!dragged) return; // safety
-                if (hole.dataset.type === 'square') {
-                    // normal drop handler (might duplicate auto-drop but safe)
-                    hole.appendChild(dragged);
-                    dragged.draggable = false;
-                    dragged.style.cursor = 'default';
-                    dragged.style.visibility = 'hidden';
-                    msg.textContent = '✅ Thats right! It goes in the square hole!';
-                    recordShapePlaced();
-                    checkAndRefill();
-                } else {
-                    hole.classList.add('reject');
-                    setTimeout(() => hole.classList.remove('reject'), 300);
-                    msg.textContent = '❌ Nope, try again!';
-                    setTimeout(() => msg.textContent = '', 1500);
-                    // move shape back to the palette so it doesn't get stuck
-                    shapesContainer.appendChild(dragged);
-                }
-            });
-        }
-        // attach to existing square hole
-        holes = Array.from(holesContainer.querySelectorAll('.hole'));
-        holes.forEach(attachHoleHandlers);
+  // Touch drag with ghost
+  div.addEventListener('touchstart', e => {
+    e.stopPropagation();
+    const touch = e.touches[0];
+    const rect = div.getBoundingClientRect();
 
-        function checkAndRefill() {
-            // if no draggable shapes remain, spawn new batch
-            const remaining = shapesContainer.querySelectorAll('.shape[draggable="true"]');
-            if (remaining.length === 0) {
-                const msg = document.getElementById('message');
-                msg.textContent = '🔁 New shapes incoming...';
-                setTimeout(() => { msg.textContent = ''; populateShapes(); populateHoles(); }, 1000);
-            }
-        }
-        
-        function populateHoles() {
-            // empty out holes container except square; remove any shapes inside holes
-            holesContainer.querySelectorAll('.hole').forEach(h => {
-                // remove all shape children regardless of hole type
-                Array.from(h.children).forEach(child => {
-                    if (child.classList.contains('shape')) {
-                        child.remove();
-                    }
-                });
-                if (h.dataset.type !== 'square') {
-                    h.remove();
-                }
-            });
-            // shuffle a copy of holeTypes for the non-square holes
-            const types = holeTypes.slice();
-            for (let i = types.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [types[i], types[j]] = [types[j], types[i]];
-            }
-            // add five holes in random order
-            types.forEach(type => {
-                const div = document.createElement('div');
-                div.className = 'hole ' + type + '-hole';
-                div.dataset.type = type;
-                attachHoleHandlers(div);
-                holesContainer.appendChild(div);
-            });
-            // refresh holes array
-            holes = Array.from(holesContainer.querySelectorAll('.hole'));
-        }
-    </script>
-    <div class="footer" style="margin:20px; text-align:center; font-size:0.9em; color:#000;">
-        <p>It belongs in the square Hole</p>
-    </div>
+    const clone = div.cloneNode(true);
+    clone.style.position = 'fixed';
+    clone.style.left = `${touch.clientX - rect.width / 2}px`;
+    clone.style.top  = `${touch.clientY - rect.height / 2}px`;
+    clone.style.opacity = '0.78';
+    clone.style.pointerEvents = 'none';
+    clone.style.zIndex = '9999';
+    document.body.appendChild(clone);
+
+    div._touchClone = clone;
+    div._touchOffsetX = touch.clientX - rect.left;
+    div._touchOffsetY = touch.clientY - rect.top;
+  }, {passive: false});
+
+  div.addEventListener('touchmove', e => {
+    if (!div._touchClone) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    div._touchClone.style.left = `${touch.clientX - div._touchOffsetX}px`;
+    div._touchClone.style.top  = `${touch.clientY - div._touchOffsetY}px`;
+  }, {passive: false});
+
+  div.addEventListener('touchend', e => {
+    if (div._touchClone) {
+      div._touchClone.remove();
+      delete div._touchClone;
+    }
+
+    const touch = e.changedTouches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const hole = el?.closest('.hole');
+
+    handleDrop(hole, div);
+  });
+
+  return div;
+}
+
+function handleDrop(hole, shapeElement) {
+  if (!hole) return;
+
+  if (hole.dataset.type === 'square') {
+    placed++;
+    placedEl.textContent = placed;
+    msgEl.textContent = `✅ It goes in the square hole! (${placed})`;
+    squareSound.currentTime = 0;
+    squareSound.play().catch(() => {}); // autoplay policy safe-guard
+    setTimeout(() => msgEl.textContent = '', 2200);
+  } else {
+    wrongs++;
+    wrongEl.textContent = wrongs;
+    hole.classList.add('reject');
+    setTimeout(() => hole.classList.remove('reject'), 450);
+    msgEl.textContent = "❌ Nope — square hole only";
+    setTimeout(() => msgEl.textContent = '', 1800);
+  }
+}
+
+// ───────────────────────────────────────────────
+//   Square hole accepts PC drops
+// ───────────────────────────────────────────────
+
+const squareHole = document.querySelector('.square-hole');
+
+squareHole.addEventListener('dragover', e => e.preventDefault());
+
+squareHole.addEventListener('drop', e => {
+  e.preventDefault();
+  const type = e.dataTransfer.getData('text/plain');
+  if (type && shapeTypes.includes(type)) {
+    placed++;
+    placedEl.textContent = placed;
+    msgEl.textContent = `✅ It goes in the square hole! (${placed})`;
+    squareSound.currentTime = 0;
+    squareSound.play().catch(() => {});
+    setTimeout(() => msgEl.textContent = '', 2200);
+  }
+});
+
+// ───────────────────────────────────────────────
+//   Populate initial shapes
+// ───────────────────────────────────────────────
+
+function populateShapes(count = 5) {
+  shapesEl.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+    shapesEl.appendChild(createShape(type));
+  }
+}
+
+populateShapes();
+
+// Optional: auto-refill when empty
+setInterval(() => {
+  if (shapesEl.children.length === 0) {
+    populateShapes(4);
+    msgEl.textContent = "New shapes arrived...";
+    setTimeout(() => msgEl.textContent = '', 1800);
+  }
+}, 6000);
+</script>
 </body>
 </html>
