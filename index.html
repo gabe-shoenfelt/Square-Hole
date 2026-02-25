@@ -19,28 +19,11 @@
         h1 {
             margin: 20px 0;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 20px;
-            width: 90vw;
-            max-width: 800px;
-        }
-        .cell:hover { transform: rotate(15deg) scale(1.1); }
-        .cell { transition: transform 0.3s; }
         @keyframes wiggleBg { 0% {background: #ffdd99;} 100% {background: #99ccff;} }
-        .cell {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border: 4px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .shape {
             width: 80px;
             height: 80px;
+            cursor: grab;
         }
         /* shapes using clip-path */
         .circle { clip-path: circle(50% at 50% 50%); background: crimson; }
@@ -49,37 +32,77 @@
         .hexagon { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); background: mediumseagreen; }
         .star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: violet; }
         .diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); background: teal; }
+        /* game-specific styles */
+        #game { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+        #shapes { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; border: 2px dashed #666; }
+        #holes { display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; }
+        .hole { width: 100px; height: 100px; border: 3px dashed #333; display: flex; align-items: center; justify-content: center; }
+        .hole.reject { animation: shake 0.3s; }
+        @keyframes shake { 0% { transform: translateX(0);} 25% {transform: translateX(-5px);} 50% {transform: translateX(5px);} 75% {transform: translateX(-5px);} 100% {transform: translateX(0);} }
     </style>
 </head>
 <body>
-    <h1>Square Hole (??? edition)</h1>
-    <p>🤣 <em>Meme logic says "it goes in the square hole" — so here&rsquo;s every shape jammed into a square anyway!</em></p>
-    <p>💩 Made by a professional clown (not legally binding)</p>
-    <div class="grid">
-        <!-- warning: shapes may be silly -->
-        <div class="cell"><div class="shape circle"></div></div>
-        <div class="cell"><div class="shape triangle"></div></div>
-        <div class="cell"><div class="shape pentagon"></div></div>
-        <div class="cell"><div class="shape hexagon"></div></div>
-        <div class="cell"><div class="shape star"></div></div>
-        <div class="cell"><div class="shape diamond"></div></div>
-        <div class="cell"><marquee>THIS IS NOT A DRILL</marquee></div>
-        <!-- repeat some shapes to fill grid -->
-        <div class="cell"><div class="shape circle"></div></div>
-        <div class="cell"><div class="shape triangle"></div></div>
-        <div class="cell"><div class="shape pentagon"></div></div>
+    <h1>It Goes In The Square Hole</h1>
+    <p>Drag a shape and drop it into a hole.</p>
+    <p class="instruction">(Good Luck)</p>
+    <div id="message" style="min-height:1.2em; color:#333; margin-bottom:10px;"></div>
+    <div id="game">
+        <div id="shapes" aria-label="shape palette">
+            <div class="shape circle" draggable="true" id="shape-circle"></div>
+            <div class="shape triangle" draggable="true" id="shape-triangle"></div>
+            <div class="shape pentagon" draggable="true" id="shape-pentagon"></div>
+            <div class="shape hexagon" draggable="true" id="shape-hexagon"></div>
+            <div class="shape star" draggable="true" id="shape-star"></div>
+            <div class="shape diamond" draggable="true" id="shape-diamond"></div>
+        </div>
+        <div id="holes" aria-label="holes for shapes">
+            <div class="hole circle-hole" data-type="circle"></div>
+            <div class="hole triangle-hole" data-type="triangle"></div>
+            <div class="hole pentagon-hole" data-type="pentagon"></div>
+            <div class="hole hexagon-hole" data-type="hexagon"></div>
+            <div class="hole star-hole" data-type="star"></div>
+            <div class="hole square-hole" data-type="square">⬜</div>
+        </div>
     </div>
     <script>
-        // randomises cell colors every second for chaos
-        setInterval(() => {
-            document.querySelectorAll('.cell .shape').forEach(el => {
-                el.style.filter = 'hue-rotate(' + Math.floor(Math.random()*360) + 'deg)';
+        const shapes = document.querySelectorAll('#shapes .shape');
+        const holes = document.querySelectorAll('#holes .hole');
+
+        shapes.forEach(shape => {
+            shape.addEventListener('dragstart', ev => {
+                ev.dataTransfer.setData('text/plain', shape.id);
+                shape.classList.add('dragging');
             });
-        }, 1000);
+            shape.addEventListener('dragend', ev => {
+                shape.classList.remove('dragging');
+            });
+        });
+
+        holes.forEach(hole => {
+            hole.addEventListener('dragover', ev => {
+                ev.preventDefault();
+            });
+            hole.addEventListener('drop', ev => {
+                ev.preventDefault();
+                const id = ev.dataTransfer.getData('text/plain');
+                const dragged = document.getElementById(id);
+                const msg = document.getElementById('message');
+                if (hole.dataset.type === 'square') {
+                    hole.appendChild(dragged);
+                    dragged.draggable = false;
+                    dragged.style.cursor = 'default';
+                    msg.textContent = '✅ Thats right! It goesin the square hole!';
+                } else {
+                    hole.classList.add('reject');
+                    setTimeout(() => hole.classList.remove('reject'), 300);
+                    msg.textContent = '❌ Nope, try again!';
+                    setTimeout(() => msg.textContent = '', 1500);
+                }
+            });
+        });
     </script>
-    <footer style="margin:20px; text-align:center; font-size:0.9em; color:#666;">
-        <p>🧠 Meme logic: <strong>"it goes in the square hole" — and now it does, for real.</strong></p>
-        <p>(a literal take on the viral caption)</p>
+    <footer style="margin:20px; text-align:center; font-size:0.9em; color:#000;">
+        <p>It belongs in the square Hole</p>
     </footer>
 </body>
 </html>
