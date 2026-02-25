@@ -118,7 +118,7 @@
 
 <header id="drag-header">
   <h1>It Goes In The Square Hole</h1>
-  <p>Drag shapes, holes, header, achievements tab — only square wins</p>
+  <p>Drag shapes — into their hole </p>
 </header>
 
 <div class="tabs">
@@ -172,15 +172,14 @@
   let unlocked = new Set();
 
   const achievements = [
-    {id:'10', name:"10 Squares – Baby Steps", desc:"You placed 10 shapes. Gold star for effort.", check:()=>placed>=10},
+    {id:'10', name:"10 Squares – Baby Steps", desc:"You placed 10 shapes.", check:()=>placed>=10},
     {id:'50', name:"50 Squares – Getting Serious", desc:"50 shapes. This is now a lifestyle.", check:()=>placed>=50},
-    {id:'100', name:"100 Squares – Square Obsession", desc:"100 shapes. The square lives rent-free in your head.", check:()=>placed>=100},
-    {id:'500', name:"500 Squares – Halfway to Madness", desc:"500 shapes. No return ticket.", check:()=>placed>=500},
-    {id:'1000', name:"1000 Squares – Why Though?", desc:"1000 shapes. No one asked. No one will thank you.", check:()=>placed>=1000},
-    {id:'idle2m', name:"Pro Procrastinator", desc:"2 minutes idle. Peak performance.", check:()=>false},
-    {id:'title-square', name:"Title Goes In The Square Hole", desc:"You dragged the header into the square. Iconic.", check:()=>false},
-    {id:'ach-tab-square', name:"Achievements Go In The Square Hole Too", desc:"Dragged the achievements tab into the square. Maximum meta.", check:()=>false},
-    {id:'hole-square', name:"Hole-ception", desc:"Fake hole in real hole. Physics.exe has stopped.", check:()=>false}
+    {id:'100', name:"100 Squares – Square Obsession", desc:"100 shapes.", check:()=>placed>=100},
+    {id:'500', name:"500 Squares – Halfway to Madness", desc:"500 shapes.", check:()=>placed>=500},
+    {id:'1000', name:"1000 Squares – Why Though?", desc:"1000 shapes.", check:()=>placed>=1000},
+    {id:'title-square', name:"Title Goes In The Square Hole", desc:"You dragged the title into the square.", check:()=>false},
+    {id:'ach-tab-square', name:"Achievements Go In The Square Hole Too", desc:"You dragged the achievements tab into the square.", check:()=>false},
+    {id:'hole-square', name:"Hole-ception", desc:"You dragged a wrong hole into the square.", check:()=>false}
   ];
 
   function unlock(ach) {
@@ -195,16 +194,14 @@
   }
 
   function checkAchievements() {
-    achievements.forEach(a => {
-      if (a.check && a.check()) unlock(a);
-    });
+    achievements.forEach(a => { if (a.check && a.check()) unlock(a); });
   }
 
   function renderAchievements() {
     achList.innerHTML = '';
     achievements.forEach(a => {
       const div = document.createElement('div');
-      div.style.padding = '10px';
+      div.style.padding = '12px';
       div.style.margin = '10px 0';
       div.style.border = '2px solid #ccc';
       div.style.borderRadius = '8px';
@@ -225,13 +222,9 @@
     });
   });
 
-  // Draggable header + achievements tab (snap back + achievement)
-  const header = document.getElementById('drag-header');
-  const achTab = document.getElementById('achievements-tab');
-
-  [header, achTab].forEach(el => {
+  // Draggable header and achievements tab
+  function makeDraggable(el, achId) {
     let dragging = false, offsetX, offsetY, origLeft, origTop;
-    const achId = el === header ? 'title-square' : 'ach-tab-square';
 
     el.addEventListener('mousedown', e => {
       if (e.target.closest('button')) return;
@@ -245,7 +238,7 @@
       el.style.left = rect.left + 'px';
       el.style.top = rect.top + 'px';
       el.style.width = rect.width + 'px';
-      el.classList.add(el === header ? 'dragging-header' : 'dragging-tab');
+      el.classList.add(el === document.getElementById('drag-header') ? 'dragging-header' : 'dragging-tab');
       e.preventDefault();
     });
 
@@ -267,12 +260,12 @@
         elRect.top + elRect.height/2 - (sqRect.top + sqRect.height/2)
       );
 
-      if (dist < 140) {
+      if (dist < 140 && achId) {
         const ach = achievements.find(a => a.id === achId);
         if (ach) {
           ach.check = () => true;
           checkAchievements();
-          msgEl.textContent = `The ${el === header ? 'header' : 'achievements tab'} went in the square hole. Chaos achieved.`;
+          msgEl.textContent = `The ${el === document.getElementById('drag-header') ? 'title' : 'achievements tab'} went in the square hole.`;
           setTimeout(() => msgEl.textContent = '', 4000);
         }
       }
@@ -288,7 +281,10 @@
         el.style.transition = '';
       }, 650);
     });
-  });
+  }
+
+  makeDraggable(document.getElementById('drag-header'), 'title-square');
+  makeDraggable(document.getElementById('achievements-tab'), 'ach-tab-square');
 
   // Shape creation + drag (mouse + touch)
   function createShape(type) {
@@ -346,7 +342,7 @@
           wrongEl.textContent = wrongs;
           hole.classList.add('reject');
           setTimeout(() => hole.classList.remove('reject'), 400);
-          msgEl.textContent = "❌ Wrong hole!";
+          msgEl.textContent = "❌ Nope — only the square hole";
           setTimeout(() => msgEl.textContent = '', 2000);
           shapesEl.appendChild(div); // return to palette
         }
@@ -364,17 +360,29 @@
     }
   }
 
+  function populateHoles() {
+    holesEl.innerHTML = '<div class="hole square-hole" data-type="square"></div>';
+    const shuffled = [...holeTypes].sort(() => Math.random() - 0.5);
+    shuffled.forEach(type => {
+      const h = document.createElement('div');
+      h.className = `hole ${type}-hole`;
+      h.dataset.type = type;
+      holesEl.appendChild(h);
+    });
+  }
+
   function checkRefill() {
     if (shapesEl.children.length === 0) {
-      msgEl.textContent = "New batch of 5 shapes incoming...";
+      msgEl.textContent = "New 5 shapes incoming...";
       setTimeout(() => {
         msgEl.textContent = '';
         populateShapes(5);
+        populateHoles();
       }, 1200);
     }
   }
 
-  // Start with 5 shapes + holes
+  // Start
   populateShapes(5);
   populateHoles();
   renderAchievements();
