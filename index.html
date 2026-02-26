@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Square Hole – Cycle Edition</title>
-
+<title>Square Hole – Shape Match Edition</title>
 <style>
 body{
   font-family:Arial,sans-serif;
@@ -38,6 +37,7 @@ header{text-align:center;padding:15px;cursor:grab;}
 }
 .tab-content.active{display:block;}
 #game{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;}
+#shapes,#holes{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
 .shape,.hole{
   width:90px;height:90px;
   cursor:grab;
@@ -49,32 +49,22 @@ header{text-align:center;padding:15px;cursor:grab;}
 .hexagon{clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);background:mediumseagreen;}
 .star{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:violet;}
 .square-hole{border:4px solid #333;background:#ddd;}
-
+.circle-hole{clip-path:circle(50%);border:2px dashed #333;background:#eee;}
+.triangle-hole{clip-path:polygon(50% 0%,0% 100%,100% 100%);border:2px dashed #333;background:#eee;}
+.pentagon-hole{clip-path:polygon(50% 0%,0% 38%,19% 100%,81% 100%,100% 38%);border:2px dashed #333;background:#eee;}
+.hexagon-hole{clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);border:2px dashed #333;background:#eee;}
+.star-hole{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);border:2px dashed #333;background:#eee;}
 .ach-item{padding:8px;margin:4px 0;background:#eee;border-radius:6px;opacity:.5;}
 .ach-item.unlocked{opacity:1;border-left:4px solid gold;}
-
-#achievement-popup{
-  position:fixed;top:20px;right:20px;
-  background:gold;padding:15px;display:none;
-}
+#achievement-popup{position:fixed;top:20px;right:20px;background:gold;padding:15px;display:none;}
 #achievement-popup.show{display:block;}
-
-#fake-toast{
-  position:fixed;bottom:20px;left:50%;
-  transform:translateX(-50%);
-  background:#222;color:white;
-  padding:12px 20px;border-radius:8px;
-  display:none;z-index:9999;
-}
 </style>
 </head>
 <body>
 
 <header id="main-title" data-draggable="true">
 <h1>It Goes In The Square Hole</h1>
-<p id="judgement-text" data-draggable="true">
-Everything fits... if you believe.
-</p>
+<p id="judgement-text" data-draggable="true">Everything fits... if you believe.</p>
 </header>
 
 <div class="tabs">
@@ -92,6 +82,11 @@ Placed: <strong id="count">0</strong>
 <div id="shapes"></div>
 <div id="holes">
 <div class="hole square-hole" id="main-square"></div>
+<div class="hole circle-hole" id="h-circle"></div>
+<div class="hole triangle-hole" id="h-triangle"></div>
+<div class="hole pentagon-hole" id="h-pentagon"></div>
+<div class="hole hexagon-hole" id="h-hexagon"></div>
+<div class="hole star-hole" id="h-star"></div>
 </div>
 </div>
 </div>
@@ -115,14 +110,10 @@ Placed: <strong id="count">0</strong>
 <div id="pop-name"></div>
 </div>
 
-<div id="fake-toast" data-draggable="true"></div>
-
 <script>
 let placed=parseInt(localStorage.getItem('placed')||0);
 let unlocked=new Set(JSON.parse(localStorage.getItem('unlocked')||'[]'));
 let idleTime=parseInt(localStorage.getItem('idle')||0);
-let dropTimes=[];
-let dragged=null,offsetX=0,offsetY=0;
 
 const shapeTypes=["circle","triangle","pentagon","hexagon","star"];
 let usedShapes=new Set();
@@ -130,7 +121,7 @@ let usedShapes=new Set();
 function spawnShapes(){
   const container=document.getElementById("shapes");
   container.innerHTML="";
-  shapeTypes.forEach((type,i)=>{
+  shapeTypes.forEach((type)=>{
     const div=document.createElement("div");
     div.className="shape "+type;
     div.id="shape-"+type;
@@ -142,9 +133,9 @@ function spawnShapes(){
 spawnShapes();
 
 function save(){
-localStorage.setItem('placed',placed);
-localStorage.setItem('unlocked',JSON.stringify([...unlocked]));
-localStorage.setItem('idle',idleTime);
+  localStorage.setItem('placed',placed);
+  localStorage.setItem('unlocked',JSON.stringify([...unlocked]));
+  localStorage.setItem('idle',idleTime);
 }
 
 setInterval(()=>{idleTime+=1000;save();checkAchievements();},1000);
@@ -166,92 +157,103 @@ const achievements=[
 ];
 
 function unlock(id){
-if(unlocked.has(id))return;
-unlocked.add(id);save();
-let a=achievements.find(x=>x.id===id);
-let el=document.getElementById("ach-"+id);
-if(el)el.classList.add("unlocked");
-document.getElementById("pop-name").innerHTML="<b>"+a.name+"</b><br>"+a.desc;
-document.getElementById("achievement-popup").classList.add("show");
-setTimeout(()=>document.getElementById("achievement-popup").classList.remove("show"),3000);
-if(id==='1000000'){
-setTimeout(()=>{placed=0;unlock('again');save();updateCount();},2500);
-}
+  if(unlocked.has(id))return;
+  unlocked.add(id);
+  save();
+  const a=achievements.find(x=>x.id===id);
+  const el=document.getElementById("ach-"+id);
+  if(el)el.classList.add("unlocked");
+  document.getElementById("pop-name").innerHTML="<b>"+a.name+"</b><br>"+a.desc;
+  document.getElementById("achievement-popup").classList.add("show");
+  setTimeout(()=>document.getElementById("achievement-popup").classList.remove("show"),3000);
+  if(id==='1000000'){
+    setTimeout(()=>{
+      placed=0;
+      usedShapes.clear();
+      spawnShapes();
+      unlock('again');
+      save();
+      updateCount();
+    },2500);
+  }
 }
 
-function checkAchievements(){
-achievements.forEach(a=>{if(!unlocked.has(a.id)&&a.check())unlock(a.id);});
-}
-
+function checkAchievements(){achievements.forEach(a=>{if(!unlocked.has(a.id)&&a.check())unlock(a.id);});}
 function updateCount(){document.getElementById("count").textContent=placed;}
 
+// Drag & drop
+let dragged=null,offsetX=0,offsetY=0;
+
 document.addEventListener("pointerdown",e=>{
-let d=e.target.closest("[data-draggable='true']");
-if(!d)return;
-dragged=d;
-let r=d.getBoundingClientRect();
-offsetX=e.clientX-r.left;
-offsetY=e.clientY-r.top;
-d.style.position="fixed";
-d.style.zIndex=9999;
+  let d=e.target.closest("[data-draggable='true']");
+  if(!d)return;
+  dragged=d;
+  const r=d.getBoundingClientRect();
+  offsetX=e.clientX-r.left;
+  offsetY=e.clientY-r.top;
+  d.style.position="fixed";
+  d.style.zIndex=9999;
 });
 
 document.addEventListener("pointermove",e=>{
-if(!dragged)return;
-dragged.style.left=(e.clientX-offsetX)+"px";
-dragged.style.top=(e.clientY-offsetY)+"px";
+  if(!dragged)return;
+  dragged.style.left=(e.clientX-offsetX)+"px";
+  dragged.style.top=(e.clientY-offsetY)+"px";
 });
 
 document.addEventListener("pointerup",e=>{
-if(!dragged)return;
-let drop=document.elementFromPoint(e.clientX,e.clientY);
-if(drop&&drop.closest(".square-hole")){
-if(dragged.classList.contains("shape")){
-  const type=dragged.dataset.type;
-  if(!usedShapes.has(type)){
-    usedShapes.add(type);
-    dragged.remove();
-    placed++;
-    updateCount();
-    checkAchievements();
-    save();
+  if(!dragged)return;
+  const drop=document.elementFromPoint(e.clientX,e.clientY);
+  if(drop && drop.closest(".square-hole, .circle-hole, .triangle-hole, .pentagon-hole, .hexagon-hole, .star-hole")){
+    const dropHole=drop.closest(".square-hole, .circle-hole, .triangle-hole, .pentagon-hole, .hexagon-hole, .star-hole");
+    const type=dragged.dataset.type;
+    let valid=false;
+    if(dropHole.id==='main-square'){valid=true;} // anything can go in square hole
+    else if(dropHole.id==='h-'+type){valid=true;} // must match
+    if(valid && dragged.classList.contains("shape")){
+      if(!usedShapes.has(type)){
+        usedShapes.add(type);
+        dragged.remove();
+        placed++;
+        updateCount();
+        checkAchievements();
+        save();
+      }
+      if(usedShapes.size===5){
+        usedShapes.clear();
+        spawnShapes();
+      }
+    }
+    if(dragged.id==="main-title")unlock("title-square");
+    if(dragged.id==="ach-tab-btn")unlock("ach-tab-square");
+    if(dragged.id==="judgement-text")unlock("judgement-square");
+    if(dragged.id==="patch-tab-btn")unlock("patch-square");
   }
-  if(usedShapes.size===5){
-    usedShapes.clear();
-    spawnShapes();
-  }
-}
-if(dragged.id==="main-title")unlock("title-square");
-if(dragged.id==="ach-tab-btn")unlock("ach-tab-square");
-if(dragged.id==="judgement-text")unlock("judgement-square");
-if(dragged.id==="patch-tab-btn")unlock("patch-square");
-if(dragged.id==="fake-toast")unlock("gaslight-square");
-}
-dragged.style.position="";
-dragged=null;
+  dragged.style.position="";
+  dragged=null;
 });
 
 document.querySelectorAll(".tab-btn").forEach(b=>{
-b.addEventListener("click",()=>{
-document.querySelectorAll(".tab-btn").forEach(x=>x.classList.remove("active"));
-document.querySelectorAll(".tab-content").forEach(x=>x.classList.remove("active"));
-b.classList.add("active");
-document.getElementById(b.dataset.tab+"-tab").classList.add("active");
-});
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".tab-btn").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    document.getElementById(b.dataset.tab+"-tab").classList.add("active");
+  });
 });
 
 function init(){
-updateCount();
-let list=document.getElementById("achievement-list");
-achievements.forEach(a=>{
-let div=document.createElement("div");
-div.id="ach-"+a.id;
-div.className="ach-item";
-div.innerHTML="<b>"+a.name+"</b><br>"+a.desc;
-if(unlocked.has(a.id))div.classList.add("unlocked");
-list.appendChild(div);
-});
-checkAchievements();
+  updateCount();
+  const list=document.getElementById("achievement-list");
+  achievements.forEach(a=>{
+    const div=document.createElement("div");
+    div.id="ach-"+a.id;
+    div.className="ach-item";
+    div.innerHTML="<b>"+a.name+"</b><br>"+a.desc;
+    if(unlocked.has(a.id))div.classList.add("unlocked");
+    list.appendChild(div);
+  });
+  checkAchievements();
 }
 init();
 </script>
