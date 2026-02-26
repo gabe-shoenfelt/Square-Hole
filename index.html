@@ -276,7 +276,7 @@ const achievements = [
   {id:'r300',  name:"300",                               desc:"THIS. IS. A SQUARE HOLE.",                                                                           check:()=>placed>=300},
   {id:'r365',  name:"One Shape Per Day (If You Did This Over A Year)", desc:"You didn't. But you could have. You chose to do it right now instead.",               check:()=>placed>=365},
   {id:'r400',  name:"Four Hundred Shapes",               desc:"Nobody is coming to stop you. That's the scariest part.",                                            check:()=>placed>=400},
-  {id:'r420',  name:"Blaze It",                          desc:"420 shapes. The square hole appreciates your commitment to the bit.",                                check:()=>placed>=420},
+  {id:'r420',  name:"Snoop",                          desc:"420 shapes. The square hole appreciates your commitment to the bit.",                                check:()=>placed>=420},
   {id:'r450',  name:"Almost 500",                        desc:"Getting close to something. What? Nobody knows.",                                                    check:()=>placed>=450},
   {id:'r555',  name:"Triple Fives",                      desc:"Patterns emerge. The mind seeks order. The square accepts everything.",                              check:()=>placed>=555},
   {id:'r600',  name:"Six Hundred",                       desc:"You have placed 600 shapes into a square hole. Read that sentence again.",                           check:()=>placed>=600},
@@ -302,7 +302,6 @@ const achievements = [
   {id:'r6000', name:"Six Thousand",                      desc:"6000. You have placed more shapes than there are named bones in the human body. Relevant? No. True? Yes.", check:()=>placed>=6000},
   {id:'r6969', name:"Nice Nice",                         desc:"6969. An achievement of pure vibes.",                                                                check:()=>placed>=6969},
   {id:'r7000', name:"Seven Thousand",                    desc:"7000 shapes. The square hole is your oldest relationship at this point.",                            check:()=>placed>=7000},
-  {id:'r7777', name:"Lucky Lucky Lucky Lucky",           desc:"Four sevens. An omen. Or just a number. Probably just a number.",                                    check:()=>placed>=7777},
   {id:'r8000', name:"Eight Thousand",                    desc:"8000 shapes. You've entered a realm where the numbers stop feeling real.",                           check:()=>placed>=8000},
   {id:'r8888', name:"Eights All The Way Down",           desc:"8888 is considered lucky in some cultures. This is not one of them.",                               check:()=>placed>=8888},
   {id:'r9000', name:"It's Over 9000",                    desc:"WHAT? NINE THOUSAND?! ...yes.",                                                                     check:()=>placed>=9000},
@@ -377,57 +376,6 @@ const achievements = [
   {id:'1000000',name:"One Million Squares",               desc:"You did it. Why?",                  check:()=>placed>=1000000},
   {id:'again',  name:"Again?",                            desc:"The counter reset.",                check:()=>false},
 // === ROAST ACHIEVEMENTS (500+) ===
-  {id:"p2", name:"Two Squares", desc:"You placed two. The journey has begun.", check:()=>placed>=2},
-  {id:"p5", name:"Five Squares \u2013 Warming Up", desc:"The square is warming up to you.", check:()=>placed>=5},
-  {id:"p15", name:"15 Squares", desc:"Not stopping at 10, huh.", check:()=>placed>=15},
-  {id:"p20", name:"20 Squares", desc:"A solid score. For a toddler.", check:()=>placed>=20},
-  {id:"p25", name:"Quarter Century", desc:"A quarter of a hundred. Congrats.", check:()=>placed>=25},
-  {id:"p30", name:"30 Squares", desc:"30 isn't as impressive as you think.", check:()=>placed>=30},
-  {id:"p40", name:"40 Squares", desc:"Getting there. Slowly. Very slowly.", check:()=>placed>=40},
-  {id:"p60", name:"60 Squares", desc:"You passed 50 and kept going. Mistake.", check:()=>placed>=60},
-  {id:"p69", name:"Nice.", desc:"Nice.", check:()=>placed>=69},
-  {id:"p70", name:"70 Squares", desc:"Nothing special about 70.", check:()=>placed>=70},
-  {id:"p75", name:"Three Quarters To 100", desc:"Three quarters of the way to 100. Fine.", check:()=>placed>=75},
-  {id:"p80", name:"80 Squares", desc:"80 squares. You have no hobbies.", check:()=>placed>=80},
-  {id:"p90", name:"90 Squares", desc:"So close to 100 you can taste the disappointment.", check:()=>placed>=90},
-  {id:"p111", name:"111 \u2013 Repdigit", desc:"Ooooh, fancy number. Still pointless.", check:()=>placed>=111},
-  {id:"p150", name:"150 Squares", desc:"One hundred and fifty. Half of three hundred. Useless.", check:()=>placed>=150},
-  {id:"p200", name:"200 Squares \u2013 Two Hundred", desc:"TWO HUNDRED SHAPES. Please go outside.", check:()=>placed>=200},
-  {id:"p250", name:"250 Squares", desc:"A quarter of a thousand. You're doing great, champ.", check:()=>placed>=250},
-  {id:"p300", name:"300 \u2013 THIS IS SPARTA", desc:"Three hundred. You are not Spartan. You are at a computer.", check:()=>placed>=300},
-  {id:"p350", name:"350 Squares", desc:"Halfway to 700. That's not a milestone. Why are we here.", check:()=>placed>=350},
-  {id:"p400", name:"400 Squares", desc:"Four hundred squares. Any regrets?", check:()=>placed>=400},
-  {id:"p420", name:"420 Squares", desc:"Blaze it. Into the square hole.", check:()=>placed>=420},
-  {id:"p450", name:"450 Squares", desc:"Nine-tenths of 500. The worst fraction.", check:()=>placed>=450},
-  {id:"p600", name:"600 Squares", desc:"Six hundred. Your fingers must be tired.", check:()=>placed>=600},
-  {id:"p666", name:"666 \u2013 The Number", desc:"The devil plays square hole.", check:()=>placed>=666},
-  {id:"p700", name:"700 Squares", desc:"Seven hundred. The hole is satisfied. You are not.", check:()=>placed>=700},
-  {id:"p750", name:"750 \u2013 Three Quarters Thousand", desc:"Three quarters of a thousand. It means nothing.", check:()=>placed>=750},
-  {id:"p800", name:"800 Squares", desc:"Eight hundred shapes sacrificed to the square.", check:()=>placed>=800},
-  {id:"p900", name:"900 Squares", desc:"So close to 1000. You can feel the emptiness.", check:()=>placed>=900},
-  {id:"p1111", name:"1111 \u2013 Repdigit II", desc:"Make a wish. It won't be granted.", check:()=>placed>=1111},
-  {id:"p1234", name:"1234 Squares", desc:"You can count! In order! Gold star.", check:()=>placed>=1234},
-  {id:"p1337", name:"1337 Squares", desc:"l33t. Very l33t. Very sad.", check:()=>placed>=1337},
-  {id:"p1500", name:"1500 Squares", desc:"One and a half thousand. You need help.", check:()=>placed>=1500},
-  {id:"p2000", name:"2000 Squares", desc:"Two thousand. This is your life now.", check:()=>placed>=2000},
-  {id:"p2500", name:"2500 Squares", desc:"Two and a half thousand. Incredible. Horrible.", check:()=>placed>=2500},
-  {id:"p3000", name:"3000 Squares", desc:"Three thousand. Your family is worried.", check:()=>placed>=3000},
-  {id:"p3141", name:"3141 \u2013 Pi Squares", desc:"3.141 thousand. The circle hole mocks you.", check:()=>placed>=3141},
-  {id:"p4000", name:"4000 Squares", desc:"Four thousand. We're past the point of jokes.", check:()=>placed>=4000},
-  {id:"p5000", name:"5000 Squares", desc:"Five thousand. The hole is full. You are empty.", check:()=>placed>=5000},
-  {id:"p6000", name:"6000 Squares", desc:"Six thousand. I'm so tired.", check:()=>placed>=6000},
-  {id:"p7000", name:"7000 Squares", desc:"Seven thousand. Why are you still here.", check:()=>placed>=7000},
-  {id:"p7777", name:"7777 \u2013 Lucky?", desc:"Lucky number. Unlucky life choices.", check:()=>placed>=7777},
-  {id:"p8000", name:"8000 Squares", desc:"Eight thousand. The square has consumed you.", check:()=>placed>=8000},
-  {id:"p9001", name:"It's Over 9000", desc:"Nobody is impressed.", check:()=>placed>=9001},
-  {id:"p9999", name:"9999 Squares", desc:"One away from ten thousand. Go on then.", check:()=>placed>=9999},
-  {id:"p10000", name:"10,000 Squares", desc:"TEN THOUSAND. This is a medical condition.", check:()=>placed>=10000},
-  {id:"p12345", name:"12,345 Squares", desc:"Sequential. Impressive. Pathetic.", check:()=>placed>=12345},
-  {id:"p20000", name:"20,000 Squares", desc:"Twenty thousand. You have transcended shame.", check:()=>placed>=20000},
-  {id:"p50000", name:"50,000 Squares", desc:"Fifty thousand. Seek professional help.", check:()=>placed>=50000},
-  {id:"p99999", name:"99,999 Squares", desc:"One away from 100k. You absolute maniac.", check:()=>placed>=99999},
-  {id:"p100000", name:"100,000 Squares", desc:"One hundred thousand. There are no words.", check:()=>placed>=100000},
-  {id:"p500000", name:"500,000 Squares", desc:"Half a million. The universe is indifferent.", check:()=>placed>=500000},
   {id:"w2", name:"Wrong Twice", desc:"Could be a fluke.", check:()=>wrongHoles>=2},
   {id:"w3", name:"Wrong Three Times", desc:"Pattern emerging.", check:()=>wrongHoles>=3},
   {id:"w5", name:"Wrong Five Times", desc:"Not a fluke. A lifestyle.", check:()=>wrongHoles>=5},
@@ -904,7 +852,7 @@ function unlock(id) {
 
 function checkAchievements() {
   achievements.forEach(a => {
-    if (!unlocked.has(a.id) && a.check()) unlock(a.id);
+    if (!unlocked.has(a.id) && typeof a.check === 'function' && a.check()) unlock(a.id);
   });
 }
 function updateCount() { document.getElementById("count").textContent = placed; }
@@ -1094,7 +1042,7 @@ function confirmReset() {
   <div style="background:white;border-radius:16px;padding:30px;max-width:340px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
     <div style="font-size:2em;margin-bottom:8px;">⚠️</div>
     <h3 style="margin:0 0 8px;font-family:'Fredoka One',cursive;">Reset Everything?</h3>
-    <p style="margin:0 0 20px;color:#666;">All shapes placed, achievements, and idle time will be wiped. The square hole will forget you.</p>
+    <p style="margin:0 0 20px;color:#999;">All shapes placed, achievements, and idle time will be wiped. The square hole will forget you.</p>
     <div style="display:flex;gap:10px;justify-content:center;">
       <button onclick="cancelReset()" style="padding:10px 20px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">Cancel</button>
       <button onclick="confirmReset()" style="padding:10px 20px;border:none;border-radius:8px;background:#e53935;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">Yes, Reset</button>
