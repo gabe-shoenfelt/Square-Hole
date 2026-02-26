@@ -3,46 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Square Hole – Shape Match Edition</title>
+<title>Square Hole – Diabolical Edition</title>
 <style>
-body{
-  font-family:Arial,sans-serif;
-  margin:0;
-  background:linear-gradient(45deg,#ffdd99,#99ccff);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  min-height:100vh;
-  overflow-x:hidden;
-  touch-action:manipulation;
-}
+body{font-family:Arial,sans-serif;margin:0;background:linear-gradient(45deg,#ffdd99,#99ccff);display:flex;flex-direction:column;align-items:center;min-height:100vh;overflow-x:hidden;touch-action:manipulation;}
 header{text-align:center;padding:15px;cursor:grab;}
 .tabs{display:flex;gap:10px;margin:20px 0;}
-.tab-btn{
-  padding:10px 20px;
-  background:rgba(255,255,255,0.5);
-  border:none;
-  border-radius:10px 10px 0 0;
-  cursor:pointer;
-}
+.tab-btn{padding:10px 20px;background:rgba(255,255,255,0.5);border:none;border-radius:10px 10px 0 0;cursor:pointer;}
 .tab-btn.active{background:white;font-weight:bold;}
-.tab-content{
-  width:90%;
-  max-width:800px;
-  background:rgba(255,255,255,0.85);
-  border-radius:12px;
-  padding:20px;
-  display:none;
-  min-height:350px;
-}
+.tab-content{width:90%;max-width:800px;background:rgba(255,255,255,0.85);border-radius:12px;padding:20px;display:none;min-height:350px;}
 .tab-content.active{display:block;}
 #game{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;}
 #shapes,#holes{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
-.shape,.hole{
-  width:90px;height:90px;
-  cursor:grab;
-  touch-action:none;
-}
+.shape,.hole{width:90px;height:90px;cursor:grab;touch-action:none;}
 .circle{clip-path:circle(50%);background:crimson;}
 .triangle{clip-path:polygon(50% 0%,0% 100%,100% 100%);background:royalblue;}
 .pentagon{clip-path:polygon(50% 0%,0% 38%,19% 100%,81% 100%,100% 38%);background:gold;}
@@ -56,7 +28,7 @@ header{text-align:center;padding:15px;cursor:grab;}
 .star-hole{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);border:2px dashed #333;background:#eee;}
 .ach-item{padding:8px;margin:4px 0;background:#eee;border-radius:6px;opacity:.5;}
 .ach-item.unlocked{opacity:1;border-left:4px solid gold;}
-#achievement-popup{position:fixed;top:20px;right:20px;background:gold;padding:15px;display:none;}
+#achievement-popup{position:fixed;top:20px;right:20px;background:gold;padding:15px;display:none;z-index:9999;}
 #achievement-popup.show{display:block;}
 </style>
 </head>
@@ -81,12 +53,12 @@ Placed: <strong id="count">0</strong>
 <div id="game">
 <div id="shapes"></div>
 <div id="holes">
-<div class="hole square-hole" id="main-square"></div>
-<div class="hole circle-hole" id="h-circle"></div>
-<div class="hole triangle-hole" id="h-triangle"></div>
-<div class="hole pentagon-hole" id="h-pentagon"></div>
-<div class="hole hexagon-hole" id="h-hexagon"></div>
-<div class="hole star-hole" id="h-star"></div>
+<div class="hole square-hole" id="main-square" data-type="any"></div>
+<div class="hole circle-hole" data-type="circle"></div>
+<div class="hole triangle-hole" data-type="triangle"></div>
+<div class="hole pentagon-hole" data-type="pentagon"></div>
+<div class="hole hexagon-hole" data-type="hexagon"></div>
+<div class="hole star-hole" data-type="star"></div>
 </div>
 </div>
 </div>
@@ -121,10 +93,9 @@ let usedShapes=new Set();
 function spawnShapes(){
   const container=document.getElementById("shapes");
   container.innerHTML="";
-  shapeTypes.forEach((type)=>{
+  shapeTypes.forEach(type=>{
     const div=document.createElement("div");
     div.className="shape "+type;
-    div.id="shape-"+type;
     div.dataset.type=type;
     div.dataset.draggable="true";
     container.appendChild(div);
@@ -138,7 +109,11 @@ function save(){
   localStorage.setItem('idle',idleTime);
 }
 
-setInterval(()=>{idleTime+=1000;save();checkAchievements();},1000);
+setInterval(()=>{
+  idleTime+=1000;
+  save();
+  checkAchievements();
+},1000);
 
 const achievements=[
 {id:'10',name:"10 Squares – Baby Steps",desc:"Gold star for effort.",check:()=>placed>=10},
@@ -147,6 +122,8 @@ const achievements=[
 {id:'500',name:"500 Squares – Halfway to Madness",desc:"No return ticket.",check:()=>placed>=500},
 {id:'1000',name:"1000 Squares – Why Though?",desc:"No applause.",check:()=>placed>=1000},
 {id:'idle2m',name:"Pro Procrastinator",desc:"2 minutes idle.",check:()=>idleTime>=120000},
+{id:'idle5m',name:"Supreme Sloth",desc:"5 minutes idle. Incredible dedication to nothing.",check:()=>idleTime>=300000},
+{id:'idle10m',name:"Master of Time Wasting",desc:"10 minutes idle. You monster.",check:()=>idleTime>=600000},
 {id:'title-square',name:"Title Goes In The Square Hole",desc:"Iconic.",check:()=>false},
 {id:'ach-tab-square',name:"Achievements Go In The Square Hole Too",desc:"Meta.",check:()=>false},
 {id:'judgement-square',name:"Judgement Goes In The Square Hole",desc:"Silenced.",check:()=>false},
@@ -181,7 +158,6 @@ function unlock(id){
 function checkAchievements(){achievements.forEach(a=>{if(!unlocked.has(a.id)&&a.check())unlock(a.id);});}
 function updateCount(){document.getElementById("count").textContent=placed;}
 
-// Drag & drop
 let dragged=null,offsetX=0,offsetY=0;
 
 document.addEventListener("pointerdown",e=>{
@@ -203,16 +179,14 @@ document.addEventListener("pointermove",e=>{
 
 document.addEventListener("pointerup",e=>{
   if(!dragged)return;
-  const drop=document.elementFromPoint(e.clientX,e.clientY);
-  if(drop && drop.closest(".square-hole, .circle-hole, .triangle-hole, .pentagon-hole, .hexagon-hole, .star-hole")){
-    const dropHole=drop.closest(".square-hole, .circle-hole, .triangle-hole, .pentagon-hole, .hexagon-hole, .star-hole");
-    const type=dragged.dataset.type;
-    let valid=false;
-    if(dropHole.id==='main-square'){valid=true;} // anything can go in square hole
-    else if(dropHole.id==='h-'+type){valid=true;} // must match
-    if(valid && dragged.classList.contains("shape")){
-      if(!usedShapes.has(type)){
-        usedShapes.add(type);
+  let drop=document.elementFromPoint(e.clientX,e.clientY);
+  if(drop) drop=drop.closest(".hole");
+  if(drop){
+    const holeType=drop.dataset.type;
+    const shapeType=dragged.dataset.type;
+    if(holeType==="any" || holeType===shapeType){
+      if(dragged.classList.contains("shape") && !usedShapes.has(shapeType)){
+        usedShapes.add(shapeType);
         dragged.remove();
         placed++;
         updateCount();
