@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>Square Hole – Ultimate Edition</title>
 <style>
 body {
@@ -137,11 +137,11 @@ const achievements=[
 {id:'500',name:"500 Squares – Halfway to Madness",desc:"No return ticket.",check:()=>placed>=500},
 {id:'1000',name:"1000 Squares – Why Though?",desc:"No applause.",check:()=>placed>=1000},
 {id:'idle2m',name:"Pro Procrastinator",desc:"2 minutes idle.",check:()=>idleTime>=120000},
-{id:'title-square',name:"Title Goes In The Square Hole",desc:"Iconic.",check:()=>false},
-{id:'ach-tab-square',name:"Achievements Go In The Square Hole Too",desc:"Meta.",check:()=>false},
-{id:'judgement-square',name:"Judgement Goes In The Square Hole",desc:"Silenced.",check:()=>false},
-{id:'patch-square',name:"Patch Notes Go In The Square Hole",desc:"Updates rejected.",check:()=>false},
-{id:'gaslight-square',name:"Gaslighting Goes In The Square Hole",desc:"Contained.",check:()=>false},
+{id:'title-square',name:"Title Goes In The Square Hole",desc:"Iconic.",check:()=>!unlocked.has('title-square')},
+{id:'ach-tab-square',name:"Achievements Go In The Square Hole Too",desc:"Meta.",check:()=>!unlocked.has('ach-tab-square')},
+{id:'judgement-square',name:"Judgement Goes In The Square Hole",desc:"Silenced.",check:()=>!unlocked.has('judgement-square')},
+{id:'patch-square',name:"Patch Notes Go In The Square Hole",desc:"Updates rejected.",check:()=>!unlocked.has('patch-square')},
+{id:'gaslight-square',name:"Gaslighting Goes In The Square Hole",desc:"Contained.",check:()=>!unlocked.has('gaslight-square')},
 {id:'1000000',name:"One Million Squares",desc:"You did it. Why?",check:()=>placed>=1000000},
 {id:'again',name:"Again?",desc:"The counter reset.",check:()=>false}
 ];
@@ -161,7 +161,11 @@ function unlock(id){
   }
 }
 
-function checkAchievements(){achievements.forEach(a=>{if(!unlocked.has(a.id)&&a.check())unlock(a.id);});}
+function checkAchievements(){
+  achievements.forEach(a => {
+    if(!unlocked.has(a.id) && a.check()) unlock(a.id);
+  });
+}
 function updateCount(){document.getElementById("count").textContent=placed;}
 
 document.addEventListener("pointerdown",e=>{
@@ -181,14 +185,16 @@ document.addEventListener("pointermove",e=>{
   dragged.style.top=(e.clientY-offsetY)+"px";
 });
 
-document.addEventListener("pointerup",e=>{
-  if(!dragged) return;
-  let drop=document.elementFromPoint(e.clientX,e.clientY);
-  if(drop) drop=drop.closest(".hole");
-  if(drop && drop.classList.contains("square-hole")){
-    if(dragged.classList.contains("shape")){
-      const type=dragged.dataset.type;
-      if(!usedShapes.has(type)){
+document.addEventListener("pointerup", e => {
+  if (!dragged) return;
+  let drop = document.elementFromPoint(e.clientX, e.clientY);
+  if (drop) drop = drop.closest(".hole");
+  
+  // Only allow placement if dropped into main square hole
+  if (drop && drop.id === "main-square") {
+    if (dragged.classList.contains("shape")) {
+      const type = dragged.dataset.type;
+      if (!usedShapes.has(type)) {
         usedShapes.add(type);
         dragged.remove();
         placed++;
@@ -196,19 +202,24 @@ document.addEventListener("pointerup",e=>{
         checkAchievements();
         save();
       }
-      if(usedShapes.size===shapeTypes.length){
+      if (usedShapes.size === shapeTypes.length) {
         usedShapes.clear();
         spawnShapes();
       }
     }
-    if(dragged.id==="main-title") unlock("title-square");
-    if(dragged.id==="ach-tab-btn") unlock("ach-tab-square");
-    if(dragged.id==="judgement-text") unlock("judgement-square");
-    if(dragged.id==="patch-tab-btn") unlock("patch-square");
-    if(dragged.id==="fake-toast") unlock("gaslight-square");
+  } else {
+    // Dropped outside or into other holes, trigger achievement for special items
+    if (dragged.id === "main-title") unlock("title-square");
+    if (dragged.id === "ach-tab-btn") unlock("ach-tab-square");
+    if (dragged.id === "judgement-text") unlock("judgement-square");
+    if (dragged.id === "patch-tab-btn") unlock("patch-square");
+    if (dragged.id === "fake-toast") unlock("gaslight-square");
   }
-  dragged.style.position="";
-  dragged=null;
+
+  // Reset position styles
+  dragged.style.position = "";
+  dragged.style.zIndex = "";
+  dragged = null;
 });
 
 document.querySelectorAll(".tab-btn").forEach(b=>{
@@ -234,6 +245,7 @@ function init(){
   checkAchievements();
 }
 init();
+
 </script>
 </body>
 </html>
