@@ -1325,18 +1325,13 @@ function scheduleFakePopup() {
 }
 
 function showFakePopup() {
-    if (popupQueue.length === 0) { popupShowing = false; return; }
-  popupShowing = true;
-  const a = popupQueue.shift();
-  document.getElementById("pop-name").innerHTML = "<b>" + a.name + "</b><br>" + a.desc;
-  const popup = document.getElementById("achievement-popup");
-  popup.classList.remove("show");
+  const msg = fakeAchievements[Math.floor(Math.random() * fakeAchievements.length)];
+  document.getElementById('fake-pop-name').textContent = msg;
+  const popup = document.getElementById('fake-achievement-popup');
+  popup.classList.remove('show');
   void popup.offsetWidth;
-  popup.classList.add("show");
-  setTimeout(() => {
-    popup.classList.remove("show");
-    setTimeout(showNextPopup, 300);
-  }, 3000);
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 3500);
 }
 
 scheduleFakePopup();
