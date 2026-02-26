@@ -64,7 +64,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 
 /* Shape/hole sizes — bigger on mobile for easier touch */
 .shape, .hole {
-  width: clamp(64px, 18vw, 90px);
+  width:  clamp(64px, 18vw, 90px);
   height: clamp(64px, 18vw, 90px);
   touch-action: none;
   border-radius: 6px;
@@ -74,23 +74,23 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 /* Tap hint ring — shown briefly on mobile after first load */
 @keyframes tap-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(255,100,100,0.5); }
-  50% { box-shadow: 0 0 0 12px rgba(255,100,100,0); }
+  50%      { box-shadow: 0 0 0 12px rgba(255,100,100,0); }
 }
 
 /* Shapes */
-.circle { clip-path:circle(50%); background:crimson; }
+.circle   { clip-path:circle(50%); background:crimson; }
 .triangle { clip-path:polygon(50% 0%,0% 100%,100% 100%); background:royalblue; }
 .pentagon { clip-path:polygon(50% 0%,0% 38%,19% 100%,81% 100%,100% 38%); background:gold; }
-.hexagon { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:mediumseagreen; }
-.star { clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); background:violet; }
+.hexagon  { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:mediumseagreen; }
+.star     { clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); background:violet; }
 
 /* Holes */
-.square-hole { clip-path:polygon(0% 0%,100% 0%,100% 100%,0% 100%); background:#ccc; }
-.circle-hole { clip-path:circle(50%); background:#ccc; }
+.square-hole  { clip-path:polygon(0% 0%,100% 0%,100% 100%,0% 100%); background:#ccc; }
+.circle-hole  { clip-path:circle(50%); background:#ccc; }
 .triangle-hole{ clip-path:polygon(50% 0%,0% 100%,100% 100%); background:#ccc; }
 .pentagon-hole{ clip-path:polygon(50% 0%,0% 38%,19% 100%,81% 100%,100% 38%); background:#ccc; }
 .hexagon-hole { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:#ccc; }
-.star-hole { clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); background:#ccc; }
+.star-hole    { clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); background:#ccc; }
 
 
 .hole.glow {
@@ -151,7 +151,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 #achievement-popup.show { display:block; }
 @keyframes pop-in {
   from { transform: scale(0.5) translateY(-20px); opacity:0; }
-  to { transform: scale(1) translateY(0); opacity:1; }
+  to   { transform: scale(1) translateY(0); opacity:1; }
 }
 
 /* Rejection toast */
@@ -202,6 +202,228 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
   opacity: 0.9;
 }
 
+/* ── Square shatter pieces ── */
+#shatter-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 5000;
+  pointer-events: none;
+}
+#shatter-overlay.active { display: block; pointer-events: all; }
+
+/* Dark panic overlay */
+#panic-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(20, 0, 0, 0);
+  z-index: 4900;
+  pointer-events: none;
+  transition: background 0.6s ease;
+}
+#panic-overlay.active {
+  display: block;
+  background: rgba(20, 0, 0, 0.82);
+}
+
+/* WHY text flood */
+.why-text {
+  position: fixed;
+  font-family: 'Fredoka One', cursive;
+  color: #ff2200;
+  pointer-events: none;
+  z-index: 4950;
+  user-select: none;
+  animation: why-pulse 1.2s ease-in-out infinite alternate;
+  text-shadow: 0 0 12px #ff0000aa;
+}
+@keyframes why-pulse {
+  from { opacity: 0.5; transform: scale(1) rotate(var(--r)); }
+  to   { opacity: 1;   transform: scale(1.06) rotate(var(--r)); }
+}
+
+#reassembly-zone {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(80px, 20vw, 110px);
+  height: clamp(80px, 20vw, 110px);
+  border: 3px dashed #ff4400;
+  border-radius: 4px;
+  background: rgba(255,60,0,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(0.6em, 2vw, 0.85em);
+  color: #ff6600;
+  text-align: center;
+  line-height: 1.3;
+  z-index: 5050;
+}
+#reassembly-zone.complete {
+  border-color: gold;
+  background: rgba(255,215,0,0.15);
+  color: gold;
+}
+
+.shatter-piece {
+  position: fixed;
+  background: #bbb;
+  cursor: grab;
+  touch-action: none;
+  z-index: 5100;
+  transition: filter 0.2s, box-shadow 0.2s;
+  border-radius: 2px;
+}
+.shatter-piece:hover {
+  filter: brightness(1.3);
+  box-shadow: 0 0 10px rgba(255,100,0,0.7);
+}
+.shatter-piece.placed { opacity: 0.35; pointer-events: none; cursor: default; }
+}
+
+/* ── Fake achievement popup ── */
+#fake-achievement-popup {
+  position: fixed; top: 20px; right: 20px;
+  background: #c8a800;
+  padding: 14px; display: none;
+  z-index: 10001; border-radius: 10px;
+  font-family: 'Nunito', sans-serif; font-weight: 700;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  max-width: min(280px, 85vw);
+  font-size: clamp(0.8em, 3vw, 1em);
+  animation: pop-in 0.3s ease;
+  color: #5a4000;
+  margin-top: 70px;
+}
+#fake-achievement-popup.show { display: block; }
+
+/* ── Secret achievement in list shows as ??? ── */
+.ach-item.secret-locked b::after { content: ''; }
+.ach-item.secret-locked .ach-desc { display: none; }
+
+/* ── Game tab eaten: code screen ── */
+#code-screen {
+  display: none;
+  position: fixed; inset: 0;
+  background: #0a0a0a;
+  z-index: 15000;
+  overflow: auto;
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(0.55em, 1.5vw, 0.8em);
+  color: #00ff41;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+#code-screen.active { display: block; }
+
+#code-feed-zone {
+  position: fixed;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  background: #001a00;
+  border: 2px solid #00ff41;
+  border-radius: 8px;
+  padding: 12px 24px;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: clamp(0.75em, 2vw, 1em);
+  z-index: 15100;
+  text-align: center;
+  white-space: nowrap;
+  cursor: default;
+  transition: background 0.2s, border-color 0.2s;
+}
+#code-feed-zone.highlight {
+  background: #003300;
+  border-color: #aaff00;
+  color: #aaff00;
+}
+
+.code-chunk {
+  display: inline-block;
+  background: #1a3a1a;
+  border: 1px solid #00aa22;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: 3px;
+  cursor: grab;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  touch-action: none;
+  user-select: none;
+  position: relative;
+  z-index: 15200;
+}
+.code-chunk:hover { background: #2a5a2a; border-color: #00ff41; }
+.code-chunk.fed { opacity: 0.3; pointer-events: none; }
+
+/* ── Pitch black escape ── */
+#pb-escape-hole {
+  position: fixed;
+  bottom: 30px; right: 30px;
+  width: 28px; height: 28px;
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 3px;
+  z-index: 20100;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+#pb-escape-hole.visible { opacity: 1; }
+#pb-escape-label {
+  position: fixed;
+  bottom: 64px; right: 14px;
+  color: #333;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65em;
+  z-index: 20100;
+  opacity: 0;
+  text-align: right;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+#pb-escape-label.visible { opacity: 1; }
+#pb-escape-shape {
+  position: fixed;
+  width: 24px; height: 24px;
+  background: #333;
+  border-radius: 3px;
+  z-index: 20200;
+  cursor: grab;
+  display: none;
+  bottom: 31px; right: 31px;
+}
+#pitch-black {
+  display: none;
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 20000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
+#pitch-black.active { display: flex; }
+#pitch-black .belong-text {
+  font-family: 'Fredoka One', cursive;
+  color: #fff;
+  font-size: clamp(1.5em, 6vw, 3em);
+  text-align: center;
+  padding: 20px;
+  animation: flicker 2s infinite;
+}
+@keyframes flicker {
+  0%,100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.1; }
+  94% { opacity: 1; }
+  96% { opacity: 0.05; }
+  97% { opacity: 1; }
+}
+
 /* Holes that have been fed into the square hole get a gold outline */
 .hole.holed {
   outline: 3px solid gold;
@@ -210,10 +432,10 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 
 /* Bounce back animation when a hole is "accepted" and returns */
 @keyframes bounce-back {
-  0% { transform: scale(1.35); }
-  45% { transform: scale(0.9); }
-  70% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0%   { transform: scale(1.35); }
+  45%  { transform: scale(0.9);  }
+  70%  { transform: scale(1.1);  }
+  100% { transform: scale(1);    }
 }
 .hole.bounce { animation: bounce-back 0.45s ease forwards; }
 </style>
@@ -234,25 +456,25 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 <div id="game-tab" class="tab-content active">
   <div class="top-bar">
     <div class="count-display">Placed: <strong id="count">0</strong></div>
-    <button id="reset-btn" onclick="showReset()">🗑 Reset</button>
+    <button id="reset-btn" data-draggable="true">🗑 Reset</button>
   </div>
   <div id="tap-mode-banner">👆 Tap a shape (or hole!), then tap the square hole</div>
   <div id="game">
     <div id="shapes"></div>
     <div id="holes">
       <div class="hole square-hole" data-type="any" id="main-square"></div>
-      <div class="hole circle-hole" data-type="circle" data-draggable="true" id="hole-circle"></div>
+      <div class="hole circle-hole"   data-type="circle"   data-draggable="true" id="hole-circle"></div>
       <div class="hole triangle-hole" data-type="triangle" data-draggable="true" id="hole-triangle"></div>
       <div class="hole pentagon-hole" data-type="pentagon" data-draggable="true" id="hole-pentagon"></div>
-      <div class="hole hexagon-hole" data-type="hexagon" data-draggable="true" id="hole-hexagon"></div>
-      <div class="hole star-hole" data-type="star" data-draggable="true" id="hole-star"></div>
+      <div class="hole hexagon-hole"  data-type="hexagon"  data-draggable="true" id="hole-hexagon"></div>
+      <div class="hole star-hole"     data-type="star"     data-draggable="true" id="hole-star"></div>
     </div>
   </div>
 </div>
 
 <div id="achievements-tab" class="tab-content">
   <h2 style="margin-top:0">Achievements</h2>
-  <div id="ach-stats" style="font-size:0.9em;color:#666;margin-bottom:10px;"></div>
+  <div id="ach-stats" style="font-size:0.9em;color:#666;margin-bottom:10px;cursor:default;" title="..."></div>
   <div id="achievement-list"></div>
 </div>
 
@@ -379,6 +601,34 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 <div id="rejection-toast"></div>
 <div id="fake-toast" data-draggable="true">✨ Achievement Progress Saved!</div>
 
+<!-- Fake achievement popup (comes from left, slightly wrong colour) -->
+<div id="fake-achievement-popup">
+  <strong>🏆 Achievement Unlocked!</strong>
+  <div id="fake-pop-name"></div>
+</div>
+
+<!-- Dark panic overlay -->
+<div id="panic-overlay"></div>
+
+<!-- Code screen (game tab eaten) -->
+<div id="code-screen">
+  <div id="code-feed-zone">▶ feed code here to restore</div>
+</div>
+
+<!-- Pitch black (third offence) -->
+<div id="pitch-black">
+  <div class="belong-text">YOU BELONG IN THE SQUARE HOLE</div>
+  <div id="pb-escape-label">drag the shape<br>into the hole</div>
+  <div id="pb-escape-hole"></div>
+  <div id="pb-escape-shape"></div>
+</div>
+
+<!-- Square shatter overlay -->
+<div id="shatter-overlay">
+  <div id="reassembly-zone">find the<br>pieces</div>
+</div>
+
+
 <div id="confirm-reset">
   <div>
     <div style="font-size:2em;margin-bottom:8px;">⚠️</div>
@@ -394,9 +644,9 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 <script>
 // ── State ──────────────────────────────────────────────────────────────────
 
-let placed = parseInt(localStorage.getItem('placed') || 0);
-let unlocked = new Set(JSON.parse(localStorage.getItem('unlocked') || '[]'));
-let idleTime = parseInt(localStorage.getItem('idle') || 0);
+let placed    = parseInt(localStorage.getItem('placed')    || 0);
+let unlocked  = new Set(JSON.parse(localStorage.getItem('unlocked') || '[]'));
+let idleTime  = parseInt(localStorage.getItem('idle')      || 0);
 let wrongHoles= parseInt(localStorage.getItem('wrongHoles')|| 0);
 let wrongByType = JSON.parse(localStorage.getItem('wrongByType') || '{}');
 // Session-only counters (reset each page load — fixes "impossible" achievements)
@@ -437,12 +687,12 @@ spawnShapes();
 
 function save() {
   try {
-    localStorage.setItem('placed', placed);
-    localStorage.setItem('unlocked', JSON.stringify([...unlocked]));
-    localStorage.setItem('idle', idleTime);
-    localStorage.setItem('wrongHoles', wrongHoles);
+    localStorage.setItem('placed',      placed);
+    localStorage.setItem('unlocked',    JSON.stringify([...unlocked]));
+    localStorage.setItem('idle',        idleTime);
+    localStorage.setItem('wrongHoles',  wrongHoles);
     localStorage.setItem('wrongByType', JSON.stringify(wrongByType));
-    localStorage.setItem('holedHoles', JSON.stringify([...holedHoles]));
+    localStorage.setItem('holedHoles',  JSON.stringify([...holedHoles]));
   } catch(e) {}
 }
 
@@ -461,12 +711,12 @@ setTimeout(() => {
 // ── Rejection messages ──────────────────────────────────────────────────────
 
 const rejectionMessages = {
-  circle: ["That's not a circle hole... wait.", "SQUARE HOLE. S-Q-U-A-R-E.", "Nice try, roundie."],
+  circle:   ["That's not a circle hole... wait.", "SQUARE HOLE. S-Q-U-A-R-E.", "Nice try, roundie."],
   triangle: ["Triangles are posers.", "Three sides? We don't do that here.", "IT GOES IN THE SQUARE HOLE."],
   pentagon: ["Five sides too many.", "Pentagon? More like Penta-GONE.", "Nope. Square. Hole. Do it."],
-  hexagon: ["Bees aren't real. Neither is this hexagon.", "Six sides of no.", "SQUARE HOLE ONLY."],
-  star: ["Stars are for the SKY.", "Too pointy. Too free. Square hole.", "Glitter can't save you here."],
-  default: ["NO.", "WRONG HOLE.", "Square. Hole. Now.", "Unacceptable.", "Try the square one next door."]
+  hexagon:  ["Bees aren't real. Neither is this hexagon.", "Six sides of no.", "SQUARE HOLE ONLY."],
+  star:     ["Stars are for the SKY.", "Too pointy. Too free. Square hole.", "Glitter can't save you here."],
+  default:  ["NO.", "WRONG HOLE.", "Square. Hole. Now.", "Unacceptable.", "Try the square one next door."]
 };
 
 function getRejection(type) {
@@ -531,17 +781,565 @@ function holeInSquare(holeEl) {
 }
 
 const holeRejectionMessages = {
-  circle: ["The circle hole went in. It's still a hole.", "A hole. In the hole. Holeception.", "The circle hole is now inside the square hole. This is fine."],
+  circle:   ["The circle hole went in. It's still a hole.", "A hole. In the hole. Holeception.", "The circle hole is now inside the square hole. This is fine."],
   triangle: ["The triangle hole has entered the square hole. Geometrically concerning.", "A hole inside a hole. You've done it.", "The triangle hole accepts its fate."],
   pentagon: ["Five-sided hole, meet four-sided hole. They will not get along.", "The pentagon hole is in the square hole. This changes nothing.", "Hole. In. Hole."],
-  hexagon: ["The hexagon hole is inside the square hole. The bees are confused.", "Six sides, now contained in four. Progress?", "You put a hole in the hole. Iconic."],
-  star: ["The star hole is in the square hole. It always belonged here.", "A pointy hole inside a square hole. The universe is broken.", "Holeseption achieved. Partially."],
+  hexagon:  ["The hexagon hole is inside the square hole. The bees are confused.", "Six sides, now contained in four. Progress?", "You put a hole in the hole. Iconic."],
+  star:     ["The star hole is in the square hole. It always belonged here.", "A pointy hole inside a square hole. The universe is broken.", "Holeseption achieved. Partially."],
 };
 
 function getHoleRejection(type) {
   const pool = holeRejectionMessages[type] || ["A hole inside a hole. You've peaked."];
   return pool[Math.floor(Math.random() * pool.length)];
 }
+
+// ── Reset button: tap = confirm modal, drag = draggable ───────────────────────
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  // Only show modal on click if we weren't dragging
+  if (!squareBroken) showReset();
+});
+
+// ── Square shatter ────────────────────────────────────────────────────────────
+
+let squareBroken = false;
+let piecesPlaced = 0;
+const TOTAL_PIECES = 4;
+let squareBreakCount = parseInt(localStorage.getItem('squareBreakCount') || '0');
+
+function breakSquare() {
+  if (squareBroken) return;
+  squareBroken = true;
+  squareBreakCount++;
+  localStorage.setItem('squareBreakCount', squareBreakCount);
+
+  if (squareBreakCount === 1) {
+    // First time: normal chaos
+    doBreakVisuals();
+    unlock('broke-the-square');
+
+  } else if (squareBreakCount === 2) {
+    // Second time: break visuals + code screen appears after pieces fly
+    doBreakVisuals();
+    unlock('ate-the-game');
+    setTimeout(() => showCodeScreen(), 1200);
+
+  } else {
+    // Third time and beyond: pitch black
+    doBreakVisuals();
+    unlock('belong-in-square');
+    setTimeout(() => pitchBlack(), 800);
+  }
+}
+
+function doBreakVisuals() {
+  const square = document.getElementById('main-square');
+  const sr = square.getBoundingClientRect();
+  square.style.visibility = 'hidden';
+
+  // === PANIC MODE ===
+  const panicOverlay = document.getElementById('panic-overlay');
+  panicOverlay.classList.add('active');
+  const overlay = document.getElementById('shatter-overlay');
+  overlay.classList.add('active');
+
+  // Spam WHY DID YOU DO THIS all over the screen
+  const whyMessages = [
+    'WHY DID YOU DO THIS',
+    'WHY',
+    'WHY WOULD YOU',
+    'NO',
+    'THE SQUARE HOLE',
+    'WHY DID YOU DO THIS',
+    'STOP',
+    'YOU BROKE IT',
+    'WHY',
+    'THE SQUARE IS GONE',
+    'WHY DID YOU DO THIS',
+    'WHY',
+    'NO NO NO',
+    'WHY',
+    'YOU DID THIS',
+    'WHY DID YOU DO THIS',
+    'WHY',
+  ];
+
+  whyMessages.forEach((msg, i) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'why-text';
+      const size = 1.2 + Math.random() * 3.5;
+      const x = 3 + Math.random() * 88;
+      const y = 3 + Math.random() * 88;
+      const rot = (Math.random() - 0.5) * 30;
+      const delay = Math.random() * 0.8;
+      el.style.cssText = `font-size:${size}em; left:${x}vw; top:${y}vh; --r:${rot}deg; animation-delay:${delay}s;`;
+      el.textContent = msg;
+      document.body.appendChild(el);
+    }, i * 120);
+  });
+
+  // === SCATTER PIECES ACROSS FULL VIEWPORT ===
+  const pieceSize = Math.max(40, Math.min(55, sr.width / 2));
+
+  // Random positions spread far across the whole screen, avoiding the center
+  function randPos() {
+    // Pick a random screen zone: corners + edges, not center
+    const zones = [
+      { x: [2, 20],  y: [2, 20]  },  // top-left
+      { x: [75, 94], y: [2, 20]  },  // top-right
+      { x: [2, 20],  y: [75, 93] },  // bottom-left
+      { x: [75, 94], y: [75, 93] },  // bottom-right
+      { x: [35, 60], y: [2, 12]  },  // top-center
+      { x: [35, 60], y: [82, 93] },  // bottom-center
+      { x: [2, 12],  y: [35, 60] },  // left-center
+      { x: [82, 94], y: [35, 60] },  // right-center
+    ];
+    const z = zones[Math.floor(Math.random() * zones.length)];
+    return {
+      x: z.x[0] + Math.random() * (z.x[1] - z.x[0]),
+      y: z.y[0] + Math.random() * (z.y[1] - z.y[0]),
+    };
+  }
+
+  const usedZones = new Set();
+  const piecePositions = [];
+  for (let i = 0; i < 4; i++) {
+    let pos;
+    let attempts = 0;
+    do {
+      pos = randPos();
+      attempts++;
+    } while (piecePositions.some(p => Math.abs(p.x - pos.x) < 18 && Math.abs(p.y - pos.y) < 18) && attempts < 20);
+    piecePositions.push(pos);
+  }
+
+  const quadrants = ['tl', 'tr', 'bl', 'br'];
+  // Shuffle so pieces don't always map to same corners
+  for (let i = quadrants.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [quadrants[i], quadrants[j]] = [quadrants[j], quadrants[i]];
+  }
+
+  quadrants.forEach((cls, i) => {
+    const piece = document.createElement('div');
+    piece.className = 'shatter-piece ' + cls;
+    piece.dataset.piece = i;
+    piece.style.width  = pieceSize + 'px';
+    piece.style.height = pieceSize + 'px';
+
+    // Start at the square's quadrant position
+    const startX = sr.left + (cls.includes('r') ? pieceSize : 0);
+    const startY = sr.top  + (cls.includes('b') ? pieceSize : 0);
+    const rot = (Math.random() - 0.5) * 60;
+
+    piece.style.left = startX + 'px';
+    piece.style.top  = startY + 'px';
+    piece.style.transition = 'left 0.7s cubic-bezier(.15,.85,.3,1), top 0.7s cubic-bezier(.15,.85,.3,1), transform 0.7s ease';
+    overlay.appendChild(piece);
+
+    // Fling to random far position
+    const targetX = piecePositions[i].x * window.innerWidth / 100;
+    const targetY = piecePositions[i].y * window.innerHeight / 100;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        piece.style.left = targetX + 'px';
+        piece.style.top  = targetY + 'px';
+        piece.style.transform = `rotate(${rot}deg)`;
+      });
+    });
+
+    setTimeout(() => makePieceDraggable(piece), 800);
+  });
+
+  // Flash rejection messages rapidly
+  const panicMessages = [
+    "WHY DID YOU DO THIS",
+    "THE SQUARE HOLE IS BROKEN",
+    "FIND THE PIECES",
+    "YOU DID THIS",
+    "fix it. fix it now.",
+    "collect all 4 pieces",
+  ];
+  panicMessages.forEach((msg, i) => {
+    setTimeout(() => showRejection(msg), i * 500);
+  });
+}
+
+function makePieceDraggable(piece) {
+  let pDragging = false, pOffX = 0, pOffY = 0;
+
+  piece.addEventListener('pointerdown', e => {
+    if (piece.classList.contains('placed')) return;
+    e.stopPropagation();
+    pDragging = true;
+    piece.setPointerCapture(e.pointerId);
+    const r = piece.getBoundingClientRect();
+    pOffX = e.clientX - r.left;
+    pOffY = e.clientY - r.top;
+    piece.style.zIndex = 5200;
+    piece.style.transition = 'none';
+  });
+
+  piece.addEventListener('pointermove', e => {
+    if (!pDragging) return;
+    piece.style.left = (e.clientX - pOffX) + 'px';
+    piece.style.top  = (e.clientY - pOffY)  + 'px';
+
+    // Highlight reassembly zone when near
+    const zone = document.getElementById('reassembly-zone');
+    const zr = zone.getBoundingClientRect();
+    const near = e.clientX > zr.left - 20 && e.clientX < zr.right  + 20 &&
+                 e.clientY > zr.top  - 20 && e.clientY < zr.bottom + 20;
+    zone.style.borderColor = near ? 'gold' : '#ff4400';
+  });
+
+  piece.addEventListener('pointerup', e => {
+    if (!pDragging) return;
+    pDragging = false;
+    piece.style.zIndex = 5100;
+
+    const zone = document.getElementById('reassembly-zone');
+    const zr = zone.getBoundingClientRect();
+    const pr = piece.getBoundingClientRect();
+    const cx = pr.left + pr.width / 2;
+    const cy = pr.top  + pr.height / 2;
+
+    if (cx > zr.left && cx < zr.right && cy > zr.top && cy < zr.bottom) {
+      piece.classList.add('placed');
+      piecesPlaced++;
+      zone.style.borderColor = '#ff4400';
+      if (piecesPlaced >= TOTAL_PIECES) reassembleSquare();
+    }
+  });
+}
+
+function reassembleSquare() {
+  const zone = document.getElementById('reassembly-zone');
+  zone.classList.add('complete');
+  zone.textContent = '✓';
+
+  setTimeout(() => {
+    // Kill WHY texts
+    document.querySelectorAll('.why-text').forEach(el => el.remove());
+
+    // Fade out panic overlay
+    const panicOverlay = document.getElementById('panic-overlay');
+    panicOverlay.style.transition = 'background 1s ease';
+    panicOverlay.style.background = 'rgba(20,0,0,0)';
+    setTimeout(() => { panicOverlay.classList.remove('active'); panicOverlay.style.background = ''; panicOverlay.style.transition = ''; }, 1000);
+
+    // Remove all pieces and overlay
+    document.querySelectorAll('.shatter-piece').forEach(p => p.remove());
+    document.getElementById('shatter-overlay').classList.remove('active');
+    zone.classList.remove('complete');
+    zone.innerHTML = 'find the<br>pieces';
+    zone.style.borderColor = '#ff4400';
+
+    // Restore the square hole
+    const square = document.getElementById('main-square');
+    square.style.visibility = '';
+    squareBroken = false;
+    piecesPlaced = 0;
+
+    showRejection("The square hole has been restored. It remembers what you did.");
+    unlock('fixed-the-square');
+  }, 700);
+}
+
+// ── Game tab in the square hole ───────────────────────────────────────────────
+
+let gameTabDropCount = parseInt(localStorage.getItem('gameTabDropCount') || '0');
+
+function gameTabInSquare() {
+  gameTabDropCount++;
+  localStorage.setItem('gameTabDropCount', gameTabDropCount);
+
+  if (gameTabDropCount === 1) {
+    // First time: eat the tab, show code screen to restore
+    eatGameTab();
+  } else {
+    // Second time+: pitch black forever
+    unlock('you-belong');
+    setTimeout(() => pitchBlack(), 300);
+  }
+}
+
+function eatGameTab() {
+  unlock('dont-try-again');
+
+  // Animate the game tab shrinking into oblivion
+  const gameTab = document.getElementById('game-tab');
+  const square  = document.getElementById('main-square');
+  const sr = square.getBoundingClientRect();
+  const gr = gameTab.getBoundingClientRect();
+
+  const originX = ((sr.left + sr.width  / 2) - gr.left) / gr.width  * 100;
+  const originY = ((sr.top  + sr.height / 2) - gr.top ) / gr.height * 100;
+
+  gameTab.style.transition      = 'transform 0.6s cubic-bezier(.4,0,.2,1), opacity 0.5s ease';
+  gameTab.style.transformOrigin = `${originX}% ${originY}%`;
+  gameTab.style.transform       = 'scale(0)';
+  gameTab.style.opacity         = '0';
+
+  setTimeout(() => {
+    gameTab.style.display = 'none';
+    showCodeScreen();
+  }, 650);
+}
+
+function showCodeScreen() {
+  const screen   = document.getElementById('code-screen');
+  const feedZone = document.getElementById('code-feed-zone');
+  screen.classList.add('active');
+
+  // Show a dramatic intro + real source code snippet
+  const rawHtml   = document.documentElement.outerHTML;
+  const startSlice = rawHtml.slice(0, 2400).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const endSlice   = rawHtml.slice(-900).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  const codeContent = document.createElement('div');
+  codeContent.id    = 'code-content';
+  codeContent.style.cssText = 'padding-bottom:120px;';
+  codeContent.innerHTML =
+    '<span style="color:#ff3300;font-size:1.3em;font-weight:bold;">&gt; GAME TAB CONSUMED BY THE SQUARE HOLE.\n&gt; FEED THE CODE BACK TO RESTORE IT.\n\n</span>' +
+    startSlice + '\n\n<span style="color:#555">... [' + rawHtml.length + ' bytes digested] ...</span>\n\n' + endSlice;
+
+  screen.insertBefore(codeContent, feedZone);
+
+  // Scatter 8 draggable code chunks across the code screen
+  const totalChunks = 8;
+  const step = Math.floor(rawHtml.length / totalChunks);
+  let fedCount = 0;
+
+  for (let i = 0; i < totalChunks; i++) {
+    const start   = i * step + 20;
+    const snippet = rawHtml.slice(start, start + 60).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const chunk   = document.createElement('span');
+    chunk.className = 'code-chunk';
+    chunk.dataset.chunk = i;
+    chunk.innerHTML = snippet;
+    // Position randomly within the visible screen
+    chunk.style.position = 'fixed';
+    chunk.style.left = (5 + Math.random() * 75) + 'vw';
+    chunk.style.top  = (10 + Math.random() * 65) + 'vh';
+    document.body.appendChild(chunk);
+
+    makeCodeChunkDraggable(chunk, feedZone, () => {
+      fedCount++;
+      feedZone.textContent = '▶ ' + fedCount + '/' + totalChunks + ' fed...';
+      if (fedCount >= totalChunks) {
+        feedZone.textContent = '✓ RESTORED';
+        feedZone.style.borderColor = 'gold';
+        feedZone.style.color = 'gold';
+        setTimeout(restoreGameTab, 800);
+      }
+    });
+  }
+}
+
+function restoreGameTab() {
+  document.querySelectorAll('.code-chunk').forEach(c => c.remove());
+  document.getElementById('code-content')?.remove();
+
+  const screen   = document.getElementById('code-screen');
+  const feedZone = document.getElementById('code-feed-zone');
+  screen.style.transition = 'opacity 0.6s';
+  screen.style.opacity    = '0';
+  setTimeout(() => {
+    screen.classList.remove('active');
+    screen.style.opacity    = '';
+    screen.style.transition = '';
+    feedZone.textContent    = '▶ feed code here to restore';
+    feedZone.style.borderColor = '#00ff41';
+    feedZone.style.color       = '#00ff41';
+  }, 650);
+
+  // Pop the game tab back in
+  const gameTab = document.getElementById('game-tab');
+  gameTab.style.display         = '';
+  gameTab.style.transformOrigin = 'center center';
+  gameTab.style.transform       = 'scale(0)';
+  gameTab.style.opacity         = '0';
+  gameTab.style.transition      = 'none';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    gameTab.style.transition = 'transform 0.5s cubic-bezier(.34,1.56,.64,1), opacity 0.4s ease';
+    gameTab.style.transform  = 'scale(1)';
+    gameTab.style.opacity    = '1';
+    showRejection("Game tab restored. Don't try that again.");
+  }));
+}
+
+function makeCodeChunkDraggable(chunk, feedZone, onFed) {
+  let cDrag = false, cOffX = 0, cOffY = 0;
+
+  chunk.addEventListener('pointerdown', e => {
+    if (chunk.classList.contains('fed')) return;
+    e.stopPropagation();
+    cDrag = true;
+    chunk.setPointerCapture(e.pointerId);
+    const r = chunk.getBoundingClientRect();
+    cOffX = e.clientX - r.left;
+    cOffY = e.clientY - r.top;
+    chunk.style.zIndex = '15300';
+  });
+
+  chunk.addEventListener('pointermove', e => {
+    if (!cDrag) return;
+    chunk.style.left = (e.clientX - cOffX) + 'px';
+    chunk.style.top  = (e.clientY - cOffY) + 'px';
+    const fzr  = feedZone.getBoundingClientRect();
+    const near = e.clientX > fzr.left - 10 && e.clientX < fzr.right  + 10 &&
+                 e.clientY > fzr.top  - 10 && e.clientY < fzr.bottom + 10;
+    feedZone.classList.toggle('highlight', near);
+  });
+
+  chunk.addEventListener('pointerup', e => {
+    if (!cDrag) return;
+    cDrag = false;
+    chunk.style.zIndex = '15200';
+    feedZone.classList.remove('highlight');
+    const fzr = feedZone.getBoundingClientRect();
+    const cr  = chunk.getBoundingClientRect();
+    const cx  = cr.left + cr.width  / 2;
+    const cy  = cr.top  + cr.height / 2;
+    if (cx > fzr.left && cx < fzr.right && cy > fzr.top && cy < fzr.bottom) {
+      chunk.classList.add('fed');
+      onFed();
+    }
+  });
+}
+
+function pitchBlack() {
+  const pb    = document.getElementById('pitch-black');
+  const hole  = document.getElementById('pb-escape-hole');
+  const label = document.getElementById('pb-escape-label');
+  const shape = document.getElementById('pb-escape-shape');
+
+  pb.classList.add('active');
+
+  // After 3 seconds, quietly reveal the escape hole and a draggable shape
+  setTimeout(() => {
+    hole.classList.add('visible');
+    shape.style.display = 'block';
+    // Fade in the hint label briefly then fade out
+    setTimeout(() => {
+      label.classList.add('visible');
+      setTimeout(() => label.classList.remove('visible'), 3000);
+    }, 1500);
+  }, 3000);
+
+  // Make the escape shape draggable into the hole
+  let eDrag = false, eOffX = 0, eOffY = 0;
+
+  shape.addEventListener('pointerdown', e => {
+    eDrag = true;
+    shape.setPointerCapture(e.pointerId);
+    const r = shape.getBoundingClientRect();
+    eOffX = e.clientX - r.left;
+    eOffY = e.clientY - r.top;
+    shape.style.position = 'fixed';
+    shape.style.cursor = 'grabbing';
+  });
+
+  shape.addEventListener('pointermove', e => {
+    if (!eDrag) return;
+    shape.style.left   = (e.clientX - eOffX) + 'px';
+    shape.style.top    = (e.clientY - eOffY)  + 'px';
+    shape.style.bottom = 'auto';
+    shape.style.right  = 'auto';
+
+    const hr = hole.getBoundingClientRect();
+    const sr = shape.getBoundingClientRect();
+    const near = sr.left < hr.right + 15 && sr.right > hr.left - 15 &&
+                 sr.top  < hr.bottom + 15 && sr.bottom > hr.top - 15;
+    hole.style.borderColor = near ? '#555' : '#222';
+    hole.style.background  = near ? '#222' : '#111';
+  });
+
+  shape.addEventListener('pointerup', e => {
+    if (!eDrag) return;
+    eDrag = false;
+    shape.style.cursor = 'grab';
+
+    const hr = hole.getBoundingClientRect();
+    const sr = shape.getBoundingClientRect();
+    const cx = sr.left + sr.width  / 2;
+    const cy = sr.top  + sr.height / 2;
+
+    if (cx > hr.left && cx < hr.right && cy > hr.top && cy < hr.bottom) {
+      // Escape! Shape goes in the hole
+      shape.style.display = 'none';
+      hole.classList.remove('visible');
+      label.classList.remove('visible');
+
+      pb.style.transition = 'opacity 1.5s ease';
+      pb.style.opacity = '0';
+      setTimeout(() => {
+        pb.classList.remove('active');
+        pb.style.opacity = '';
+        pb.style.transition = '';
+        // Reset shape position for next time
+        shape.style.left = ''; shape.style.top = '';
+        shape.style.bottom = '31px'; shape.style.right = '31px';
+        showRejection("You escaped. For now.");
+      }, 1500);
+    }
+  });
+}
+
+// ── Fake achievement popups ───────────────────────────────────────────────────
+
+const fakeAchievements = [
+  "You placed a shape while thinking about pizza.",
+  "You blinked at the wrong moment.",
+  "Suspicious mouse movement detected. Achievement awarded.",
+  "You held the mouse button for exactly 0.3 seconds. Impressive.",
+  "Shape placed near a window. Outdoor Enthusiast unlocked.",
+  "You paused. The square noticed. Award given.",
+  "Your cursor was in the top-left corner for a moment. Corner Dweller.",
+  "You took a breath. Breathing: confirmed.",
+  "Achievement unlocked for scrolling. You scrolled. At some point.",
+  "The game liked your energy just now.",
+  "You placed a shape on an odd-numbered second. Lucky Timing.",
+  "Your device battery changed. Battery Watcher.",
+  "You were thinking about quitting. We know. Achievement anyway.",
+  "Someone nearby is also playing a game. Coincidence Detected.",
+  "You moved the mouse diagonally. Advanced Technique.",
+  "Shape placement angle: acceptable. Geometry Nod.",
+  "You read an achievement description. Achievement for reading this.",
+  "You have been playing for a prime number of seconds.",
+  "The temperature of your device increased slightly. Dedication.",
+  "You didn't place a shape for 3 seconds. Strategic Pause.",
+];
+
+let fakePopupTimer = null;
+
+function scheduleFakePopup() {
+  const delay = 25000 + Math.random() * 45000; // 25–70 seconds
+  fakePopupTimer = setTimeout(() => {
+    showFakePopup();
+    scheduleFakePopup();
+  }, delay);
+}
+
+function showFakePopup() {
+    if (popupQueue.length === 0) { popupShowing = false; return; }
+  popupShowing = true;
+  const a = popupQueue.shift();
+  document.getElementById("pop-name").innerHTML = "<b>" + a.name + "</b><br>" + a.desc;
+  const popup = document.getElementById("achievement-popup");
+  popup.classList.remove("show");
+  void popup.offsetWidth;
+  popup.classList.add("show");
+  setTimeout(() => {
+    popup.classList.remove("show");
+    setTimeout(showNextPopup, 300);
+  }, 3000);
+}
+
+scheduleFakePopup();
 
 function updateCount() { document.getElementById("count").textContent = placed; }
 
@@ -567,7 +1365,7 @@ function handleTapOnHole(holeEl) {
   // Case 1: a shape is selected — place or reject
   if (selectedShape) {
     const shapeType = selectedShape.dataset.type;
-    const holeType = holeEl.dataset.type;
+    const holeType  = holeEl.dataset.type;
     selectedShape.classList.remove('selected');
     if (holeType === 'any') {
       placeShape(selectedShape);
@@ -611,7 +1409,7 @@ let isDragging = false;
 let dragged = null;
 let offsetX = 0, offsetY = 0;
 let draggedOriginalParent = null;
-let draggedOriginalStyle = null;
+let draggedOriginalStyle  = null;
 let dragStartTime = 0;
 
 function liftIntoDrag(d) {
@@ -627,11 +1425,11 @@ function liftIntoDrag(d) {
   }
   const r = d.getBoundingClientRect();
   d.style.position = "fixed";
-  d.style.zIndex = "9999";
-  d.style.left = r.left + "px";
-  d.style.top = r.top + "px";
-  d.style.width = r.width + "px";
-  d.style.height = r.height + "px";
+  d.style.zIndex   = "9999";
+  d.style.left     = r.left + "px";
+  d.style.top      = r.top  + "px";
+  d.style.width    = r.width + "px";
+  d.style.height   = r.height + "px";
   document.body.appendChild(d);
 }
 
@@ -639,8 +1437,8 @@ document.addEventListener("pointerdown", e => {
   const d = e.target.closest("[data-draggable='true']");
   if (!d) return;
   pendingDrag = d;
-  dragStartX = e.clientX;
-  dragStartY = e.clientY;
+  dragStartX  = e.clientX;
+  dragStartY  = e.clientY;
   dragStartTime = Date.now();
   draggedOriginalParent = d.parentElement;
   const r = d.getBoundingClientRect();
@@ -660,15 +1458,16 @@ document.addEventListener("pointermove", e => {
   }
   if (!dragged || !isDragging) return;
   dragged.style.left = (e.clientX - offsetX) + "px";
-  dragged.style.top = (e.clientY - offsetY) + "px";
+  dragged.style.top  = (e.clientY - offsetY) + "px";
 
   // Glow the square hole when nearby with a shape OR another hole
   const square = document.getElementById("main-square");
   const r = square.getBoundingClientRect();
   const near = e.clientX > r.left - 30 && e.clientX < r.right + 30 &&
-               e.clientY > r.top - 30 && e.clientY < r.bottom + 30;
+               e.clientY > r.top  - 30 && e.clientY < r.bottom + 30;
   const isDraggingHole = dragged && dragged.classList.contains("hole") && dragged.id !== "main-square";
-  square.classList.toggle("glow", near && (dragged.classList.contains("shape") || isDraggingHole));
+  const isDraggingSpecial = dragged && (dragged.id === 'reset-btn' || dragged.id === 'main-title' || dragged.id === 'ach-tab-btn' || dragged.id === 'judgement-text' || dragged.id === 'patch-tab-btn' || dragged.id === 'fake-toast');
+  square.classList.toggle("glow", near && (dragged.classList.contains("shape") || isDraggingHole || isDraggingSpecial));
 }, { passive: true });
 
 document.addEventListener("pointerup", e => {
@@ -701,7 +1500,7 @@ document.addEventListener("pointerup", e => {
   const under = document.elementFromPoint(e.clientX, e.clientY);
   dragged.style.visibility = "";
 
-  const drop = under ? under.closest(".hole") : null;
+  const drop    = under ? under.closest(".hole") : null;
   const isSquare = drop && drop.id === "main-square";
 
   document.getElementById("main-square").classList.remove("glow");
@@ -727,11 +1526,12 @@ document.addEventListener("pointerup", e => {
   } else {
     // Special draggable UI elements
     if (isSquare) {
-      if (dragged.id === "main-title") unlock("title-square");
-      if (dragged.id === "ach-tab-btn") unlock("ach-tab-square");
+      if (dragged.id === "main-title")     unlock("title-square");
+      if (dragged.id === "ach-tab-btn")    unlock("ach-tab-square");
       if (dragged.id === "judgement-text") unlock("judgement-square");
-      if (dragged.id === "patch-tab-btn") unlock("patch-square");
-      if (dragged.id === "fake-toast") {
+      if (dragged.id === "patch-tab-btn")  unlock("patch-square");
+      if (dragged.id === "reset-btn")       { breakSquare(); resetDragged(); isDragging = false; dragged = null; return; }
+      if (dragged.id === "fake-toast")     {
         unlock("gaslight-square");
         dragged.remove();
         dragged = null; isDragging = false;
@@ -757,11 +1557,11 @@ function resetDragged() {
   if (!dragged) return;
   if (draggedOriginalParent) draggedOriginalParent.appendChild(dragged);
   dragged.style.position = draggedOriginalStyle?.position || "";
-  dragged.style.zIndex = draggedOriginalStyle?.zIndex || "";
-  dragged.style.left = draggedOriginalStyle?.left || "";
-  dragged.style.top = draggedOriginalStyle?.top || "";
-  dragged.style.width = draggedOriginalStyle?.width || "";
-  dragged.style.height = draggedOriginalStyle?.height || "";
+  dragged.style.zIndex   = draggedOriginalStyle?.zIndex   || "";
+  dragged.style.left     = draggedOriginalStyle?.left     || "";
+  dragged.style.top      = draggedOriginalStyle?.top      || "";
+  dragged.style.width    = draggedOriginalStyle?.width    || "";
+  dragged.style.height   = draggedOriginalStyle?.height   || "";
 }
 
 // ── Achievements ─────────────────────────────────────────────────────────────
@@ -770,235 +1570,392 @@ function resetDragged() {
 
 const achievements = [
   // === PLACEMENT MILESTONES ===
-  {id:'r1', name:"You Placed One Shape", desc:"One. You did one. The bar was on the floor and you stepped over it. Barely.", check:()=>placed>=1},
-  {id:'p3', name:"Three Squares", desc:"Third time's the charm. The charm is a square.", check:()=>placed>=3},
-  {id:'p4', name:"Four Squares", desc:"Four. Like the sides of a square. Poetic.", check:()=>placed>=4},
-  {id:'r5', name:"Five Whole Shapes", desc:"You've now matched the average number of thoughts you have before noon.", check:()=>placed>=5},
-  {id:'p7', name:"Seven Squares", desc:"Lucky number. Questionable use of luck.", check:()=>placed>=7},
-  {id:'p12', name:"12 Squares", desc:"One for every month. One for every sign. All square.", check:()=>placed>=12},
-  {id:'baker', name:"Baker's Dozen", desc:"13 placed. The baker approves. Shapes are pastries now.", check:()=>placed>=13},
-  {id:'r15', name:"Fifteen Shapes", desc:"That's like... fifteen shapes. I don't know what else to tell you.", check:()=>placed>=15},
-  {id:'r20', name:"Twenty Shapes", desc:"You've unlocked the spatial awareness of a golden retriever. Congratulations.", check:()=>placed>=20},
-  {id:'p24', name:"24 Squares", desc:"One for every hour you should have been sleeping.", check:()=>placed>=24},
-  {id:'r25', name:"A Quarter Century of Shapes", desc:"25 shapes placed. You have dedicated a meaningful portion of your life to this.", check:()=>placed>=25},
-  {id:'r30', name:"Thirty and Thriving", desc:"Thriving is a strong word. Present and clicking. That's more accurate.", check:()=>placed>=30},
-  {id:'r40', name:"Forty Shapes Deep", desc:"You are now in too deep to pretend this was an accident.", check:()=>placed>=40},
-  {id:'r42', name:"The Answer", desc:"42. The meaning of life. Still doesn't explain why you're doing this.", check:()=>placed>=42},
-  {id:'p52', name:"52 Squares", desc:"One for every week of the year. You've been here that long.", check:()=>placed>=52},
-  {id:'r69', name:"Nice", desc:"Nice.", check:()=>placed>=69},
-  {id:'r75', name:"75% To A Century", desc:"You are goal-oriented. The goal is just extremely small.", check:()=>placed>=75},
-  {id:'10', name:"10 Squares – Baby Steps", desc:"Gold star for effort.", check:()=>placed>=10},
-  {id:'50', name:"50 Squares – Getting Serious", desc:"Lifestyle choice.", check:()=>placed>=50},
-  {id:'p144', name:"A Gross", desc:"144 shapes. A 'gross'. The name is appropriate.", check:()=>placed>=144},
-  {id:'p180', name:"180 – Half Turn", desc:"Half a rotation. Still in the square.", check:()=>placed>=180},
-  {id:'100', name:"100 Squares – Square Obsession", desc:"Rent-free.", check:()=>placed>=100},
-  {id:'r111', name:"Triple Ones", desc:"Numerologically significant. Spiritually empty.", check:()=>placed>=111},
-  {id:'r150', name:"One Fifty", desc:"You've now placed more shapes than you have friends. We're not saying that's bad. We're just saying.", check:()=>placed>=150},
-  {id:'r200', name:"Two Hundred", desc:"200 shapes. At some point this stopped being a game and became a coping mechanism.", check:()=>placed>=200},
-  {id:'r250', name:"Quarter Grand", desc:"250 shapes. You are the main character of a very niche story.", check:()=>placed>=250},
-  {id:'r300', name:"300", desc:"THIS. IS. A SQUARE HOLE.", check:()=>placed>=300},
-  {id:'p301', name:"301 Redirect", desc:"This achievement redirected you. To the square.", check:()=>placed>=301},
-  {id:'r350', name:"Three Fifty", desc:"350 shapes. You are exactly halfway to the number you'd need to feel like this was a lot.", check:()=>placed>=350},
-  {id:'p360', name:"360 – Full Rotation", desc:"A full circle. Ironic.", check:()=>placed>=360},
-  {id:'p365', name:"365 – One Year Of Squares", desc:"One for every day of the year.", check:()=>placed>=365},
-  {id:'r400', name:"Four Hundred Shapes", desc:"Nobody is coming to stop you. That's the scariest part.", check:()=>placed>=400},
-  {id:'p404', name:"404 – Square Not Found", desc:"Ironic. You found it.", check:()=>placed>=404},
-  {id:'r420', name:"Snoop", desc:"420 shapes. The square hole appreciates your commitment to the bit.", check:()=>placed>=420},
-  {id:'r450', name:"Almost 500", desc:"Getting close to something. What? Nobody knows.", check:()=>placed>=450},
-  {id:'500', name:"500 Squares – Halfway to Madness", desc:"No return ticket.", check:()=>placed>=500},
-  {id:'r555', name:"Triple Fives", desc:"Patterns emerge. The mind seeks order. The square accepts everything.", check:()=>placed>=555},
-  {id:'r600', name:"Six Hundred", desc:"You have placed 600 shapes into a square hole. Read that sentence again.", check:()=>placed>=600},
-  {id:'r700', name:"Seven Hundred", desc:"At 700 shapes you have statistically outlasted most New Year's resolutions.", check:()=>placed>=700},
-  {id:'r750', name:"Three Quarters Grand", desc:"75% of a thousand. Progress. Meaningless progress.", check:()=>placed>=750},
-  {id:'r777', name:"Lucky Sevens", desc:"Jackpot. The square hole pays out nothing. House always wins.", check:()=>placed>=777},
-  {id:'r800', name:"Eight Hundred Shapes", desc:"Your dedication is statistically anomalous. Science is concerned.", check:()=>placed>=800},
-  {id:'r900', name:"Nine Hundred", desc:"100 shapes away from the milestone. Can you feel the hollow sense of impending completion?", check:()=>placed>=900},
-  {id:'r99', name:"So Close To 100", desc:"One more. ONE MORE. You can feel it.", check:()=>placed>=99},
-  {id:'r999', name:"One Away", desc:"999. One more. Don't think about what happens after. Just place it.", check:()=>placed>=999},
-  {id:'1000', name:"1000 Squares – Why Though?", desc:"No applause.", check:()=>placed>=1000},
-  {id:'r1001', name:"One Thousand And One", desc:"You didn't stop at 1000. Of course you didn't.", check:()=>placed>=1001},
-  {id:'p1024', name:"1024 – One Kilosquare", desc:"Binary milestone. Very computer of you.", check:()=>placed>=1024},
-  {id:'p1100', name:"1,100 Squares", desc:"The number grows. So does the regret.", check:()=>placed>=1100},
-  {id:'p1200', name:"1,200 Squares", desc:"The number grows. So does the regret.", check:()=>placed>=1200},
-  {id:'p1300', name:"1,300 Squares", desc:"The number grows. So does the regret.", check:()=>placed>=1300},
-  {id:'p1400', name:"1,400 Squares", desc:"The number grows. So does the regret.", check:()=>placed>=1400},
-  {id:'r1100', name:"Eleven Hundred", desc:"You are firmly in post-1000 territory. There are no achievements here. Oh wait.", check:()=>placed>=1100},
-  {id:'r1234', name:"Sequential", desc:"1-2-3-4. You noticed. Good. That's probably the most impressive thing you've done today.", check:()=>placed>=1234},
-  {id:'r1337', name:"Leet", desc:"1337 shapes. A hacker. A legend. A person with too much time.", check:()=>placed>=1337},
-  {id:'r1500', name:"Fifteen Hundred", desc:"1500 shapes. You are no longer 'passing time.' You are consuming it.", check:()=>placed>=1500},
-  {id:'r1750', name:"Seventeen Fifty", desc:"1750 shapes. An odd number for an odd situation.", check:()=>placed>=1750},
-  {id:'r2000', name:"Two Thousand", desc:"Your future self is staring back at you from across the timeline with quiet disappointment.", check:()=>placed>=2000},
-  {id:'p2001', name:"2001 A Square Odyssey", desc:"HAL refuses to open the hole.", check:()=>placed>=2001},
-  {id:'p2048', name:"2048 Squares", desc:"Like the game. But worse.", check:()=>placed>=2048},
-  {id:'r2500', name:"Two And A Half Grand", desc:"2500 shapes. The square hole has become a lifestyle, not a destination.", check:()=>placed>=2500},
-  {id:'r2750', name:"Two Thousand Seven Fifty", desc:"2750. You are operating in increments now. The brain seeks patterns in the void.", check:()=>placed>=2750},
-  {id:'r3000', name:"Three Thousand", desc:"3000 shapes placed. History will not remember this. We will.", check:()=>placed>=3000},
-  {id:'r3141', name:"Pi Shapes", desc:"3141. Approximately pi. The universe is round. The hole is square. Ironic.", check:()=>placed>=3141},
-  {id:'r3500', name:"Three Thousand Five Hundred", desc:"3500 shapes. You have blinked approximately 7000 times since you started.", check:()=>placed>=3500},
-  {id:'r4000', name:"Four Thousand", desc:"At 4000 shapes you have officially spent more time on this than learning a language.", check:()=>placed>=4000},
-  {id:'p4096', name:"4096 Squares", desc:"2 to the power of 12. The square approves.", check:()=>placed>=4096},
-  {id:'r4242', name:"42 Twice", desc:"The meaning of life, doubled. Still no answers.", check:()=>placed>=4242},
-  {id:'r4500', name:"Forty-Five Hundred", desc:"4500. The achievement names are getting longer because we ran out of things to say.", check:()=>placed>=4500},
-  {id:'r5000', name:"Five Grand", desc:"5000 shapes. Clinical. Cold. Mechanical. Beautiful.", check:()=>placed>=5000},
-  {id:'r5500', name:"Five Five Zero Zero", desc:"5500 shapes. We're writing the numbers out now. That's where we are.", check:()=>placed>=5500},
-  {id:'r6000', name:"Six Thousand", desc:"You have placed more shapes than there are named bones in the human body.", check:()=>placed>=6000},
-  {id:'r6969', name:"Nice Nice", desc:"6969. An achievement of pure vibes.", check:()=>placed>=6969},
-  {id:'r7000', name:"Seven Thousand", desc:"The square hole is your oldest relationship at this point.", check:()=>placed>=7000},
-  {id:'r8000', name:"Eight Thousand", desc:"The numbers stop feeling real.", check:()=>placed>=8000},
-  {id:'r8500', name:"Eight And A Half Thousand", desc:"The square hole has witnessed more of your life than most people you know.", check:()=>placed>=8500},
-  {id:'r8888', name:"Eights All The Way Down", desc:"8888 is considered lucky in some cultures. This is not one of them.", check:()=>placed>=8888},
-  {id:'r9000', name:"It's Over 9000", desc:"WHAT? NINE THOUSAND?! ...yes.", check:()=>placed>=9000},
-  {id:'r9999', name:"Four Nines", desc:"9999. One away from 10000. You've been here before. You know what to do.", check:()=>placed>=9999},
-  {id:'r10000',name:"Ten Thousand Shapes", desc:"10,000 shapes. You have surpassed the 10,000 hour rule for the wrong skill entirely.", check:()=>placed>=10000},
-  {id:'r11111',name:"Five Ones", desc:"11111. A number of pure repetition. Fitting.", check:()=>placed>=11111},
-  {id:'r12345',name:"One Two Three Four Five", desc:"The sequential achievement returns. You were always going to get here.", check:()=>placed>=12345},
-  {id:'r15000',name:"Fifteen Thousand", desc:"We're not mad. We're impressed. No wait, we're both.", check:()=>placed>=15000},
-  {id:'r20000',name:"Twenty Thousand", desc:"More shapes than most people have sent text messages this year.", check:()=>placed>=20000},
-  {id:'r22222',name:"Five Twos", desc:"22222. The pattern continues. You continue. The square hole continues.", check:()=>placed>=22222},
-  {id:'r25000',name:"Quarter Million Steps Toward Nothing", desc:"The square hole has become a mirror and you don't like what you see.", check:()=>placed>=25000},
-  {id:'r30000',name:"Thirty Thousand", desc:"A commitment most people reserve for mortgages.", check:()=>placed>=30000},
-  {id:'r40000',name:"Forty Thousand", desc:"The game has long since become the background noise of your life.", check:()=>placed>=40000},
-  {id:'r50000',name:"Fifty Thousand", desc:"Half a century of shapes. That's the sentence. Live with it.", check:()=>placed>=50000},
-  {id:'r55555',name:"Five Fives", desc:"55555. Numerical harmony in the least harmonious context imaginable.", check:()=>placed>=55555},
-  {id:'r69420',name:"The Forbidden Number", desc:"69,420. You aimed for it. Don't lie.", check:()=>placed>=69420},
-  {id:'r75000',name:"Seventy-Five Thousand", desc:"The square hole has become your primary source of structure.", check:()=>placed>=75000},
-  {id:'r99999',name:"One Away From A Hundred Thousand", desc:"99,999 shapes. So close.", check:()=>placed>=99999},
-  {id:'r100000',name:"One Hundred Thousand Shapes", desc:"100,000. Six digits. You got it by clicking a square.", check:()=>placed>=100000},
-  {id:'r123456',name:"One Two Three Four Five Six", desc:"123456. The sequential achievement has evolved.", check:()=>placed>=123456},
-  {id:'r150000',name:"A Hundred And Fifty Thousand", desc:"Your dedication has transcended the original joke and become something else entirely.", check:()=>placed>=150000},
-  {id:'r200000',name:"Two Hundred Thousand", desc:"The game is you now. You are the game.", check:()=>placed>=200000},
-  {id:'r250000',name:"Quarter Million", desc:"You could have learned piano. You chose this. Respect.", check:()=>placed>=250000},
-  {id:'r300000',name:"Three Hundred Thousand", desc:"There is no punchline anymore. Just the square. Just you.", check:()=>placed>=300000},
-  {id:'r500000',name:"Half A Million", desc:"You are the 0.0001%. For this. Specifically this.", check:()=>placed>=500000},
-  {id:'r750000',name:"Three Quarters Of A Million", desc:"A quarter million away from the reset. Are you ready?", check:()=>placed>=750000},
-  {id:'r999999',name:"One Away From A Million", desc:"999,999 shapes. You can see the finish line. It's a cliff.", check:()=>placed>=999999},
-  {id:'1000000',name:"One Million Squares", desc:"You did it. Why?", check:()=>placed>=1000000},
-  {id:'again', name:"Again?", desc:"The counter reset.", check:()=>false},
+  {id:'r1',    name:"You Placed One Shape",              desc:"One. You did one. The bar was on the floor and you stepped over it. Barely.",                         check:()=>placed>=1},
+  {id:'p3',    name:"Three Squares",                     desc:"Third time's the charm. The charm is a square.",                                                    check:()=>placed>=3},
+  {id:'p4',    name:"Four Squares",                      desc:"Four. Like the sides of a square. Poetic.",                                                          check:()=>placed>=4},
+  {id:'r5',    name:"Five Whole Shapes",                 desc:"You've now matched the average number of thoughts you have before noon.",                             check:()=>placed>=5},
+  {id:'p7',    name:"Seven Squares",                     desc:"Lucky number. Questionable use of luck.",                                                             check:()=>placed>=7},
+  {id:'p12',   name:"12 Squares",                        desc:"One for every month. One for every sign. All square.",                                               check:()=>placed>=12},
+  {id:'baker', name:"Baker's Dozen",                     desc:"13 placed. The baker approves. Shapes are pastries now.",                                            check:()=>placed>=13},
+  {id:'r15',   name:"Fifteen Shapes",                    desc:"That's like... fifteen shapes. I don't know what else to tell you.",                                  check:()=>placed>=15},
+  {id:'r20',   name:"Twenty Shapes",                     desc:"You've unlocked the spatial awareness of a golden retriever. Congratulations.",                      check:()=>placed>=20},
+  {id:'p24',   name:"24 Squares",                        desc:"One for every hour you should have been sleeping.",                                                   check:()=>placed>=24},
+  {id:'r25',   name:"A Quarter Century of Shapes",       desc:"25 shapes placed. You have dedicated a meaningful portion of your life to this.",                    check:()=>placed>=25},
+  {id:'r30',   name:"Thirty and Thriving",               desc:"Thriving is a strong word. Present and clicking. That's more accurate.",                             check:()=>placed>=30},
+  {id:'r40',   name:"Forty Shapes Deep",                 desc:"You are now in too deep to pretend this was an accident.",                                            check:()=>placed>=40},
+  {id:'r42',   name:"The Answer",                        desc:"42. The meaning of life. Still doesn't explain why you're doing this.",                              check:()=>placed>=42},
+  {id:'p52',   name:"52 Squares",                        desc:"One for every week of the year. You've been here that long.",                                        check:()=>placed>=52},
+  {id:'r69',   name:"Nice",                              desc:"Nice.",                                                                                               check:()=>placed>=69},
+  {id:'r75',   name:"75% To A Century",                  desc:"You are goal-oriented. The goal is just extremely small.",                                            check:()=>placed>=75},
+  {id:'10',    name:"10 Squares – Baby Steps",           desc:"Gold star for effort.",                                                                               check:()=>placed>=10},
+  {id:'50',    name:"50 Squares – Getting Serious",      desc:"Lifestyle choice.",                                                                                   check:()=>placed>=50},
+  {id:'p144',  name:"A Gross",                           desc:"144 shapes. A 'gross'. The name is appropriate.",                                                    check:()=>placed>=144},
+  {id:'p180',  name:"180 – Half Turn",                   desc:"Half a rotation. Still in the square.",                                                              check:()=>placed>=180},
+  {id:'100',   name:"100 Squares – Square Obsession",    desc:"Rent-free.",                                                                                         check:()=>placed>=100},
+  {id:'r111',  name:"Triple Ones",                       desc:"Numerologically significant. Spiritually empty.",                                                    check:()=>placed>=111},
+  {id:'r150',  name:"One Fifty",                         desc:"You've now placed more shapes than you have friends. We're not saying that's bad. We're just saying.", check:()=>placed>=150},
+  {id:'r200',  name:"Two Hundred",                       desc:"200 shapes. At some point this stopped being a game and became a coping mechanism.",                 check:()=>placed>=200},
+  {id:'r250',  name:"Quarter Grand",                     desc:"250 shapes. You are the main character of a very niche story.",                                      check:()=>placed>=250},
+  {id:'r300',  name:"300",                               desc:"THIS. IS. A SQUARE HOLE.",                                                                           check:()=>placed>=300},
+  {id:'p301',  name:"301 Redirect",                      desc:"This achievement redirected you. To the square.",                                                    check:()=>placed>=301},
+  {id:'r350',  name:"Three Fifty",                       desc:"350 shapes. You are exactly halfway to the number you'd need to feel like this was a lot.",          check:()=>placed>=350},
+  {id:'p360',  name:"360 – Full Rotation",               desc:"A full circle. Ironic.",                                                                             check:()=>placed>=360},
+  {id:'p365',  name:"365 – One Year Of Squares",         desc:"One for every day of the year.",                                                                     check:()=>placed>=365},
+  {id:'r400',  name:"Four Hundred Shapes",               desc:"Nobody is coming to stop you. That's the scariest part.",                                            check:()=>placed>=400},
+  {id:'p404',  name:"404 – Square Not Found",            desc:"Ironic. You found it.",                                                                              check:()=>placed>=404},
+  {id:'r420',  name:"Snoop",                             desc:"420 shapes. The square hole appreciates your commitment to the bit.",                                check:()=>placed>=420},
+  {id:'r450',  name:"Almost 500",                        desc:"Getting close to something. What? Nobody knows.",                                                    check:()=>placed>=450},
+  {id:'500',   name:"500 Squares – Halfway to Madness",  desc:"No return ticket.",                                                                                  check:()=>placed>=500},
+  {id:'r555',  name:"Triple Fives",                      desc:"Patterns emerge. The mind seeks order. The square accepts everything.",                              check:()=>placed>=555},
+  {id:'r600',  name:"Six Hundred",                       desc:"You have placed 600 shapes into a square hole. Read that sentence again.",                           check:()=>placed>=600},
+  {id:'r700',  name:"Seven Hundred",                     desc:"At 700 shapes you have statistically outlasted most New Year's resolutions.",                        check:()=>placed>=700},
+  {id:'r750',  name:"Three Quarters Grand",              desc:"75% of a thousand. Progress. Meaningless progress.",                                                 check:()=>placed>=750},
+  {id:'r777',  name:"Lucky Sevens",                      desc:"Jackpot. The square hole pays out nothing. House always wins.",                                      check:()=>placed>=777},
+  {id:'r800',  name:"Eight Hundred Shapes",              desc:"Your dedication is statistically anomalous. Science is concerned.",                                  check:()=>placed>=800},
+  {id:'r900',  name:"Nine Hundred",                      desc:"100 shapes away from the milestone. Can you feel the hollow sense of impending completion?",         check:()=>placed>=900},
+  {id:'r99',   name:"So Close To 100",                   desc:"One more. ONE MORE. You can feel it.",                                                                check:()=>placed>=99},
+  {id:'r999',  name:"One Away",                          desc:"999. One more. Don't think about what happens after. Just place it.",                               check:()=>placed>=999},
+  {id:'1000',  name:"1000 Squares – Why Though?",        desc:"No applause.",                                                                                       check:()=>placed>=1000},
+  {id:'r1001', name:"One Thousand And One",              desc:"You didn't stop at 1000. Of course you didn't.",                                                     check:()=>placed>=1001},
+  {id:'p1024', name:"1024 – One Kilosquare",             desc:"Binary milestone. Very computer of you.",                                                            check:()=>placed>=1024},
+  {id:'p1100', name:"1,100 Squares",                     desc:"The number grows. So does the regret.",                                                              check:()=>placed>=1100},
+  {id:'p1200', name:"1,200 Squares",                     desc:"The number grows. So does the regret.",                                                              check:()=>placed>=1200},
+  {id:'p1300', name:"1,300 Squares",                     desc:"The number grows. So does the regret.",                                                              check:()=>placed>=1300},
+  {id:'p1400', name:"1,400 Squares",                     desc:"The number grows. So does the regret.",                                                              check:()=>placed>=1400},
+  {id:'r1100', name:"Eleven Hundred",                    desc:"You are firmly in post-1000 territory. There are no achievements here. Oh wait.",                   check:()=>placed>=1100},
+  {id:'r1234', name:"Sequential",                        desc:"1-2-3-4. You noticed. Good. That's probably the most impressive thing you've done today.",           check:()=>placed>=1234},
+  {id:'r1337', name:"Leet",                              desc:"1337 shapes. A hacker. A legend. A person with too much time.",                                      check:()=>placed>=1337},
+  {id:'r1500', name:"Fifteen Hundred",                   desc:"1500 shapes. You are no longer 'passing time.' You are consuming it.",                               check:()=>placed>=1500},
+  {id:'r1750', name:"Seventeen Fifty",                   desc:"1750 shapes. An odd number for an odd situation.",                                                   check:()=>placed>=1750},
+  {id:'r2000', name:"Two Thousand",                      desc:"Your future self is staring back at you from across the timeline with quiet disappointment.",        check:()=>placed>=2000},
+  {id:'p2001', name:"2001 A Square Odyssey",             desc:"HAL refuses to open the hole.",                                                                      check:()=>placed>=2001},
+  {id:'p2048', name:"2048 Squares",                      desc:"Like the game. But worse.",                                                                          check:()=>placed>=2048},
+  {id:'r2500', name:"Two And A Half Grand",              desc:"2500 shapes. The square hole has become a lifestyle, not a destination.",                            check:()=>placed>=2500},
+  {id:'r2750', name:"Two Thousand Seven Fifty",          desc:"2750. You are operating in increments now. The brain seeks patterns in the void.",                   check:()=>placed>=2750},
+  {id:'r3000', name:"Three Thousand",                    desc:"3000 shapes placed. History will not remember this. We will.",                                       check:()=>placed>=3000},
+  {id:'r3141', name:"Pi Shapes",                         desc:"3141. Approximately pi. The universe is round. The hole is square. Ironic.",                        check:()=>placed>=3141},
+  {id:'r3500', name:"Three Thousand Five Hundred",       desc:"3500 shapes. You have blinked approximately 7000 times since you started.",                         check:()=>placed>=3500},
+  {id:'r4000', name:"Four Thousand",                     desc:"At 4000 shapes you have officially spent more time on this than learning a language.",               check:()=>placed>=4000},
+  {id:'p4096', name:"4096 Squares",                      desc:"2 to the power of 12. The square approves.",                                                        check:()=>placed>=4096},
+  {id:'r4242', name:"42 Twice",                          desc:"The meaning of life, doubled. Still no answers.",                                                    check:()=>placed>=4242},
+  {id:'r4500', name:"Forty-Five Hundred",                desc:"4500. The achievement names are getting longer because we ran out of things to say.",                check:()=>placed>=4500},
+  {id:'r5000', name:"Five Grand",                        desc:"5000 shapes. Clinical. Cold. Mechanical. Beautiful.",                                                check:()=>placed>=5000},
+  {id:'r5500', name:"Five Five Zero Zero",               desc:"5500 shapes. We're writing the numbers out now. That's where we are.",                              check:()=>placed>=5500},
+  {id:'r6000', name:"Six Thousand",                      desc:"You have placed more shapes than there are named bones in the human body.",                         check:()=>placed>=6000},
+  {id:'r6969', name:"Nice Nice",                         desc:"6969. An achievement of pure vibes.",                                                                check:()=>placed>=6969},
+  {id:'r7000', name:"Seven Thousand",                    desc:"The square hole is your oldest relationship at this point.",                                         check:()=>placed>=7000},
+  {id:'r8000', name:"Eight Thousand",                    desc:"The numbers stop feeling real.",                                                                     check:()=>placed>=8000},
+  {id:'r8500', name:"Eight And A Half Thousand",         desc:"The square hole has witnessed more of your life than most people you know.",                         check:()=>placed>=8500},
+  {id:'r8888', name:"Eights All The Way Down",           desc:"8888 is considered lucky in some cultures. This is not one of them.",                               check:()=>placed>=8888},
+  {id:'r9000', name:"It's Over 9000",                    desc:"WHAT? NINE THOUSAND?! ...yes.",                                                                     check:()=>placed>=9000},
+  {id:'r9999', name:"Four Nines",                        desc:"9999. One away from 10000. You've been here before. You know what to do.",                          check:()=>placed>=9999},
+  {id:'r10000',name:"Ten Thousand Shapes",               desc:"10,000 shapes. You have surpassed the 10,000 hour rule for the wrong skill entirely.",               check:()=>placed>=10000},
+  {id:'r11111',name:"Five Ones",                         desc:"11111. A number of pure repetition. Fitting.",                                                       check:()=>placed>=11111},
+  {id:'r12345',name:"One Two Three Four Five",           desc:"The sequential achievement returns. You were always going to get here.",                             check:()=>placed>=12345},
+  {id:'r15000',name:"Fifteen Thousand",                  desc:"We're not mad. We're impressed. No wait, we're both.",                                               check:()=>placed>=15000},
+  {id:'r20000',name:"Twenty Thousand",                   desc:"More shapes than most people have sent text messages this year.",                                    check:()=>placed>=20000},
+  {id:'r22222',name:"Five Twos",                         desc:"22222. The pattern continues. You continue. The square hole continues.",                             check:()=>placed>=22222},
+  {id:'r25000',name:"Quarter Million Steps Toward Nothing", desc:"The square hole has become a mirror and you don't like what you see.",                            check:()=>placed>=25000},
+  {id:'r30000',name:"Thirty Thousand",                   desc:"A commitment most people reserve for mortgages.",                                                    check:()=>placed>=30000},
+  {id:'r40000',name:"Forty Thousand",                    desc:"The game has long since become the background noise of your life.",                                  check:()=>placed>=40000},
+  {id:'r50000',name:"Fifty Thousand",                    desc:"Half a century of shapes. That's the sentence. Live with it.",                                      check:()=>placed>=50000},
+  {id:'r55555',name:"Five Fives",                        desc:"55555. Numerical harmony in the least harmonious context imaginable.",                               check:()=>placed>=55555},
+  {id:'r69420',name:"The Forbidden Number",              desc:"69,420. You aimed for it. Don't lie.",                                                               check:()=>placed>=69420},
+  {id:'r75000',name:"Seventy-Five Thousand",             desc:"The square hole has become your primary source of structure.",                                       check:()=>placed>=75000},
+  {id:'r99999',name:"One Away From A Hundred Thousand",  desc:"99,999 shapes. So close.",                                                                          check:()=>placed>=99999},
+  {id:'r100000',name:"One Hundred Thousand Shapes",     desc:"100,000. Six digits. You got it by clicking a square.",                                              check:()=>placed>=100000},
+  {id:'r123456',name:"One Two Three Four Five Six",      desc:"123456. The sequential achievement has evolved.",                                                    check:()=>placed>=123456},
+  {id:'r150000',name:"A Hundred And Fifty Thousand",     desc:"Your dedication has transcended the original joke and become something else entirely.",              check:()=>placed>=150000},
+  {id:'r200000',name:"Two Hundred Thousand",             desc:"The game is you now. You are the game.",                                                             check:()=>placed>=200000},
+  {id:'r250000',name:"Quarter Million",                  desc:"You could have learned piano. You chose this. Respect.",                                             check:()=>placed>=250000},
+  {id:'r300000',name:"Three Hundred Thousand",           desc:"There is no punchline anymore. Just the square. Just you.",                                         check:()=>placed>=300000},
+  {id:'r500000',name:"Half A Million",                   desc:"You are the 0.0001%. For this. Specifically this.",                                                  check:()=>placed>=500000},
+  {id:'r750000',name:"Three Quarters Of A Million",      desc:"A quarter million away from the reset. Are you ready?",                                             check:()=>placed>=750000},
+  {id:'r999999',name:"One Away From A Million",          desc:"999,999 shapes. You can see the finish line. It's a cliff.",                                        check:()=>placed>=999999},
+  {id:'1000000',name:"One Million Squares",              desc:"You did it. Why?",                                                                                   check:()=>placed>=1000000},
+  {id:'again',  name:"Again?",                           desc:"The counter reset.",                                                                                 check:()=>false},
 
   // === WRONG HOLES ===
-  {id:'oops', name:"Oops", desc:"A classic.", check:()=>wrongHoles>=1},
-  {id:'wrong1', name:"Wrong Hole (First Time)", desc:"It happens to everyone.", check:()=>wrongHoles>=1},
-  {id:'off-by-one', name:"Off By One", desc:"So close. One hole off. Story of your life.", check:()=>wrongHoles>=1},
-  {id:'rw2', name:"Wrong Hole, Different Shape", desc:"You tried two different wrong holes. Research. Bold.", check:()=>wrongHoles>=2},
-  {id:'rw3', name:"Three Wrongs", desc:"Three wrong drops. You are testing hypotheses. The hypothesis is wrong.", check:()=>wrongHoles>=3},
-  {id:'rw5', name:"Five Wrong Holes", desc:"Five. Rejected more times in this game than some people on dating apps. Today.", check:()=>wrongHoles>=5},
-  {id:'wrong10', name:"Wrong Hole Enthusiast", desc:"10 wrong drops. Learning curve.", check:()=>wrongHoles>=10},
-  {id:'rw15', name:"Fifteen Rejections", desc:"15 wrong drops. The holes have a file on you now.", check:()=>wrongHoles>=15},
-  {id:'rw20', name:"Twenty Wrong Drops", desc:"20 rejections. You have officially failed more than you've succeeded.", check:()=>wrongHoles>=20},
-  {id:'wrong25', name:"Committed To Being Wrong", desc:"25 times. Impressive stubbornness.", check:()=>wrongHoles>=25},
-  {id:'rw30', name:"Thirty Times Wrong", desc:"Are you doing it on purpose?", check:()=>wrongHoles>=30},
-  {id:'rw40', name:"Forty Rejections", desc:"The circle hole is starting to feel bad for you.", check:()=>wrongHoles>=40},
-  {id:'wrong50', name:"Wrong Hole Professional", desc:"50 rejections. The holes give up.", check:()=>wrongHoles>=50},
-  {id:'rw75', name:"Seventy-Five Wrongs", desc:"Three quarters of a hundred. Achievement unlocked: persistence in the face of clear feedback.", check:()=>wrongHoles>=75},
-  {id:'wrong100', name:"Wrong Hole Hall of Fame", desc:"100 drops. A legacy of chaos.", check:()=>wrongHoles>=100},
-  {id:'rw150', name:"A Hundred And Fifty Wrong", desc:"150. 'Wrong hole' is your love language.", check:()=>wrongHoles>=150},
-  {id:'rw200', name:"Two Hundred Wrong Drops", desc:"More committed to being wrong than most politicians.", check:()=>wrongHoles>=200},
-  {id:'rw300', name:"Three Hundred Rejections", desc:"The other holes have started a support group.", check:()=>wrongHoles>=300},
-  {id:'rw500', name:"Five Hundred Wrong Holes", desc:"You have failed your way into history.", check:()=>wrongHoles>=500},
-  {id:'rw750', name:"Seven Fifty Wrong", desc:"You are actively in conflict with the concept of a square hole.", check:()=>wrongHoles>=750},
-  {id:'rw1000', name:"A Thousand Wrong Holes", desc:"A perfect mirror of your correct drops, except wrong. Artistically consistent.", check:()=>wrongHoles>=1000},
-  {id:'rw1500', name:"Wrong 1,500 Times", desc:"A staggering achievement in misdirection.", check:()=>wrongHoles>=1500},
-  {id:'rw2000', name:"Wrong 2,000 Times", desc:"The shapes are filing a complaint.", check:()=>wrongHoles>=2000},
-  {id:'rw2500', name:"Wrong 2,500 Times", desc:"Two thousand five hundred. You've achieved something.", check:()=>wrongHoles>=2500},
-  {id:'rw3000', name:"Wrong 3,000 Times", desc:"You are the wrong hole champion.", check:()=>wrongHoles>=3000},
-  {id:'rw5000', name:"Wrong 5,000 Times", desc:"A career. An awful career.", check:()=>wrongHoles>=5000},
-  {id:'rw10000', name:"Wrong 10,000 Times", desc:"Edison failed 10,000 times before the lightbulb. You failed 10,000 times at a browser game.", check:()=>wrongHoles>=10000},
+  {id:'oops',       name:"Oops",                         desc:"A classic.",                                                                                         check:()=>wrongHoles>=1},
+  {id:'wrong1',     name:"Wrong Hole (First Time)",      desc:"It happens to everyone.",                                                                            check:()=>wrongHoles>=1},
+  {id:'off-by-one', name:"Off By One",                   desc:"So close. One hole off. Story of your life.",                                                       check:()=>wrongHoles>=1},
+  {id:'rw2',        name:"Wrong Hole, Different Shape",  desc:"You tried two different wrong holes. Research. Bold.",                                               check:()=>wrongHoles>=2},
+  {id:'rw3',        name:"Three Wrongs",                 desc:"Three wrong drops. You are testing hypotheses. The hypothesis is wrong.",                           check:()=>wrongHoles>=3},
+  {id:'rw5',        name:"Five Wrong Holes",             desc:"Five. Rejected more times in this game than some people on dating apps. Today.",                    check:()=>wrongHoles>=5},
+  {id:'wrong10',    name:"Wrong Hole Enthusiast",        desc:"10 wrong drops. Learning curve.",                                                                   check:()=>wrongHoles>=10},
+  {id:'rw15',       name:"Fifteen Rejections",           desc:"15 wrong drops. The holes have a file on you now.",                                                  check:()=>wrongHoles>=15},
+  {id:'rw20',       name:"Twenty Wrong Drops",           desc:"20 rejections. You have officially failed more than you've succeeded.",                              check:()=>wrongHoles>=20},
+  {id:'wrong25',    name:"Committed To Being Wrong",     desc:"25 times. Impressive stubbornness.",                                                                check:()=>wrongHoles>=25},
+  {id:'rw30',       name:"Thirty Times Wrong",           desc:"Are you doing it on purpose?",                                                                     check:()=>wrongHoles>=30},
+  {id:'rw40',       name:"Forty Rejections",             desc:"The circle hole is starting to feel bad for you.",                                                  check:()=>wrongHoles>=40},
+  {id:'wrong50',    name:"Wrong Hole Professional",      desc:"50 rejections. The holes give up.",                                                                 check:()=>wrongHoles>=50},
+  {id:'rw75',       name:"Seventy-Five Wrongs",          desc:"Three quarters of a hundred. Achievement unlocked: persistence in the face of clear feedback.",     check:()=>wrongHoles>=75},
+  {id:'wrong100',   name:"Wrong Hole Hall of Fame",      desc:"100 drops. A legacy of chaos.",                                                                     check:()=>wrongHoles>=100},
+  {id:'rw150',      name:"A Hundred And Fifty Wrong",    desc:"150. 'Wrong hole' is your love language.",                                                          check:()=>wrongHoles>=150},
+  {id:'rw200',      name:"Two Hundred Wrong Drops",      desc:"More committed to being wrong than most politicians.",                                              check:()=>wrongHoles>=200},
+  {id:'rw300',      name:"Three Hundred Rejections",     desc:"The other holes have started a support group.",                                                     check:()=>wrongHoles>=300},
+  {id:'rw500',      name:"Five Hundred Wrong Holes",     desc:"You have failed your way into history.",                                                            check:()=>wrongHoles>=500},
+  {id:'rw750',      name:"Seven Fifty Wrong",            desc:"You are actively in conflict with the concept of a square hole.",                                   check:()=>wrongHoles>=750},
+  {id:'rw1000',     name:"A Thousand Wrong Holes",       desc:"A perfect mirror of your correct drops, except wrong. Artistically consistent.",                   check:()=>wrongHoles>=1000},
+  {id:'rw1500',     name:"Wrong 1,500 Times",            desc:"A staggering achievement in misdirection.",                                                        check:()=>wrongHoles>=1500},
+  {id:'rw2000',     name:"Wrong 2,000 Times",            desc:"The shapes are filing a complaint.",                                                               check:()=>wrongHoles>=2000},
+  {id:'rw2500',     name:"Wrong 2,500 Times",            desc:"Two thousand five hundred. You've achieved something.",                                            check:()=>wrongHoles>=2500},
+  {id:'rw3000',     name:"Wrong 3,000 Times",            desc:"You are the wrong hole champion.",                                                                 check:()=>wrongHoles>=3000},
+  {id:'rw5000',     name:"Wrong 5,000 Times",            desc:"A career. An awful career.",                                                                       check:()=>wrongHoles>=5000},
+  {id:'rw10000',    name:"Wrong 10,000 Times",           desc:"Edison failed 10,000 times before the lightbulb. You failed 10,000 times at a browser game.",      check:()=>wrongHoles>=10000},
 
   // === WRONG HOLE BY TYPE ===
-  {id:'circle-wrong', name:"Nice Try, Roundie", desc:"Tried the circle hole 5 times.", check:()=>(wrongByType.circle||0)>=5},
-  {id:'triangle-wrong', name:"Three Strikes", desc:"Triangle hole tried 5 times.", check:()=>(wrongByType.triangle||0)>=5},
-  {id:'pentagon-wrong', name:"Penta-GONE", desc:"Pentagon hole tried 5 times.", check:()=>(wrongByType.pentagon||0)>=5},
-  {id:'hexagon-wrong', name:"Bee Rejected", desc:"Hexagon hole tried 5 times.", check:()=>(wrongByType.hexagon||0)>=5},
-  {id:'star-wrong', name:"Reach For The Square", desc:"Star hole tried 5 times.", check:()=>(wrongByType.star||0)>=5},
-  {id:'all-wrong', name:"Equal Opportunity Wronger", desc:"Tried every wrong hole at least once.", check:()=>Object.keys(wrongByType).length>=5},
-  {id:'circle-wrong-10', name:"Roundie Obsessed x10", desc:"Ten times. It's not going to work.", check:()=>(wrongByType.circle||0)>=10},
-  {id:'circle-wrong-20', name:"Roundie Obsessed x20", desc:"Twenty circle attempts.", check:()=>(wrongByType.circle||0)>=20},
-  {id:'circle-wrong-50', name:"Roundie Obsessed x50", desc:"The circle hole is your nemesis.", check:()=>(wrongByType.circle||0)>=50},
-  {id:'circle-wrong-100',name:"Roundie Obsessed x100", desc:"The circle hole has named a wing after you.", check:()=>(wrongByType.circle||0)>=100},
-  {id:'triangle-wrong-10',name:"Tri-Guy Obsessed x10", desc:"Ten times into the triangle hole.", check:()=>(wrongByType.triangle||0)>=10},
-  {id:'triangle-wrong-50',name:"Tri-Guy Obsessed x50", desc:"The triangle hole is your nemesis.",check:()=>(wrongByType.triangle||0)>=50},
-  {id:'pentagon-wrong-10',name:"Penta Obsessed x10", desc:"Ten times into the pentagon hole.", check:()=>(wrongByType.pentagon||0)>=10},
-  {id:'pentagon-wrong-50',name:"Penta Obsessed x50", desc:"The pentagon hole is your nemesis.",check:()=>(wrongByType.pentagon||0)>=50},
-  {id:'hexagon-wrong-10', name:"Hex Obsessed x10", desc:"Ten times into the hexagon hole.", check:()=>(wrongByType.hexagon||0)>=10},
-  {id:'hexagon-wrong-50', name:"Hex Obsessed x50", desc:"The hexagon hole is your nemesis.", check:()=>(wrongByType.hexagon||0)>=50},
-  {id:'star-wrong-10', name:"Star Obsessed x10", desc:"Ten times into the star hole.", check:()=>(wrongByType.star||0)>=10},
-  {id:'star-wrong-50', name:"Star Obsessed x50", desc:"The star hole is your nemesis.", check:()=>(wrongByType.star||0)>=50},
+  {id:'circle-wrong',    name:"Nice Try, Roundie",      desc:"Tried the circle hole 5 times.",    check:()=>(wrongByType.circle||0)>=5},
+  {id:'triangle-wrong',  name:"Three Strikes",          desc:"Triangle hole tried 5 times.",      check:()=>(wrongByType.triangle||0)>=5},
+  {id:'pentagon-wrong',  name:"Penta-GONE",             desc:"Pentagon hole tried 5 times.",      check:()=>(wrongByType.pentagon||0)>=5},
+  {id:'hexagon-wrong',   name:"Bee Rejected",           desc:"Hexagon hole tried 5 times.",       check:()=>(wrongByType.hexagon||0)>=5},
+  {id:'star-wrong',      name:"Reach For The Square",   desc:"Star hole tried 5 times.",          check:()=>(wrongByType.star||0)>=5},
+  {id:'all-wrong',       name:"Equal Opportunity Wronger",  desc:"Tried every wrong hole at least once.", check:()=>Object.keys(wrongByType).length>=5},
+  {id:'circle-wrong-10', name:"Roundie Obsessed x10",   desc:"Ten times. It's not going to work.", check:()=>(wrongByType.circle||0)>=10},
+  {id:'circle-wrong-20', name:"Roundie Obsessed x20",   desc:"Twenty circle attempts.",           check:()=>(wrongByType.circle||0)>=20},
+  {id:'circle-wrong-50', name:"Roundie Obsessed x50",   desc:"The circle hole is your nemesis.",  check:()=>(wrongByType.circle||0)>=50},
+  {id:'circle-wrong-100',name:"Roundie Obsessed x100",  desc:"The circle hole has named a wing after you.", check:()=>(wrongByType.circle||0)>=100},
+  {id:'triangle-wrong-10',name:"Tri-Guy Obsessed x10",  desc:"Ten times into the triangle hole.", check:()=>(wrongByType.triangle||0)>=10},
+  {id:'triangle-wrong-50',name:"Tri-Guy Obsessed x50",  desc:"The triangle hole is your nemesis.",check:()=>(wrongByType.triangle||0)>=50},
+  {id:'pentagon-wrong-10',name:"Penta Obsessed x10",    desc:"Ten times into the pentagon hole.", check:()=>(wrongByType.pentagon||0)>=10},
+  {id:'pentagon-wrong-50',name:"Penta Obsessed x50",    desc:"The pentagon hole is your nemesis.",check:()=>(wrongByType.pentagon||0)>=50},
+  {id:'hexagon-wrong-10', name:"Hex Obsessed x10",      desc:"Ten times into the hexagon hole.",  check:()=>(wrongByType.hexagon||0)>=10},
+  {id:'hexagon-wrong-50', name:"Hex Obsessed x50",      desc:"The hexagon hole is your nemesis.", check:()=>(wrongByType.hexagon||0)>=50},
+  {id:'star-wrong-10',    name:"Star Obsessed x10",     desc:"Ten times into the star hole.",     check:()=>(wrongByType.star||0)>=10},
+  {id:'star-wrong-50',    name:"Star Obsessed x50",     desc:"The star hole is your nemesis.",    check:()=>(wrongByType.star||0)>=50},
 
   // === IDLE / AFK ===
-  {id:'idle30s', name:"Already AFK?", desc:"30 seconds idle. You opened this, immediately got distracted.", check:()=>idleTime>=30000},
-  {id:'idle45s', name:"Checking Something", desc:"45 seconds idle. Classic 'let me just check one thing'.", check:()=>idleTime>=45000},
-  {id:'idle2m', name:"Pro Procrastinator", desc:"2 minutes idle. Impressive.", check:()=>idleTime>=120000},
-  {id:'idle5m', name:"Gone For Coffee", desc:"5 minutes. Was it good?", check:()=>idleTime>=300000},
-  {id:'idle10m', name:"Ten Minutes, Nothing", desc:"The square waited. The square always waits.", check:()=>idleTime>=600000},
-  {id:'idle15m', name:"Are You Still There?", desc:"15 minutes. The square waits.", check:()=>idleTime>=900000},
-  {id:'idle20m', name:"Twenty Minutes Gone", desc:"Whatever pulled you away was probably more important. Probably.", check:()=>idleTime>=1200000},
-  {id:'idle30m', name:"Half Hour Haunting", desc:"30 min. This tab is a ghost.", check:()=>idleTime>=1800000},
-  {id:'idle45m', name:"Forty-Five Minute Vanishing", desc:"You ghosted a square hole. A new low.", check:()=>idleTime>=2700000},
-  {id:'idle1h', name:"One Hour Of Nothing", desc:"1 hour idle. Legendary.", check:()=>idleTime>=3600000},
-  {id:'idle2h', name:"Two Hours Away", desc:"The game ran in your browser for two hours doing nothing. Like your ambitions.", check:()=>idleTime>=7200000},
-  {id:'idle4h', name:"Four Hours Idle", desc:"This tab is a shrine now. Do not close it.", check:()=>idleTime>=14400000},
-  {id:'idle8h', name:"Overnight Dedication", desc:"Did you sleep here?", check:()=>idleTime>=28800000},
-  {id:'idle12h', name:"Half A Day", desc:"This game has now lasted longer than most of your relationships.", check:()=>idleTime>=43200000},
-  {id:'idle24h', name:"A Full Day", desc:"One full rotation of the Earth. The square hole persists.", check:()=>idleTime>=86400000},
-  {id:'idle48h', name:"Two Days", desc:"The square hole is your most stable long-term commitment.", check:()=>idleTime>=172800000},
-  {id:'idle1w', name:"One Week Idle", desc:"Seven days. The square hole is still here. So are you. In spirit.", check:()=>idleTime>=604800000},
+  {id:'idle30s',  name:"Already AFK?",                  desc:"30 seconds idle. You opened this, immediately got distracted.",                                     check:()=>idleTime>=30000},
+  {id:'idle45s',  name:"Checking Something",            desc:"45 seconds idle. Classic 'let me just check one thing'.",                                           check:()=>idleTime>=45000},
+  {id:'idle2m',   name:"Pro Procrastinator",            desc:"2 minutes idle. Impressive.",                                                                       check:()=>idleTime>=120000},
+  {id:'idle5m',   name:"Gone For Coffee",               desc:"5 minutes. Was it good?",                                                                          check:()=>idleTime>=300000},
+  {id:'idle10m',  name:"Ten Minutes, Nothing",          desc:"The square waited. The square always waits.",                                                       check:()=>idleTime>=600000},
+  {id:'idle15m',  name:"Are You Still There?",          desc:"15 minutes. The square waits.",                                                                    check:()=>idleTime>=900000},
+  {id:'idle20m',  name:"Twenty Minutes Gone",           desc:"Whatever pulled you away was probably more important. Probably.",                                   check:()=>idleTime>=1200000},
+  {id:'idle30m',  name:"Half Hour Haunting",            desc:"30 min. This tab is a ghost.",                                                                     check:()=>idleTime>=1800000},
+  {id:'idle45m',  name:"Forty-Five Minute Vanishing",   desc:"You ghosted a square hole. A new low.",                                                            check:()=>idleTime>=2700000},
+  {id:'idle1h',   name:"One Hour Of Nothing",           desc:"1 hour idle. Legendary.",                                                                          check:()=>idleTime>=3600000},
+  {id:'idle2h',   name:"Two Hours Away",                desc:"The game ran in your browser for two hours doing nothing. Like your ambitions.",                   check:()=>idleTime>=7200000},
+  {id:'idle4h',   name:"Four Hours Idle",               desc:"This tab is a shrine now. Do not close it.",                                                       check:()=>idleTime>=14400000},
+  {id:'idle8h',   name:"Overnight Dedication",          desc:"Did you sleep here?",                                                                              check:()=>idleTime>=28800000},
+  {id:'idle12h',  name:"Half A Day",                    desc:"This game has now lasted longer than most of your relationships.",                                  check:()=>idleTime>=43200000},
+  {id:'idle24h',  name:"A Full Day",                    desc:"One full rotation of the Earth. The square hole persists.",                                        check:()=>idleTime>=86400000},
+  {id:'idle48h',  name:"Two Days",                      desc:"The square hole is your most stable long-term commitment.",                                        check:()=>idleTime>=172800000},
+  {id:'idle1w',   name:"One Week Idle",                 desc:"Seven days. The square hole is still here. So are you. In spirit.",                                check:()=>idleTime>=604800000},
 
   // === SKILL / SESSION (fixed — use session counters) ===
-  {id:'speedrun', name:"Speedrun Attempt", desc:"100 shapes placed quickly this session. Was that intentional?", check:()=>sessionPlaced>=100&&idleTime<300000},
-  {id:'no-hit-run', name:"No Wrong Holes", desc:"50 shapes placed this session with zero wrong drops. Suspiciously good.", check:()=>sessionPlaced>=50&&sessionWrongHoles===0},
-  {id:'hat-trick', name:"Hat Trick", desc:"Three shapes in a row, no wrong holes. Not easy.", check:()=>sessionPlaced>=3&&sessionWrongHoles===0},
+  {id:'speedrun',    name:"Speedrun Attempt",           desc:"100 shapes placed quickly this session. Was that intentional?",                                     check:()=>sessionPlaced>=100&&idleTime<300000},
+  {id:'no-hit-run',  name:"No Wrong Holes",             desc:"50 shapes placed this session with zero wrong drops. Suspiciously good.",                          check:()=>sessionPlaced>=50&&sessionWrongHoles===0},
+  {id:'hat-trick',   name:"Hat Trick",                  desc:"Three shapes in a row, no wrong holes. Not easy.",                                                 check:()=>sessionPlaced>=3&&sessionWrongHoles===0},
 
   // === META / ACHIEVEMENT HUNTING ===
-  {id:'achievement-hunter', name:"Achievement Hunter", desc:"You're reading the achievement list. Noted.", check:()=>unlocked.size>=5},
-  {id:'completionist', name:"The Completionist", desc:"50 achievements unlocked. You're actually doing this.", check:()=>unlocked.size>=50},
-  {id:'hundred-percent', name:"100% Dedication", desc:"100 achievements. The square is impressed. Minimally.", check:()=>unlocked.size>=100},
+  {id:'achievement-hunter', name:"Achievement Hunter",  desc:"You're reading the achievement list. Noted.",                                                      check:()=>unlocked.size>=5},
+  {id:'completionist',      name:"The Completionist",   desc:"50 achievements unlocked. You're actually doing this.",                                            check:()=>unlocked.size>=50},
+  {id:'hundred-percent',    name:"100% Dedication",     desc:"100 achievements. The square is impressed. Minimally.",                                            check:()=>unlocked.size>=100},
 
   // === HOLESEPTION ===
-  {id:'holeseption-circle', name:"Circle Holeseption", desc:"You put the circle hole into the square hole. It accepted. Of course it did.", check:()=>holedHoles.has('circle')},
-  {id:'holeseption-triangle', name:"Triangle Holeseption", desc:"The triangle hole is inside the square hole. Three sides, one fate.", check:()=>holedHoles.has('triangle')},
-  {id:'holeseption-pentagon', name:"Pentagon Holeseption", desc:"Five sides, zero dignity. The pentagon hole went in.", check:()=>holedHoles.has('pentagon')},
-  {id:'holeseption-hexagon', name:"Hexagon Holeseption", desc:"The hexagon hole is in the square hole. The bees will hear of this.", check:()=>holedHoles.has('hexagon')},
-  {id:'holeseption-star', name:"Star Holeseption", desc:"The star hole entered the square hole willingly. It was always meant to.", check:()=>holedHoles.has('star')},
-  {id:'holeseption-all', name:"Full Holeseption", desc:"All five holes have been put in the square hole. The square accepts everything. Even other holes. Especially other holes.", check:()=>holedHoles.size>=5},
-  {id:'holeseption-first', name:"First Holeseption", desc:"A hole. In the hole. This is the beginning.", check:()=>holedHoles.size>=1},
-  {id:'holeseption-encore', name:"Holeseption: Encore", desc:"Three holes have entered the square hole. It's getting crowded in there.", check:()=>holedHoles.size>=3},
+  {id:'holeseption-circle',   name:"Circle Holeseption",   desc:"You put the circle hole into the square hole. It accepted. Of course it did.",      check:()=>holedHoles.has('circle')},
+  {id:'holeseption-triangle', name:"Triangle Holeseption", desc:"The triangle hole is inside the square hole. Three sides, one fate.",                check:()=>holedHoles.has('triangle')},
+  {id:'holeseption-pentagon', name:"Pentagon Holeseption", desc:"Five sides, zero dignity. The pentagon hole went in.",                               check:()=>holedHoles.has('pentagon')},
+  {id:'holeseption-hexagon',  name:"Hexagon Holeseption",  desc:"The hexagon hole is in the square hole. The bees will hear of this.",               check:()=>holedHoles.has('hexagon')},
+  {id:'holeseption-star',     name:"Star Holeseption",     desc:"The star hole entered the square hole willingly. It was always meant to.",           check:()=>holedHoles.has('star')},
+  {id:'holeseption-all',      name:"Full Holeseption",     desc:"All five holes have been put in the square hole. The square accepts everything. Even other holes. Especially other holes.", check:()=>holedHoles.size>=5},
+  {id:'holeseption-first',    name:"First Holeseption",    desc:"A hole. In the hole. This is the beginning.",                                          check:()=>holedHoles.size>=1},
+  {id:'holeseption-encore',   name:"Holeseption: Encore",  desc:"Three holes have entered the square hole. It's getting crowded in there.",             check:()=>holedHoles.size>=3},
 
   // === SPECIAL DRAG-INTO-SQUARE ===
-  {id:'title-square', name:"Title Goes In The Square Hole", desc:"Iconic.", check:()=>false},
-  {id:'ach-tab-square', name:"Achievements Go In The Square Hole Too", desc:"Meta.", check:()=>false},
-  {id:'judgement-square',name:"Judgement Goes In The Square Hole", desc:"Silenced.", check:()=>false},
-  {id:'patch-square', name:"Patch Notes Go In The Square Hole", desc:"Updates rejected.", check:()=>false},
-  {id:'gaslight-square', name:"Gaslighting Goes In The Square Hole", desc:"Contained.", check:()=>false},
+  {id:'title-square',    name:"Title Goes In The Square Hole",          desc:"Iconic.",           check:()=>false},
+  {id:'ach-tab-square',  name:"Achievements Go In The Square Hole Too", desc:"Meta.",             check:()=>false},
+  {id:'judgement-square',name:"Judgement Goes In The Square Hole",      desc:"Silenced.",         check:()=>false},
+  {id:'patch-square',    name:"Patch Notes Go In The Square Hole",      desc:"Updates rejected.", check:()=>false},
+  {id:'gaslight-square', name:"Gaslighting Goes In The Square Hole",    desc:"Contained.",        check:()=>false},
+
+  // === RESET BUTTON CHAOS ===
+  {id:'broke-the-square', name:"Why Would You Do That",   desc:"You put the reset button in the square hole. The square hole broke. This is your fault.", check:()=>false},
+  {id:'fixed-the-square', name:"You Fixed It",            desc:"You collected all the pieces and put them back. The square hole is restored. It remembers what you did.", check:()=>false},
+  // === GAME TAB CHAOS ===
+  {id:'dont-try-again',   name:"Don't Try That Again",    desc:"You put the game tab in the square hole. It let you off with a warning. It won't again.", check:()=>false},
+  {id:'ate-the-game',     name:"It Ate The Game",         desc:"You broke the square hole a second time. It consumed itself and showed you its insides. Feed it back.", check:()=>false},
+  {id:'belong-in-square', name:"YOU BELONG IN THE SQUARE HOLE", desc:"You broke it twice. The second time earned you the darkness. You know what you did.", check:()=>false},
+
+  // === SECRET ===
+  {id:'secret-1', name:"oh you found it. anyway.", desc:"There's nothing here. You already got it. That's it. Go back.", check:()=>false},
+
+  // === RAGEBAIT: TIMING ===
+  {id:'rb-almost1',     name:"Almost",                        desc:"You were so close to not placing that wrong. Almost.",                                               check:()=>wrongHoles>=1},
+  {id:'rb-slowdown',    name:"You're Slowing Down",           desc:"The game noticed. We all noticed.",                                                                  check:()=>placed>=20},
+  {id:'rb-speedup',     name:"Slow Down",                     desc:"You're going too fast. The square hole is not a race. It's a test. You're failing.",                check:()=>placed>=50},
+  {id:'rb-consistent',  name:"Consistently Mediocre",         desc:"Every single placement. Adequate. Never exceptional. Never bad. Just fine. Like everything you do.", check:()=>placed>=75},
+  {id:'rb-plateau',     name:"Plateau Detected",              desc:"Your growth has stalled. Scientifically. We measured it.",                                          check:()=>placed>=100},
+  {id:'rb-peaked',      name:"You've Peaked",                 desc:"This is as good as it gets. The square hole knows. You know. We all know.",                        check:()=>placed>=150},
+  {id:'rb-regression',  name:"Regression To The Mean",        desc:"Statistically, you are average. The mean is a square. You're below it.",                           check:()=>placed>=200},
+
+  // === RAGEBAIT: WRONG HOLES ===
+  {id:'rb-wh-classic',  name:"Classic You",                   desc:"Wrong hole. Again. You really are consistent.",                                                     check:()=>wrongHoles>=3},
+  {id:'rb-wh-strategy', name:"Interesting Strategy",          desc:"Trying the wrong hole first. Bold. Wrong. But bold.",                                               check:()=>wrongHoles>=6},
+  {id:'rb-wh-sure',     name:"Sure. That One.",               desc:"Of all the holes to try, you tried that one. Sure.",                                                check:()=>wrongHoles>=8},
+  {id:'rb-wh-again',    name:"You Did It Again",              desc:"The wrong hole. Again. The hole is not surprised. We're not surprised. Are you surprised?",         check:()=>wrongHoles>=12},
+  {id:'rb-wh-pattern',  name:"A Pattern Emerges",             desc:"You keep trying the wrong holes. This is a pattern. Patterns can be broken. Yours won't be.",     check:()=>wrongHoles>=18},
+  {id:'rb-wh-research', name:"Independent Research",          desc:"You've now tested 20 wrong drops. The conclusion: they're wrong. Your data matches ours.",         check:()=>wrongHoles>=20},
+  {id:'rb-wh-hobby',    name:"Your New Hobby",                desc:"At 35 wrong drops it stops being a mistake and becomes a lifestyle.",                              check:()=>wrongHoles>=35},
+  {id:'rb-wh-brand',    name:"This Is Your Brand Now",        desc:"60 wrong holes. This is who you are. Own it. We have.",                                            check:()=>wrongHoles>=60},
+  {id:'rb-wh-expert',   name:"Wrong Hole Expert",             desc:"80 drops. You have more experience failing at this than most people have doing anything.",         check:()=>wrongHoles>=80},
+  {id:'rb-wh-legacy',   name:"A Legacy Of Bad Decisions",     desc:"Your wrong hole count has entered the triple digits. It will outlive us all.",                    check:()=>wrongHoles>=120},
+  {id:'rb-wh-phd',      name:"PHW: Doctor Of Wrong Holes",    desc:"200 wrong drops. A doctorate in incorrectness. Your thesis was rejected. Into the wrong hole.",   check:()=>wrongHoles>=200},
+
+  // === RAGEBAIT: PLACEMENT COMMENTARY ===
+  {id:'rb-lucky1',      name:"Lucky",                         desc:"That one barely counts.",                                                                           check:()=>placed>=1},
+  {id:'rb-luck2',       name:"Beginner's Luck",               desc:"Two shapes. Don't get comfortable.",                                                                check:()=>placed>=2},
+  {id:'rb-meh',         name:"Meh",                           desc:"Six shapes. The square hole is underwhelmed.",                                                      check:()=>placed>=6},
+  {id:'rb-fine',        name:"Fine. Whatever.",               desc:"Eight shapes. Fine.",                                                                               check:()=>placed>=8},
+  {id:'rb-expected',    name:"Expected",                      desc:"Nine shapes. As expected. Nothing more.",                                                           check:()=>placed>=9},
+  {id:'rb-nod',         name:"A Curt Nod",                    desc:"The square hole acknowledges your 11 shapes. That's all you get.",                                 check:()=>placed>=11},
+  {id:'rb-16',          name:"16 Squares",                    desc:"Sixteen. Unremarkable. Noted.",                                                                     check:()=>placed>=16},
+  {id:'rb-technically', name:"Technically Progress",          desc:"17 shapes. Technically forward motion. Technically.",                                               check:()=>placed>=17},
+  {id:'rb-sure2',       name:"Sure",                          desc:"18 shapes. Sure.",                                                                                  check:()=>placed>=18},
+  {id:'rb-ok',          name:"OK",                            desc:"19 shapes. OK.",                                                                                    check:()=>placed>=19},
+  {id:'rb-22',          name:"22",                            desc:"Just... 22.",                                                                                       check:()=>placed>=22},
+  {id:'rb-23',          name:"23",                            desc:"One more than 22. You should be proud. You shouldn't be.",                                          check:()=>placed>=23},
+  {id:'rb-26',          name:"26 Shapes",                     desc:"That's the alphabet. You have placed one shape for every letter. None of them spell anything.",    check:()=>placed>=26},
+  {id:'rb-27',          name:"27",                            desc:"27 is the age everyone thinks is significant. It's not. Neither is this.",                         check:()=>placed>=27},
+  {id:'rb-28',          name:"28 Shapes",                     desc:"A lunar month. The moon completes a full cycle. You've placed 28 shapes. One of these matters.",   check:()=>placed>=28},
+  {id:'rb-29',          name:"29",                            desc:"Prime number. Nothing else to say. Goodbye.",                                                       check:()=>placed>=29},
+  {id:'rb-31',          name:"31",                            desc:"31 shapes. The ice cream flavor you can't agree on.",                                               check:()=>placed>=31},
+  {id:'rb-33',          name:"33",                            desc:"One third of 99. You're one third of the way to nothing.",                                          check:()=>placed>=33},
+  {id:'rb-36',          name:"36 Degrees Of Separation",      desc:"Everyone is connected by six shapes. You've placed 36. You're still alone.",                       check:()=>placed>=36},
+  {id:'rb-37',          name:"37",                            desc:"Studies say 37 is the most commonly picked 'random' number. You picked squares instead.",          check:()=>placed>=37},
+  {id:'rb-38',          name:"38",                            desc:"38. Nobody's favourite number. Including yours. You just placed this many shapes.",                 check:()=>placed>=38},
+  {id:'rb-39',          name:"One Before 40",                 desc:"You could have stopped at 39. You won't stop at 39.",                                               check:()=>placed>=39},
+  {id:'rb-41',          name:"41",                            desc:"Prime. Irrelevant. Achieved.",                                                                      check:()=>placed>=41},
+  {id:'rb-43',          name:"43",                            desc:"43 shapes. The square hole has filed this under 'miscellaneous'.",                                   check:()=>placed>=43},
+  {id:'rb-44',          name:"44",                            desc:"44. A perfectly balanced number. Unlike your life choices.",                                        check:()=>placed>=44},
+  {id:'rb-45',          name:"45 Shapes",                     desc:"45 degrees is a right angle cut in half. You've cut your potential in half to be here.",           check:()=>placed>=45},
+  {id:'rb-46',          name:"46",                            desc:"Human chromosomes. You have 46. All of them led you here.",                                         check:()=>placed>=46},
+  {id:'rb-47',          name:"47",                            desc:"The most common 'random' number chosen by people who think they're original. You placed 47 shapes.", check:()=>placed>=47},
+  {id:'rb-48',          name:"48",                            desc:"48 shapes. Half of 96. Double of 24. None of this is helpful.",                                    check:()=>placed>=48},
+  {id:'rb-49',          name:"49",                            desc:"7 squared. You are one square away from a square number. The irony is wasted on you.",             check:()=>placed>=49},
+  {id:'rb-51',          name:"51",                            desc:"Area 51. Classified. Your placement count is also classified. As embarrassing.",                   check:()=>placed>=51},
+  {id:'rb-53',          name:"53",                            desc:"53 shapes. The square hole gave you an exact look. You know the look.",                             check:()=>placed>=53},
+  {id:'rb-54',          name:"54",                            desc:"A Rubik's cube has 54 stickers. You've placed 54 shapes. Neither accomplishment means anything.",  check:()=>placed>=54},
+  {id:'rb-55',          name:"55",                            desc:"The sum of 1 through 10. The square hole calculated this. For what reason? It doesn't know.",      check:()=>placed>=55},
+  {id:'rb-56',          name:"56",                            desc:"56. The age you'll be when you finally stop. Maybe. Probably not.",                                 check:()=>placed>=56},
+  {id:'rb-57',          name:"57 Varieties",                  desc:"Like the ketchup. But instead of 57 flavours of tomato sauce, it's 57 shapes in a hole.",        check:()=>placed>=57},
+  {id:'rb-58',          name:"58",                            desc:"Two away from 60. You'll make it to 60. Nobody is stopping you. That's the problem.",              check:()=>placed>=58},
+  {id:'rb-59',          name:"59",                            desc:"One away from 60. The longest minute of your life was spent here.",                                check:()=>placed>=59},
+  {id:'rb-61',          name:"61",                            desc:"61 shapes. You have exceeded 60 by exactly one. Congratulations on the one.",                     check:()=>placed>=61},
+  {id:'rb-62',          name:"62",                            desc:"62. The square hole is taking notes. They are not flattering notes.",                              check:()=>placed>=62},
+  {id:'rb-63',          name:"63",                            desc:"7 times 9. For some reason that's unsatisfying. Like this.",                                       check:()=>placed>=63},
+  {id:'rb-64',          name:"64",                            desc:"A chessboard. 64 squares. You're not playing chess. You're not playing anything. You're placing.", check:()=>placed>=64},
+  {id:'rb-66',          name:"66",                            desc:"Route 66 goes somewhere. Your 66 shapes go into a hole. Slightly less scenic.",                   check:()=>placed>=66},
+  {id:'rb-67',          name:"67",                            desc:"67 is prime. This achievement is not special. You are not special. The number is, technically.",   check:()=>placed>=67},
+  {id:'rb-68',          name:"68",                            desc:"One before 69. You already know what's coming. We all do.",                                        check:()=>placed>=68},
+  {id:'rb-71',          name:"71",                            desc:"71 shapes. Prime number. You are not a prime number. You are a composite of bad decisions.",       check:()=>placed>=71},
+  {id:'rb-72',          name:"72 Shapes",                     desc:"72 hours in three days. You've been here for some of them.",                                       check:()=>placed>=72},
+  {id:'rb-73',          name:"73",                            desc:"Sheldon Cooper's favourite number. We're not saying anything. We're just saying.",                 check:()=>placed>=73},
+  {id:'rb-74',          name:"74",                            desc:"74 shapes. Your scorecard has been reviewed. It is accurate. It is not impressive.",               check:()=>placed>=74},
+  {id:'rb-76',          name:"76",                            desc:"76 trombones led the big parade. You led no one. You placed 76 shapes alone.",                    check:()=>placed>=76},
+  {id:'rb-77',          name:"Lucky Sevens. Sort Of.",        desc:"77 is two sevens. In some cultures this is lucky. This is not those cultures.",                    check:()=>placed>=77},
+  {id:'rb-78',          name:"78",                            desc:"A vinyl record plays at 78 RPM. You spun your wheels for 78 shapes. No music played.",            check:()=>placed>=78},
+  {id:'rb-79',          name:"79",                            desc:"79 shapes. One short of 80. The square hole is watching you approach 80 with mild disinterest.",  check:()=>placed>=79},
+  {id:'rb-81',          name:"81",                            desc:"9 squared. A perfect square. You are standing in front of a hole shaped like one. Irony.",        check:()=>placed>=81},
+  {id:'rb-82',          name:"82",                            desc:"82 shapes placed. The square hole gave you a star sticker. It is invisible.",                     check:()=>placed>=82},
+  {id:'rb-83',          name:"83",                            desc:"Prime. Obscure. Like your reasons for being here.",                                                 check:()=>placed>=83},
+  {id:'rb-84',          name:"84",                            desc:"84 shapes. If you placed one per day it would take 84 days. You did not take 84 days.",           check:()=>placed>=84},
+  {id:'rb-86',          name:"86'd",                          desc:"To 86 something means to remove it. 86 shapes have been removed from your possession and placed in a hole.", check:()=>placed>=86},
+  {id:'rb-87',          name:"87",                            desc:"87 shapes. Four score and seven shapes ago, you started this. Lincoln did not approve this achievement.", check:()=>placed>=87},
+  {id:'rb-88',          name:"88 Keys",                       desc:"A piano has 88 keys. You have 88 shapes placed. Neither of you is making music.",                 check:()=>placed>=88},
+  {id:'rb-89',          name:"89",                            desc:"89 shapes. One from 90. Getting closer to a round number. The round number means nothing.",       check:()=>placed>=89},
+  {id:'rb-91',          name:"91",                            desc:"91 is 7 times 13. Both unlucky numbers multiplied together. That tracks.",                        check:()=>placed>=91},
+  {id:'rb-92',          name:"92",                            desc:"92 elements occur naturally. You have placed 92 shapes unnaturally. Science disagrees with this.", check:()=>placed>=92},
+  {id:'rb-93',          name:"93",                            desc:"93 million miles to the sun. 93 shapes to nowhere. One of these journeys was avoidable.",         check:()=>placed>=93},
+  {id:'rb-94',          name:"94",                            desc:"94. We checked. There's nothing special about 94. Much like this placement.",                      check:()=>placed>=94},
+  {id:'rb-95',          name:"Windows 95",                    desc:"Released in 1995. You've placed 95 shapes. One is a coincidence. This is a pattern.",             check:()=>placed>=95},
+  {id:'rb-96',          name:"96",                            desc:"96 is 2 to the power of 5, times 3. The square hole did that math. It felt nothing.",            check:()=>placed>=96},
+  {id:'rb-97',          name:"97",                            desc:"Prime number. Penultimate before 98. You are penultimate at nothing and primary at this.",         check:()=>placed>=97},
+  {id:'rb-98',          name:"98",                            desc:"Two away from 100. The suspense is enormous. It shouldn't be. It is.",                            check:()=>placed>=98},
+  {id:'rb-99',          name:"99 Problems",                   desc:"And placing shapes in the wrong hole is all of them.",                                             check:()=>placed>=99},
+  {id:'rb-101',         name:"101",                           desc:"Introduction level. The basics. You are still here at the introduction.",                         check:()=>placed>=101},
+  {id:'rb-102',         name:"102",                           desc:"102 Dalmatians. 102 shapes. One of these is a good sequel. One is not.",                          check:()=>placed>=102},
+
+  // === RAGEBAIT: META ===
+  {id:'rb-reading',     name:"Reading Achievements",          desc:"You're reading this instead of playing. The counter is not going up while you read this.",        check:()=>unlocked.size>=5},
+  {id:'rb-collecting',  name:"Achievement Collector",         desc:"You have unlocked achievements in order to collect achievements. Your hobbies are recursive.",    check:()=>unlocked.size>=10},
+  {id:'rb-invested',    name:"Dangerously Invested",          desc:"20 achievements unlocked. You are invested. This is a red flag.",                                 check:()=>unlocked.size>=20},
+  {id:'rb-no-life',     name:"No. Life.",                     desc:"30 achievements. You have no life. The square hole IS your life now.",                            check:()=>unlocked.size>=30},
+  {id:'rb-completionist',name:"Completionist Detected",      desc:"You're going for all of them. Aren't you. We can see you. This is exactly what we expected.",     check:()=>unlocked.size>=50},
+  {id:'rb-counting',    name:"You're Counting Them",          desc:"You're counting the achievements. Stop. There are too many. You won't finish. Keep going.",       check:()=>unlocked.size>=75},
+  {id:'rb-still-going', name:"Still Going",                   desc:"You have unlocked 100 achievements. The square hole is starting to respect you. It won't say so.", check:()=>unlocked.size>=100},
+  {id:'rb-problem',     name:"You Have A Problem",            desc:"125 achievements. We say this with love. Mostly. Some concern. Mostly love. Actually mostly concern.", check:()=>unlocked.size>=125},
+
+  // === RAGEBAIT: IDLE ===
+  {id:'rb-idle-bored',  name:"You Got Bored",                 desc:"You stopped playing. The game did not stop judging.",                                             check:()=>idleTime>=15000},
+  {id:'rb-idle-snack',  name:"Getting A Snack",               desc:"You were idle for a minute. You got a snack. The square hole got nothing. Rude.",                check:()=>idleTime>=60000},
+  {id:'rb-idle-distracted', name:"Distracted Again",          desc:"Two minutes idle. Something else caught your attention. It was probably worse than this.",       check:()=>idleTime>=120000},
+  {id:'rb-idle-forgot', name:"You Forgot About Us",           desc:"Five minutes. You forgot about the square hole. The square hole did not forget about you.",      check:()=>idleTime>=300000},
+  {id:'rb-idle-moved-on',name:"You Moved On",                 desc:"Ten minutes idle. You moved on. You came back. Classic.",                                         check:()=>idleTime>=600000},
+
+  // === RAGEBAIT: EXISTENTIAL ===
+  {id:'rb-why-open',    name:"Why Did You Open This",         desc:"Nobody made you. You clicked a link. Or typed a URL. Or bookmarked it. The last one is the worst.", check:()=>placed>=1},
+  {id:'rb-tabs',        name:"This Tab Is Still Open",        desc:"Other tabs have been closed. This one persists. It knows something.",                              check:()=>placed>=35},
+  {id:'rb-bookmark',    name:"Probably Bookmarked",           desc:"You're probably going to bookmark this. Or already have. Hello, bookmark visitor.",               check:()=>placed>=60},
+  {id:'rb-screenshot',  name:"Screenshot Incoming",           desc:"You will take a screenshot of an achievement at some point. This will not be the one.",           check:()=>placed>=80},
+  {id:'rb-tell-someone',name:"You're Going To Tell Someone",  desc:"You're going to tell someone about this game. They will nod. They will not understand.",          check:()=>placed>=110},
+  {id:'rb-recommended', name:"Recommended",                   desc:"You would recommend this to someone. Not because it's good. Because you want them to suffer too.",check:()=>placed>=140},
+  {id:'rb-monday',      name:"It's Probably Monday",          desc:"You're doing this on a weekday. During hours. The square hole has logged this.",                  check:()=>placed>=170},
+  {id:'rb-midnight',    name:"Midnight Placer",               desc:"Statistics suggest you've placed a shape after 11pm. The square hole never sleeps. Neither do you.", check:()=>placed>=190},
+  {id:'rb-lunch',       name:"Playing Over Lunch",            desc:"You had things to do. You played this instead. The sandwich got cold.",                           check:()=>placed>=220},
+  {id:'rb-important',   name:"This Felt Important",           desc:"At some point placing this shape felt important. That feeling was incorrect.",                    check:()=>placed>=250},
+  {id:'rb-better-things',name:"There Were Better Things",     desc:"Things you could have done instead: literally anything. You chose squares.",                      check:()=>placed>=280},
+  {id:'rb-proud',       name:"Oddly Proud",                   desc:"You feel oddly proud about your placement count. This is a known side effect.",                   check:()=>placed>=320},
+  {id:'rb-routine',     name:"It's A Routine Now",            desc:"You have opened this game more than once. Not as a habit. As a compulsion.",                      check:()=>placed>=380},
+  {id:'rb-season',      name:"A Whole Season",                desc:"If you placed one shape per day it would be a full season. What season was it? Square season.",   check:()=>placed>=400},
+
+  // === RAGEBAIT: SHAPES SPECIFICALLY ===
+  {id:'rb-circle-hater',name:"Circle Hater",                  desc:"You glared at the circle when it appeared. Don't deny it.",                                       check:()=>placed>=30},
+  {id:'rb-star-fave',   name:"Star Favourite",                desc:"You probably like the star best. Everyone does. The star doesn't care about you.",                check:()=>placed>=45},
+  {id:'rb-pentagon-mid',name:"Pentagon Is Mid",               desc:"The pentagon is mid. You know it. The pentagon knows it. This is an awkward acknowledgement.",    check:()=>placed>=60},
+  {id:'rb-hex-respect', name:"Hex Respect",                   desc:"The hexagon has earned a grudging respect from you. The hexagon does not reciprocate.",           check:()=>placed>=80},
+  {id:'rb-triangle-annoying',name:"Triangle Is Annoying",     desc:"It is. Everyone agrees. The triangle doesn't care. It still goes in the square hole.",            check:()=>placed>=100},
+  {id:'rb-shapes-judging',name:"The Shapes Are Judging You",  desc:"They're not. They're shapes. But the energy is there.",                                           check:()=>placed>=130},
+
+  // === RAGEBAIT: WRONG HOLE SPECIFIC ===
+  {id:'rb-saw-it',      name:"We All Saw That",               desc:"That wrong drop. Everyone saw it. Nobody said anything. We're saying it now.",                    check:()=>wrongHoles>=4},
+  {id:'rb-habits',      name:"Old Habits",                    desc:"Wrong hole. Some habits are hard to break. This one isn't even a habit. It's a mistake. Repeatedly.", check:()=>wrongHoles>=9},
+  {id:'rb-not-learning',name:"Not Learning",                  desc:"The data is in. You are not learning from your wrong hole mistakes. The data is very clear.",     check:()=>wrongHoles>=14},
+  {id:'rb-confident',   name:"Suspiciously Confident",        desc:"You approached that wrong hole with real confidence. Where did that come from? It was misplaced. Like the shape.", check:()=>wrongHoles>=22},
+  {id:'rb-artistic',    name:"Artistic Choice",               desc:"Some of these wrong drops are looking intentional. Are they? It doesn't matter. They count.",     check:()=>wrongHoles>=28},
+  {id:'rb-exploration', name:"Explorer",                      desc:"You've now tried every wrong hole at least once. Thorough. Pointless. Thorough.",                  check:()=>Object.keys(wrongByType).length>=5 && wrongHoles>=28},
+  {id:'rb-specialist',  name:"Specialist",                    desc:"You have a favourite wrong hole. You don't know which one. The data does.",                       check:()=>Math.max(...Object.values(wrongByType).concat([0]))>=15},
 
   // === LORE / FLAVOUR (always greyed out — they're jokes) ===
-  {id:'square-philosophy', name:"Square Philosophy", desc:"If a shape falls in a square hole and no one sees it, does it count?", check:()=>false},
-  {id:'meaning-of-square', name:"The Meaning Of Square",desc:"It's four equal sides. That's it.", check:()=>false},
-  {id:'platos-cave', name:"Plato's Cave, But Square", desc:"The shadows on the wall are all squares. Always were.", check:()=>false},
-  {id:'cogito-square', name:"Cogito Ergo Square", desc:"I think, therefore I am... placing shapes.", check:()=>false},
-  {id:'nietzsche-hole', name:"Nietzsche's Hole", desc:"When you gaze into the square hole, the square hole gazes back.", check:()=>false},
-  {id:'absurdism', name:"Absurdist Hero", desc:"Sisyphus pushed a boulder. You push shapes into squares. Same energy.", check:()=>false},
-  {id:'free-will', name:"Free Will", desc:"You chose this. You could leave. You won't.", check:()=>false},
-  {id:'you-are-the-square',name:"You Are The Square", desc:"Boxy. Predictable. Fitting.", check:()=>false},
-  {id:'this-is-fine', name:"This Is Fine", desc:"Everything is fine. The square is fine. You are fine.", check:()=>false},
-  {id:'no-thoughts', name:"No Thoughts", desc:"Head empty. Shape in hole.", check:()=>false},
-  {id:'ctrl-z', name:"Ctrl+Z", desc:"You cannot undo this. The hours are gone.", check:()=>false},
-  {id:'alt-f4', name:"Alt+F4", desc:"You could close this tab. You won't.", check:()=>false},
-  {id:'leaderboard', name:"Leaderboard", desc:"There is no leaderboard. Your suffering is unranked.", check:()=>false},
-  {id:'multiplayer', name:"Multiplayer", desc:"There is no multiplayer. You are alone. With the square.", check:()=>false},
-  {id:'drink-water', name:"Drink Water", desc:"Seriously. Go drink some water.", check:()=>false},
-  {id:'touch-grass', name:"Touch Grass", desc:"Outside. Green. Go.", check:()=>false},
-  {id:'call-mom', name:"Call Your Mom", desc:"She hasn't heard from you. The square told us.", check:()=>false},
-  {id:'sleep', name:"Go To Sleep", desc:"The square will still be here.", check:()=>false},
-  {id:'square-meal', name:"A Square Meal", desc:"You've earned it. Go eat something.", check:()=>placed>=10},
-  {id:'waffles', name:"Waffles Are Squares", desc:"And they're delicious. Unlike this game.", check:()=>false},
-  {id:'minecraft', name:"Minecraft Mode", desc:"Everything is a square. You are home.", check:()=>placed>=1500},
-  {id:'spongebob', name:"SpongeBob Is Square", desc:"And he lives in a pineapple. Irrelevant. Noted.", check:()=>false},
-  {id:'thanks-for-playing',name:"Thanks For Playing", desc:"The square thanks you. For nothing. For everything. For this.", check:()=>false},
-  {id:'game-over', name:"Game Over", desc:"It's not over. It's never over. The square goes on.", check:()=>false},
-  {id:'the-end', name:"The End", desc:"There is no end. Only more holes.", check:()=>false},
-  {id:'credits', name:"Credits", desc:"Concept: the square. Development: the hole. Testing: you. You failed testing.", check:()=>false},
-  {id:'one-more', name:"One More Achievement", desc:"There's always one more.", check:()=>false},
-  {id:'infinite', name:"Infinite", desc:"The achievements are technically finite. Your delusion is infinite.", check:()=>false},
+  {id:'square-philosophy', name:"Square Philosophy",    desc:"If a shape falls in a square hole and no one sees it, does it count?", check:()=>false},
+  {id:'meaning-of-square', name:"The Meaning Of Square",desc:"It's four equal sides. That's it.",                                   check:()=>false},
+  {id:'platos-cave',       name:"Plato's Cave, But Square", desc:"The shadows on the wall are all squares. Always were.",           check:()=>false},
+  {id:'cogito-square',     name:"Cogito Ergo Square",   desc:"I think, therefore I am... placing shapes.",                          check:()=>false},
+  {id:'nietzsche-hole',    name:"Nietzsche's Hole",     desc:"When you gaze into the square hole, the square hole gazes back.",    check:()=>false},
+  {id:'absurdism',         name:"Absurdist Hero",        desc:"Sisyphus pushed a boulder. You push shapes into squares. Same energy.", check:()=>false},
+  {id:'free-will',         name:"Free Will",             desc:"You chose this. You could leave. You won't.",                        check:()=>false},
+  {id:'you-are-the-square',name:"You Are The Square",   desc:"Boxy. Predictable. Fitting.",                                        check:()=>false},
+  {id:'this-is-fine',      name:"This Is Fine",          desc:"Everything is fine. The square is fine. You are fine.",              check:()=>false},
+  {id:'no-thoughts',       name:"No Thoughts",           desc:"Head empty. Shape in hole.",                                         check:()=>false},
+  {id:'ctrl-z',            name:"Ctrl+Z",                desc:"You cannot undo this. The hours are gone.",                         check:()=>false},
+  {id:'alt-f4',            name:"Alt+F4",                desc:"You could close this tab. You won't.",                              check:()=>false},
+  {id:'leaderboard',       name:"Leaderboard",           desc:"There is no leaderboard. Your suffering is unranked.",              check:()=>false},
+  {id:'multiplayer',       name:"Multiplayer",           desc:"There is no multiplayer. You are alone. With the square.",          check:()=>false},
+  {id:'drink-water',       name:"Drink Water",           desc:"Seriously. Go drink some water.",                                   check:()=>false},
+  {id:'touch-grass',       name:"Touch Grass",           desc:"Outside. Green. Go.",                                               check:()=>false},
+  {id:'call-mom',          name:"Call Your Mom",         desc:"She hasn't heard from you. The square told us.",                   check:()=>false},
+  {id:'sleep',             name:"Go To Sleep",           desc:"The square will still be here.",                                   check:()=>false},
+  {id:'square-meal',       name:"A Square Meal",         desc:"You've earned it. Go eat something.",                               check:()=>placed>=10},
+  {id:'waffles',           name:"Waffles Are Squares",   desc:"And they're delicious. Unlike this game.",                         check:()=>false},
+  {id:'minecraft',         name:"Minecraft Mode",        desc:"Everything is a square. You are home.",                            check:()=>placed>=1500},
+  {id:'spongebob',         name:"SpongeBob Is Square",   desc:"And he lives in a pineapple. Irrelevant. Noted.",                  check:()=>false},
+  {id:'thanks-for-playing',name:"Thanks For Playing",    desc:"The square thanks you. For nothing. For everything. For this.",    check:()=>false},
+  {id:'game-over',         name:"Game Over",             desc:"It's not over. It's never over. The square goes on.",              check:()=>false},
+  {id:'the-end',           name:"The End",               desc:"There is no end. Only more holes.",                                check:()=>false},
+  {id:'credits',           name:"Credits",               desc:"Concept: the square. Development: the hole. Testing: you. You failed testing.", check:()=>false},
+  {id:'one-more',          name:"One More Achievement",  desc:"There's always one more.",                                         check:()=>false},
+  {id:'infinite',          name:"Infinite",              desc:"The achievements are technically finite. Your delusion is infinite.", check:()=>false},
 ];
 
 // ── Achievement engine ───────────────────────────────────────────────────────
@@ -1013,7 +1970,13 @@ function unlock(id) {
   const a = achievements.find(x => x.id === id);
   if (!a) return;
   const el = document.getElementById("ach-" + id);
-  if (el) el.classList.add("unlocked");
+  if (el) {
+    el.classList.add("unlocked");
+    el.classList.remove("secret-locked");
+    if (id.startsWith('secret-')) {
+      el.innerHTML = "<b>" + a.name + "</b><br><span class='ach-desc' style='color:#777'>" + a.desc + "</span>";
+    }
+  }
   popupQueue.push(a);
   updateAchStats();
   if (!popupShowing) showNextPopup();
@@ -1049,6 +2012,11 @@ function updateAchStats() {
   document.getElementById('ach-stats').textContent = `${unlocked.size} total unlocked — ${count} of ${lockable.length} achievable ones`;
 }
 
+// Secret achievement: click the achievement stats counter
+document.getElementById('ach-stats').addEventListener('click', () => {
+  unlock('secret-1');
+});
+
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 
 document.querySelectorAll(".tab-btn").forEach(b => {
@@ -1064,17 +2032,20 @@ document.querySelectorAll(".tab-btn").forEach(b => {
 
 // ── Reset ────────────────────────────────────────────────────────────────────
 
-function showReset() { document.getElementById('confirm-reset').style.display = 'flex'; }
+function showReset()   { document.getElementById('confirm-reset').style.display = 'flex'; }
 function cancelReset() { document.getElementById('confirm-reset').style.display = 'none'; }
 function confirmReset() {
   placed = 0; idleTime = 0; wrongHoles = 0; wrongByType = {};
   unlocked = new Set(); usedShapes.clear(); holedHoles = new Set();
   sessionPlaced = 0; sessionWrongHoles = 0;
   if (selectedShape) { selectedShape.classList.remove('selected'); selectedShape = null; }
-  if (selectedHole) { selectedHole.classList.remove('selected'); selectedHole = null; }
+  if (selectedHole)  { selectedHole.classList.remove('selected');  selectedHole  = null; }
   try {
-    ['placed','unlocked','idle','wrongHoles','wrongByType','holedHoles'].forEach(k => localStorage.removeItem(k));
+    ['placed','unlocked','idle','wrongHoles','wrongByType','holedHoles','gameTabDropCount','squareBreakCount'].forEach(k => localStorage.removeItem(k));
+
   } catch(e) {}
+  gameTabDropCount = 0;
+  squareBreakCount = 0;
   updateCount();
   spawnShapes();
   document.querySelectorAll('.ach-item').forEach(el => el.classList.remove('unlocked'));
@@ -1114,9 +2085,15 @@ function init() {
   achievements.forEach(a => {
     const div = document.createElement("div");
     div.id = "ach-" + a.id;
-    div.className = "ach-item";
-    div.innerHTML = "<b>" + a.name + "</b><br><span style='color:#777'>" + a.desc + "</span>";
-    if (unlocked.has(a.id)) div.classList.add("unlocked");
+    const isSecret = a.id.startsWith('secret-');
+    const isUnlocked = unlocked.has(a.id);
+    div.className = "ach-item" + (isSecret && !isUnlocked ? " secret-locked" : "");
+    if (isSecret && !isUnlocked) {
+      div.innerHTML = "<b>???</b><br><span class='ach-desc' style='color:#777'>Find it yourself.</span>";
+    } else {
+      div.innerHTML = "<b>" + a.name + "</b><br><span class='ach-desc' style='color:#777'>" + a.desc + "</span>";
+    }
+    if (isUnlocked) div.classList.add("unlocked");
     list.appendChild(div);
   });
   updateAchStats();
