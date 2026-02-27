@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -281,21 +281,6 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 }
 
 /* ── Fake achievement popup ── */
-#fake-achievement-popup {
-  position: fixed; top: 20px; right: 20px;
-  background: #c8a800;
-  padding: 14px; display: none;
-  z-index: 10001; border-radius: 10px;
-  font-family: 'Nunito', sans-serif; font-weight: 700;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  max-width: min(280px, 85vw);
-  font-size: clamp(0.8em, 3vw, 1em);
-  animation: pop-in 0.3s ease;
-  color: #5a4000;
-  margin-top: 70px;
-}
-#fake-achievement-popup.show { display: block; }
-
 /* ── Secret achievement in list shows as ??? ── */
 .ach-item.secret-locked b::after { content: ''; }
 .ach-item.secret-locked .ach-desc { display: none; }
@@ -448,15 +433,39 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" data-tab="game">Game</button>
-  <button class="tab-btn" id="ach-tab-btn" data-tab="achievements" data-draggable="true">Achievements</button>
+  <button class="tab-btn active" data-tab="game" id="game-tab-btn" data-draggable="true">Game</button>
+  <button class="tab-btn" id="ach-tab-btn" data-tab="achievements" data-draggable="true">Achievements <span id="ach-badge" style="background:#e53935;color:white;border-radius:999px;padding:1px 6px;font-size:0.75em;margin-left:3px;"></span></button>
   <button class="tab-btn" id="patch-tab-btn" data-tab="patch" data-draggable="true">Patch Notes</button>
+  <button class="tab-btn" id="settings-tab-btn" data-tab="settings" data-draggable="true">⚙️ Settings</button>
+  <button class="tab-btn" id="stats-tab-btn" data-tab="stats" data-draggable="true">📊 Stats</button>
+  <button class="tab-btn" id="leaderboard-tab-btn" data-tab="leaderboard" data-draggable="true">🏅 Leaderboard <span style="background:#e53935;color:white;border-radius:999px;padding:1px 5px;font-size:0.72em;margin-left:2px;">LIVE</span></button>
+  <button class="tab-btn" id="notif-tab-btn" data-tab="notifications" data-draggable="true">🔔 <span id="notif-badge" style="background:#e53935;color:white;border-radius:999px;padding:1px 6px;font-size:0.75em;">3</span></button>
+  <button class="tab-btn" id="update-tab-btn" data-tab="update" data-draggable="true">🔄 Updates <span style="background:#4caf50;color:white;border-radius:999px;padding:1px 5px;font-size:0.72em;margin-left:2px;">NEW</span></button>
+</div>
+
+<!-- Fake update banner -->
+<div id="update-banner" style="
+  width:min(95vw,800px); background:#1976d2; color:white;
+  padding:8px 16px; border-radius:8px; margin-top:8px;
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:'Nunito',sans-serif; font-size:clamp(0.75em,2.5vw,0.9em);
+  font-weight:700; gap:10px;
+">
+  <span>🔔 v4.2.1 is available — improvements to the square.</span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="dismissUpdate()" style="background:white;color:#1976d2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">Update Now</button>
+    <button onclick="document.getElementById('update-banner').style.display='none'" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.5);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">✕</button>
+  </div>
 </div>
 
 <div id="game-tab" class="tab-content active">
   <div class="top-bar">
-    <div class="count-display">Placed: <strong id="count">0</strong></div>
-    <button id="reset-btn" data-draggable="true">🗑 Reset</button>
+    <div class="count-display">🔥 <span id="streak-display">3 day streak</span> &nbsp;|&nbsp; Placed: <strong id="count">0</strong></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+      <button id="daily-btn" onclick="showDaily()" data-draggable="true" style="padding:6px 10px;border:none;border-radius:8px;background:#e3f2fd;cursor:grab;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;touch-action:manipulation;">📅 Daily</button>
+      <button id="share-btn" onclick="showShare()" data-draggable="true" style="padding:6px 10px;border:none;border-radius:8px;background:#e8f5e9;cursor:grab;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;touch-action:manipulation;">↗️ Share</button>
+      <button id="reset-btn" data-draggable="true">🗑 Reset</button>
+    </div>
   </div>
   <div id="tap-mode-banner">👆 Tap a shape (or hole!), then tap the square hole</div>
   <div id="game">
@@ -593,6 +602,174 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
   </div>
 </div>
 
+<!-- ── SETTINGS TAB ── -->
+<div id="settings-tab" class="tab-content">
+  <h2 style="margin-top:0">⚙️ Settings</h2>
+
+  <div style="display:flex;flex-direction:column;gap:18px;">
+
+    <!-- Pro Mode -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,215,0,0.1);border-radius:10px;border:1px solid rgba(255,215,0,0.3);">
+      <div>
+        <strong>👑 Pro Mode</strong>
+        <div style="font-size:0.8em;color:#888;">Unlocks advanced square features.</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+        <input type="checkbox" id="pro-mode-toggle" style="opacity:0;width:0;height:0;" onchange="toggleProMode(this.checked)">
+        <span id="pro-mode-slider" style="position:absolute;inset:0;background:#ccc;border-radius:24px;transition:0.3s;"></span>
+        <span id="pro-mode-knob" style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:0.3s;"></span>
+      </label>
+    </div>
+
+    <!-- Fun slider -->
+    <div style="padding:12px;background:rgba(255,255,255,0.5);border-radius:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <strong>Fun</strong>
+        <span id="fun-val" style="color:#888;font-size:0.85em;">0%</span>
+      </div>
+      <input type="range" min="0" max="100" value="0" id="fun-slider" style="width:100%;cursor:pointer;" oninput="setFun(this.value)" onchange="resetFun(this)">
+      <div style="font-size:0.75em;color:#aaa;margin-top:4px;" id="fun-note">This setting has no effect.</div>
+    </div>
+
+    <!-- Difficulty slider -->
+    <div style="padding:12px;background:rgba(255,255,255,0.5);border-radius:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <strong>Difficulty</strong>
+        <span id="diff-val" style="color:#e53935;font-size:0.85em;font-weight:900;">Extra Hard</span>
+      </div>
+      <input type="range" min="0" max="3" value="3" id="diff-slider" style="width:100%;cursor:pointer;" oninput="setDiff(this.value)" onchange="resetDiff(this)">
+      <div style="font-size:0.75em;color:#aaa;margin-top:4px;" id="diff-note">Difficulty cannot be reduced. This is by design.</div>
+    </div>
+
+    <!-- Cloud Sync -->
+    <div style="padding:12px;background:rgba(255,255,255,0.5);border-radius:10px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <strong>☁️ Cloud Sync</strong>
+        <div style="font-size:0.8em;color:#888;" id="sync-status">Last synced: never</div>
+      </div>
+      <button onclick="triggerSync()" style="padding:6px 14px;border:none;border-radius:8px;background:#e3f2fd;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;">Sync Now</button>
+    </div>
+
+    <!-- Report a Bug -->
+    <div style="padding:12px;background:rgba(255,255,255,0.5);border-radius:10px;">
+      <strong>🐛 Report a Bug</strong>
+      <div style="font-size:0.8em;color:#888;margin:4px 0 8px;">Tell us what's wrong. We'll look into it.</div>
+      <textarea id="bug-report-text" placeholder="Describe the bug..." style="width:100%;height:80px;border-radius:8px;border:1px solid #ddd;padding:8px;font-family:'Nunito',sans-serif;font-size:0.9em;resize:vertical;box-sizing:border-box;"></textarea>
+      <button onclick="submitBugReport()" style="margin-top:6px;padding:7px 16px;border:none;border-radius:8px;background:#333;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;">Submit Report</button>
+      <div id="bug-confirm" style="display:none;margin-top:6px;font-size:0.85em;color:#888;"></div>
+    </div>
+
+    <!-- Quit button (appears after 200) -->
+    <div id="quit-section" style="display:none;padding:12px;background:rgba(255,255,255,0.5);border-radius:10px;">
+      <strong>🚪 Quit Game</strong>
+      <div style="font-size:0.8em;color:#888;margin:4px 0 8px;">Stop playing. Leave. You are free to go.</div>
+      <button onclick="tryQuit()" style="padding:7px 16px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;">Quit</button>
+    </div>
+
+    <!-- Premium -->
+    <div style="padding:12px;background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,165,0,0.1));border-radius:10px;border:1px solid rgba(255,215,0,0.4);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <strong>👑 Square Hole Premium</strong>
+        <span style="background:gold;color:#333;border-radius:999px;padding:1px 8px;font-size:0.72em;font-weight:900;">$4.99/mo</span>
+      </div>
+      <div style="font-size:0.8em;color:#888;margin-bottom:10px;">Unlock the full experience.</div>
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;color:#666;margin-bottom:12px;">
+        <div>✓ A second square hole (non-functional)</div>
+        <div>✓ Custom shape colours (not yet available)</div>
+        <div>✓ No ads (there are no ads)</div>
+        <div>✓ Priority support (response time: never)</div>
+        <div>✓ Early access to future shapes (there are no future shapes)</div>
+        <div>✓ Remove the "Fine. Whatever." message (it stays)</div>
+        <div>✓ Square Hole Premium badge (in this tab, only)</div>
+      </div>
+      <button onclick="buyPremium()" style="width:100%;padding:9px;border:none;border-radius:8px;background:gold;color:#333;cursor:pointer;font-family:'Fredoka One',cursive;font-size:1em;font-weight:900;">Subscribe Now</button>
+      <div id="premium-note" style="font-size:0.72em;color:#bbb;text-align:center;margin-top:6px;">Cancel anytime. Terms apply. The square hole is not liable.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── STATS TAB ── -->
+<div id="stats-tab" class="tab-content">
+  <h2 style="margin-top:0">📊 Stats</h2>
+  <div id="stats-content" style="display:flex;flex-direction:column;gap:10px;font-size:0.9em;"></div>
+</div>
+
+<!-- ── LEADERBOARD TAB ── -->
+<div id="leaderboard-tab" class="tab-content">
+  <h2 style="margin-top:0">🏅 Global Leaderboard <span style="font-size:0.55em;background:#4caf50;color:white;border-radius:6px;padding:2px 7px;vertical-align:middle;">LIVE</span></h2>
+  <div style="font-size:0.8em;color:#aaa;margin-bottom:12px;">Updated in real-time. Showing top players worldwide.</div>
+  <div id="leaderboard-list" style="display:flex;flex-direction:column;gap:6px;font-size:0.9em;"></div>
+  <div style="margin-top:16px;padding:10px 14px;background:rgba(255,255,255,0.6);border-radius:10px;border-left:4px solid #e53935;">
+    <strong>📍 Your Rank</strong>
+    <div id="your-rank" style="color:#e53935;font-size:1.1em;font-weight:900;margin-top:4px;"></div>
+  </div>
+  <div style="margin-top:10px;font-size:0.75em;color:#bbb;text-align:center;">Leaderboard resets every 24 hours. Your data is safe.</div>
+</div>
+
+<div id="notifications-tab" class="tab-content">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h2 style="margin:0">🔔 Notifications</h2>
+    <button onclick="clearNotifs()" style="padding:5px 12px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;">Clear All</button>
+  </div>
+  <div id="notif-list" style="display:flex;flex-direction:column;gap:8px;font-size:0.9em;"></div>
+</div>
+
+<!-- ── UPDATE TAB ── -->
+<div id="update-tab" class="tab-content">
+  <h2 style="margin-top:0">🔄 Updates</h2>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div style="padding:14px;background:rgba(76,175,80,0.1);border-radius:10px;border-left:4px solid #4caf50;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <strong>v4.2.2 — The Square Refinement Update</strong>
+        <span style="background:#4caf50;color:white;border-radius:6px;padding:2px 8px;font-size:0.75em;">LATEST</span>
+      </div>
+      <div style="font-size:0.8em;color:#888;margin-bottom:8px;">Released moments ago. You have already been updated.</div>
+      <ul style="font-size:0.85em;color:#555;margin:0;padding-left:18px;">
+        <li>Refined the square. It is now more square.</li>
+        <li>Removed the ability to not be updated.</li>
+        <li>Fixed issue where players felt agency. Resolved.</li>
+        <li>Update tab added. You are reading it. You cannot unread it.</li>
+      </ul>
+      <button id="install-update-btn" onclick="installUpdate()" style="margin-top:10px;padding:6px 14px;border:none;border-radius:8px;background:#4caf50;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;">Install Update</button>
+    </div>
+    <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:10px;">
+      <strong>v4.2.1 — The Mandatory Update</strong>
+      <div style="font-size:0.8em;color:#888;margin:4px 0;">You were already updated. You had no choice.</div>
+    </div>
+    <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:10px;">
+      <strong>v4.2.0 — The Rebalance</strong>
+      <div style="font-size:0.8em;color:#888;margin:4px 0;">See Patch Notes tab. Actually don't. It's not good news.</div>
+    </div>
+    <div style="font-size:0.75em;color:#bbb;text-align:center;margin-top:4px;">Auto-updates are enabled. They cannot be disabled. They were never able to be disabled.</div>
+  </div>
+</div>
+<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:12000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
+    <div style="font-size:1.4em;font-weight:900;font-family:'Fredoka One',cursive;margin-bottom:8px;">Share Your Score</div>
+    <div id="share-preview" style="background:linear-gradient(135deg,#ffdd99,#99ccff);border-radius:12px;padding:20px;margin:12px 0;font-family:'Fredoka One',cursive;font-size:1.1em;"></div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="copyShareLink()" style="padding:8px 18px;border:none;border-radius:8px;background:#333;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Copy Link</button>
+      <button onclick="document.getElementById('share-modal').style.display='none'" style="padding:8px 18px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Cancel</button>
+    </div>
+    <div id="share-copy-confirm" style="display:none;margin-top:8px;font-size:0.8em;color:#888;"></div>
+  </div>
+</div>
+
+<!-- ── DAILY MODAL ── -->
+<div id="daily-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:12000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
+    <div style="font-size:2em;margin-bottom:8px;">📅</div>
+    <h3 style="margin:0 0 8px;font-family:'Fredoka One',cursive;">Daily Challenge</h3>
+    <p style="color:#888;margin:0 0 16px;">Come back tomorrow.</p>
+    <button onclick="document.getElementById('daily-modal').style.display='none'" style="padding:8px 20px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">OK</button>
+  </div>
+</div>
+
+<!-- ── HELP BUTTON ── -->
+<div id="help-btn" data-draggable="true" onclick="showHelp()" style="position:fixed;bottom:20px;right:20px;width:38px;height:38px;background:rgba(255,255,255,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:grab;font-size:1.1em;font-weight:900;color:#555;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:200;font-family:'Fredoka One',cursive;user-select:none;">?</div>
+<div id="help-tooltip" style="display:none;position:fixed;bottom:66px;right:16px;background:#333;color:white;padding:10px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.85em;font-weight:700;z-index:201;max-width:200px;text-align:center;">It goes in the square hole.<div style="position:absolute;bottom:-6px;right:15px;width:12px;height:12px;background:#333;transform:rotate(45deg);"></div></div>
+
 <div id="achievement-popup">
   <strong>🏆 Achievement Unlocked!</strong>
   <div id="pop-name"></div>
@@ -600,12 +777,6 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 
 <div id="rejection-toast"></div>
 <div id="fake-toast" data-draggable="true">✨ Achievement Progress Saved!</div>
-
-<!-- Fake achievement popup (comes from left, slightly wrong colour) -->
-<div id="fake-achievement-popup">
-  <strong>🏆 Achievement Unlocked!</strong>
-  <div id="fake-pop-name"></div>
-</div>
 
 <!-- Dark panic overlay -->
 <div id="panic-overlay"></div>
@@ -1325,18 +1496,32 @@ function scheduleFakePopup() {
 }
 
 function showFakePopup() {
-  const msg = fakeAchievements[Math.floor(Math.random() * fakeAchievements.length)];
-  document.getElementById('fake-pop-name').textContent = msg;
-  const popup = document.getElementById('fake-achievement-popup');
+  if (popupShowing || popupQueue.length > 0) return;
+
+  // 30% chance to show a user's own bug report back at them
+  const pool = getUserReportPool();
+  const msg = (pool && Math.random() < 0.3)
+    ? pool[Math.floor(Math.random() * pool.length)]
+    : fakeAchievements[Math.floor(Math.random() * fakeAchievements.length)];
+
+  document.getElementById('pop-name').innerHTML = '<b>' + msg + '</b>';
+  const popup = document.getElementById('achievement-popup');
   popup.classList.remove('show');
   void popup.offsetWidth;
   popup.classList.add('show');
-  setTimeout(() => popup.classList.remove('show'), 3500);
+
+  popup._fakeTimer = setTimeout(() => {
+    popup.classList.remove('show');
+    popup._fakeTimer = null;
+  }, 3000);
 }
 
 scheduleFakePopup();
 
-function updateCount() { document.getElementById("count").textContent = placed; }
+function updateCount() {
+  document.getElementById("count").textContent = placed;
+  checkQuitButton();
+}
 
 // ── Tap-to-place system (mobile-friendly) ───────────────────────────────────
 
@@ -1461,7 +1646,16 @@ document.addEventListener("pointermove", e => {
   const near = e.clientX > r.left - 30 && e.clientX < r.right + 30 &&
                e.clientY > r.top  - 30 && e.clientY < r.bottom + 30;
   const isDraggingHole = dragged && dragged.classList.contains("hole") && dragged.id !== "main-square";
-  const isDraggingSpecial = dragged && (dragged.id === 'reset-btn' || dragged.id === 'main-title' || dragged.id === 'ach-tab-btn' || dragged.id === 'judgement-text' || dragged.id === 'patch-tab-btn' || dragged.id === 'fake-toast');
+  const isDraggingSpecial = dragged && (
+    dragged.id === 'reset-btn' || dragged.id === 'main-title' ||
+    dragged.id === 'ach-tab-btn' || dragged.id === 'judgement-text' ||
+    dragged.id === 'patch-tab-btn' || dragged.id === 'fake-toast' ||
+    dragged.id === 'settings-tab-btn' || dragged.id === 'stats-tab-btn' ||
+    dragged.id === 'leaderboard-tab-btn' || dragged.id === 'notif-tab-btn' ||
+    dragged.id === 'update-tab-btn' || dragged.id === 'game-tab-btn' ||
+    dragged.id === 'daily-btn' || dragged.id === 'share-btn' ||
+    dragged.id === 'help-btn'
+  );
   square.classList.toggle("glow", near && (dragged.classList.contains("shape") || isDraggingHole || isDraggingSpecial));
 }, { passive: true });
 
@@ -1521,10 +1715,19 @@ document.addEventListener("pointerup", e => {
   } else {
     // Special draggable UI elements
     if (isSquare) {
-      if (dragged.id === "main-title")     unlock("title-square");
-      if (dragged.id === "ach-tab-btn")    unlock("ach-tab-square");
-      if (dragged.id === "judgement-text") unlock("judgement-square");
-      if (dragged.id === "patch-tab-btn")  unlock("patch-square");
+      if (dragged.id === "main-title")          unlock("title-square");
+      if (dragged.id === "ach-tab-btn")         unlock("ach-tab-square");
+      if (dragged.id === "judgement-text")      unlock("judgement-square");
+      if (dragged.id === "patch-tab-btn")       unlock("patch-square");
+      if (dragged.id === "settings-tab-btn")    unlock("settings-square");
+      if (dragged.id === "stats-tab-btn")       unlock("stats-square");
+      if (dragged.id === "leaderboard-tab-btn") unlock("leaderboard-square");
+      if (dragged.id === "notif-tab-btn")       unlock("notif-square");
+      if (dragged.id === "update-tab-btn")      unlock("update-square");
+      if (dragged.id === "game-tab-btn")        unlock("game-tab-square");
+      if (dragged.id === "daily-btn")           { unlock("daily-square");  showRejection("📅 Daily Challenge goes in the square hole. Challenge: drag things."); }
+      if (dragged.id === "share-btn")           { unlock("share-square");  showRejection("↗️ Share goes in the square hole. Nothing was shared."); }
+      if (dragged.id === "help-btn")            { unlock("help-square");   showRejection("? goes in the square hole. You can no longer ask for help."); dragged.style.display = 'none'; dragged = null; isDragging = false; return; }
       if (dragged.id === "reset-btn")       { breakSquare(); resetDragged(); isDragging = false; dragged = null; return; }
       if (dragged.id === "fake-toast")     {
         unlock("gaslight-square");
@@ -1764,23 +1967,6 @@ const achievements = [
   {id:'judgement-square',name:"Judgement Goes In The Square Hole",      desc:"Silenced.",         check:()=>false},
   {id:'patch-square',    name:"Patch Notes Go In The Square Hole",      desc:"Updates rejected.", check:()=>false},
   {id:'gaslight-square', name:"Gaslighting Goes In The Square Hole",    desc:"Contained.",        check:()=>false},
-  {id:'settings-square', name:"Settings Go In The Square Hole", desc:"Gear squared. No options left.", check:()=>false},
-    {id:'stats-square', name:"Stats Go In The Square Hole", desc:"Numbers properly contained.", check:()=>false},
-    {id:'leaderboard-square', name:"Leaderboard Goes In The Square Hole", desc:"Ranks collapsed.", check:()=>false},
-    {id:'notif-square', name:"Notifications Go In The Square Hole", desc:"Alerts silenced.", check:()=>false},
-    {id:'update-square', name:"Updates Go In The Square Hole", desc:"Patches squared.", check:()=>false},
-    {id:'daily-square', name:"Daily Challenge Goes In The Square Hole", desc:"Come back tomorrow... squared.", check:()=>false},
-    {id:'share-square', name:"Share Goes In The Square Hole", desc:"Nothing shared.", check:()=>false},
-    {id:'help-square', name:"? Goes In The Square Hole", desc:"Help request denied. Permanently.", check:()=>false},
-    {id:'fun-slider-touched', name:"Fun Slider Touched", desc:"Fun remains 0%. Futility touched.", check:()=>false},
-    {id:'diff-slider-touched', name:"Difficulty Slider Touched", desc:"Extra Hard is eternal.", check:()=>false},
-    {id:'pro-mode-on', name:"Pro Mode Activated", desc:"Crown granted then removed.", check:()=>false},
-    {id:'cloud-sync-used', name:"Cloud Sync Attempted", desc:"Nothing synced.", check:()=>false},
-    {id:'bug-reporter', name:"Bug Reporter", desc:"Filed under user error.", check:()=>false},
-    {id:'notifications-viewed', name:"Notifications Viewed", desc:"Messages read. Content: zero.", check:()=>false},
-    {id:'stats-viewed', name:"Stats Viewed", desc:"Numbers looked back.", check:()=>false},
-    {id:'leaderboard-viewed', name:"Leaderboard Viewed", desc:"You are last. Confirmed.", check:()=>false},
-    {id:'update-tab-viewed', name:"Updates Tab Visited", desc:"Nothing improved.", check:()=>false},
 
   // === RESET BUTTON CHAOS ===
   {id:'broke-the-square', name:"Why Would You Do That",   desc:"You put the reset button in the square hole. The square hole broke. This is your fault.", check:()=>false},
@@ -1790,7 +1976,18 @@ const achievements = [
   {id:'ate-the-game',     name:"It Ate The Game",         desc:"You broke the square hole a second time. It consumed itself and showed you its insides. Feed it back.", check:()=>false},
   {id:'belong-in-square', name:"YOU BELONG IN THE SQUARE HOLE", desc:"You broke it twice. The second time earned you the darkness. You know what you did.", check:()=>false},
 
-  // === SECRET ===
+  // === FAKE UI INTERACTIONS ===
+  {id:'checked-leaderboard',  name:"Last Place",                  desc:"You checked the leaderboard. You were last. You knew this before you looked.", check:()=>false},
+  {id:'checked-notifications',name:"You Have Notifications",      desc:"You checked your notifications. They were not actionable. They were barely legible.", check:()=>false},
+  {id:'cleared-notifs',       name:"Clean Slate",                 desc:"You cleared all notifications. One remained. There is always one. You cannot clear the one.", check:()=>false},
+  {id:'bought-premium',       name:"Premium Member",              desc:"You tried to buy Premium twice. It failed twice. We gave it to you anyway. The square hole respects stubbornness.", check:()=>false},
+  {id:'bug-reporter',         name:"Bug Reporter",                desc:"You submitted a bug report. We've filed it under: not a bug, working as intended, and also we don't fix bugs.", check:()=>false},
+  {id:'clicked-update',       name:"Early Adopter",               desc:"You clicked Update Now. Nothing updated. The version number went up anyway.", check:()=>false},
+  {id:'checked-daily',        name:"Daily Challenger",            desc:"You checked the daily challenge. It said come back tomorrow. You were already here today. That's not how tomorrow works.", check:()=>false},
+  {id:'tried-to-share',       name:"Sharer",                      desc:"You tried to share your score. The share text was 'it goes in the square hole'. You knew this.", check:()=>false},
+  {id:'copied-link',          name:"Copied",                      desc:"You copied the link. The link was not a link. It was a statement of fact. You copied it anyway.", check:()=>false},
+  {id:'asked-for-help',       name:"Asked For Help",              desc:"You clicked the ? button. The help was: it goes in the square hole. This did not help.", check:()=>false},
+  {id:'looked-at-quit',       name:"You Looked At The Quit Button",desc:"You saw it. You thought about it. You didn't. You knew you wouldn't.", check:()=>false},
   {id:'secret-1', name:"oh you found it. anyway.", desc:"There's nothing here. You already got it. That's it. Go back.", check:()=>false},
 
   // === RAGEBAIT: TIMING ===
@@ -1968,6 +2165,22 @@ const achievements = [
   {id:'credits',           name:"Credits",               desc:"Concept: the square. Development: the hole. Testing: you. You failed testing.", check:()=>false},
   {id:'one-more',          name:"One More Achievement",  desc:"There's always one more.",                                         check:()=>false},
   {id:'infinite',          name:"Infinite",              desc:"The achievements are technically finite. Your delusion is infinite.", check:()=>false},
+
+  // === FAKE UI ===
+  {id:'clicked-update',   name:"Early Adopter",          desc:"You clicked 'Update Now'. Nothing updated. You are now on the same version. The button lied.", check:()=>false},
+  {id:'asked-for-help',   name:"Asked For Help",         desc:"You pressed the ? button. The answer was 'it goes in the square hole'. You knew that already.", check:()=>false},
+  {id:'checked-daily',    name:"Daily Challenger",       desc:"You checked the Daily Challenge. It said come back tomorrow. Come back tomorrow.", check:()=>false},
+  {id:'tried-to-share',   name:"Influencer",             desc:"You tried to share your score. The score was unimpressive. You shared it anyway.", check:()=>false},
+  {id:'copied-link',      name:"Link Copied",            desc:"The link was 'it goes in the square hole'. You copied it. Someone will receive this.", check:()=>false},
+  {id:'bug-reporter',     name:"Quality Assurance",      desc:"You reported a bug. The bug has been filed under 'you'. It will not be fixed.", check:()=>false},
+  {id:'looked-at-quit',   name:"Considered Quitting",    desc:"You looked at the Quit button. You're still here.", check:()=>false},
+  {id:'max-fun',          name:"Maximum Fun",            desc:"You set Fun to 100%. The game remained exactly the same. The slider was decorative.", check:()=>false},
+  {id:'set-hard',         name:"Masochist",              desc:"You chose Hard difficulty. The game is unchanged. The label changed. That's it.", check:()=>false},
+  {id:'set-easy',         name:"Coward",                 desc:"You chose Easy difficulty. The game is unchanged. You are unchanged. Everything is unchanged.", check:()=>false},
+  {id:'pro-mode-on',      name:"Pro Player",             desc:"You enabled Pro Mode. A crown appeared. It will disappear. The square is not impressed.", check:()=>false},
+  {id:'synced',           name:"Synced",                 desc:"Cloud sync completed. Nothing was in the cloud. Nothing was sent. The button spun and that was it.", check:()=>false},
+  {id:'sync-failed',      name:"Sync Failed",            desc:"Your data may be lost. It isn't. But it may be. The sync failed. This is fine.", check:()=>false},
+  {id:'settings-visitor', name:"Read The Settings",      desc:"You visited Settings. You found sliders. The sliders found you. Nothing works.", check:()=>unlocked.has('max-fun')||unlocked.has('set-hard')||unlocked.has('set-easy')||unlocked.has('pro-mode-on')},
 ];
 
 // ── Achievement engine ───────────────────────────────────────────────────────
@@ -1997,9 +2210,16 @@ function unlock(id) {
 function showNextPopup() {
   if (popupQueue.length === 0) { popupShowing = false; return; }
   popupShowing = true;
+
+  // Cancel any fake popup currently showing
+  const popup = document.getElementById('achievement-popup');
+  if (popup._fakeTimer) {
+    clearTimeout(popup._fakeTimer);
+    popup._fakeTimer = null;
+  }
+
   const a = popupQueue.shift();
   document.getElementById("pop-name").innerHTML = "<b>" + a.name + "</b><br>" + a.desc;
-  const popup = document.getElementById("achievement-popup");
   popup.classList.remove("show");
   void popup.offsetWidth;
   popup.classList.add("show");
@@ -2022,6 +2242,7 @@ function updateAchStats() {
     return a && typeof a.check === 'function';
   }).length;
   document.getElementById('ach-stats').textContent = `${unlocked.size} total unlocked — ${count} of ${lockable.length} achievable ones`;
+  updateAchBadge();
 }
 
 // Secret achievement: click the achievement stats counter
@@ -2084,8 +2305,396 @@ const _origCheck = checkAchievements;
 // (inline — check1M called inside the interval)
 setInterval(() => { check1M(); }, 500);
 
-// ── Init ─────────────────────────────────────────────────────────────────────
+// ── Fake UI ───────────────────────────────────────────────────────────────────
 
+// Achievement badge — always one ahead
+function updateAchBadge() {
+  const badge = document.getElementById('ach-badge');
+  if (badge) badge.textContent = unlocked.size + 1;
+}
+
+// Pro Mode
+let proModeOn = false;
+function toggleProMode(on) {
+  proModeOn = on;
+  const slider = document.getElementById('pro-mode-slider');
+  const knob   = document.getElementById('pro-mode-knob');
+  slider.style.background = on ? '#4caf50' : '#ccc';
+  knob.style.left = on ? '23px' : '3px';
+
+  const countEl = document.getElementById('count');
+  if (on) {
+    unlock('pro-mode-on');
+    // Add crown to count display
+    countEl.parentElement.innerHTML = '👑 Placed: <strong id="count">' + placed + '</strong>';
+    setTimeout(() => {
+      // Crown disappears after 8 seconds
+      setTimeout(() => {
+        const c = document.getElementById('count');
+        if (c) c.parentElement.innerHTML = 'Placed: <strong id="count">' + placed + '</strong>';
+      }, 8000);
+    }, 100);
+  }
+}
+
+// Fun slider
+function setFun(val) {
+  document.getElementById('fun-val').textContent = val + '%';
+  const note = document.getElementById('fun-note');
+  if (val == 0)        note.textContent = 'This setting has no effect.';
+  else if (val < 25)   note.textContent = 'Barely perceptible.';
+  else if (val < 50)   note.textContent = 'Something may have changed. It hasn\'t.';
+  else if (val < 75)   note.textContent = 'You\'re trying. The game is not.';
+  else if (val < 100)  note.textContent = 'Almost. Not quite. Not at all.';
+  else { note.textContent = 'Maximum fun enabled.'; unlock('max-fun'); }
+}
+
+// Difficulty slider
+const diffLabels = ['Easy', 'Medium', 'Hard'];
+function setDiff(val) {
+  document.getElementById('diff-val').textContent = diffLabels[val];
+  if (val == 2) unlock('set-hard');
+  if (val == 0) unlock('set-easy');
+}
+
+// Cloud Sync
+let syncCount = 0;
+function triggerSync() {
+  const status = document.getElementById('sync-status');
+  status.textContent = 'Syncing...';
+  const btn = status.closest('div').querySelector('button');
+  btn.disabled = true;
+  setTimeout(() => {
+    syncCount++;
+    if (syncCount % 3 === 0) {
+      status.textContent = '⚠️ Sync failed. Your data may be lost.';
+      unlock('sync-failed');
+    } else if (syncCount % 3 === 1) {
+      status.textContent = 'Synced just now ✓';
+      unlock('synced');
+    } else {
+      status.textContent = 'Sync complete. Nothing changed.';
+    }
+    btn.disabled = false;
+  }, 1800);
+}
+
+// Bug Report
+let userReports = JSON.parse(localStorage.getItem('bugReports') || '[]');
+function submitBugReport() {
+  const text = document.getElementById('bug-report-text').value.trim();
+  if (!text) return;
+  userReports.push(text);
+  if (userReports.length > 20) userReports.shift(); // cap at 20
+  localStorage.setItem('bugReports', JSON.stringify(userReports));
+
+  const confirm = document.getElementById('bug-confirm');
+  confirm.style.display = 'block';
+  confirm.textContent = 'Report submitted. We\'ll look into it.';
+  document.getElementById('bug-report-text').value = '';
+  unlock('bug-reporter');
+  setTimeout(() => {
+    confirm.textContent = '(We will not look into it.)';
+    setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+  }, 1500);
+}
+
+// Inject user bug reports into fake achievement pool — handled in showFakePopup
+
+// ── Leaderboard ────────────────────────────────────────────────────────────────
+
+const fakeLeaderboard = [
+  { name: 'squaregod_99',      score: 99847, note: '🔥 on a 847-day streak' },
+  { name: 'HoleEnthusiast',    score: 88203, note: 'plays professionally' },
+  { name: 'xX_SQUAREZ_Xx',     score: 71450, note: 'peaked in 2023' },
+  { name: 'definitely_human',  score: 68991, note: 'verified player' },
+  { name: 'squarequeen',       score: 54320, note: '👑 premium member' },
+  { name: 'NotCheating_real',  score: 51100, note: '🏅 leaderboard veteran' },
+  { name: 'CircleHater',       score: 47382, note: 'all squares, no circles' },
+  { name: 'TheRealSquare',     score: 44201, note: 'it was them all along' },
+  { name: 'idle_farmer_2049',  score: 39004, note: 'AFK placement legend' },
+  { name: 'NormalPerson',      score: 31750, note: 'just a normal person' },
+  { name: 'definitely_not_bot',score: 28440, note: '🤖 organic placer' },
+  { name: 'help_me',           score: 19203, note: 'been here since v1' },
+  { name: 'almost_there_99',   score: 12847, note: 'always almost there' },
+  { name: 'new_player_2024',   score:  8320, note: 'surprisingly tenacious' },
+  { name: 'justgivingup',      score:  4401, note: 'didn\'t give up' },
+];
+
+function populateLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  const rankEl = document.getElementById('your-rank');
+  if (!list) return;
+
+  // Insert player somewhere near the bottom
+  const playerPos = Math.min(fakeLeaderboard.length, 14 + Math.floor(placed / 20));
+  const displayEntries = [...fakeLeaderboard];
+
+  list.innerHTML = displayEntries.map((e, i) =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:8px;">
+      <span style="font-weight:900;color:#aaa;min-width:24px;">#${i + 1}</span>
+      <span style="flex:1"><strong>${e.name}</strong> <span style="font-size:0.75em;color:#aaa;">${e.note}</span></span>
+      <strong style="color:#555">${e.score.toLocaleString()}</strong>
+    </div>`
+  ).join('') +
+  `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,100,100,0.08);border-radius:8px;border:1px dashed #ffaaaa;">
+    <span style="font-weight:900;color:#e53935;min-width:24px;">#${playerPos + 1}</span>
+    <span style="flex:1"><strong>You</strong> <span style="font-size:0.75em;color:#aaa;">📍 this is you</span></span>
+    <strong style="color:#e53935">${placed.toLocaleString()}</strong>
+  </div>`;
+
+  rankEl.textContent = '#' + (playerPos + 1) + ' of ' + (playerPos + 1) + ' players shown. The rest have more shapes.';
+  unlock('checked-leaderboard');
+}
+
+document.querySelector('[data-tab="leaderboard"]').addEventListener('click', populateLeaderboard);
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+const baseNotifs = [
+  { icon:'🏆', title:'Achievement almost unlocked', body:'You\'re close to something. We can\'t say what. Keep going.' },
+  { icon:'📊', title:'Your stats are ready', body:'We ran the numbers. The numbers are not good. View Stats for details.' },
+  { icon:'🔔', title:'Someone beat your score', body:'Everyone has. This is not new information.' },
+  { icon:'💡', title:'Tip: Try the square hole', body:'Our data shows you haven\'t tried the square hole yet. (Data may be inaccurate.)' },
+  { icon:'⚠️', title:'Placement warning', body:'Your recent placement velocity has decreased. The square hole is concerned.' },
+  { icon:'🎉', title:'You\'re in the top 100%', body:'Of players. All of them. You are one of them.' },
+  { icon:'📅', title:'Daily challenge available', body:'Come back tomorrow.' },
+  { icon:'☁️', title:'Cloud sync failed', body:'Your data was not saved to the cloud. It was saved locally. The cloud is fine. It just didn\'t want your data.' },
+  { icon:'🐛', title:'Bug report received', body:'Thanks for your report. Status: unread. Priority: low. ETA: never.' },
+  { icon:'👑', title:'Premium reminder', body:'You haven\'t subscribed to Square Hole Premium. The square hole has noticed.' },
+  { icon:'🔄', title:'Update available', body:'v4.2.' + (Math.floor(Math.random()*9)+2) + ' brings critical improvements to the square. Dismiss to apply.' },
+  { icon:'💬', title:'New message from the square hole', body:'"..."' },
+  { icon:'📈', title:'Streak at risk', body:'Your placement streak is at risk. It was never really a streak. But it\'s at risk.' },
+  { icon:'🧠', title:'Insight', body:'Players who place more shapes tend to have placed more shapes. You\'re on track.' },
+  { icon:'❓', title:'Unknown notification', body:'This notification was sent by mistake. It still counts.' },
+];
+
+let notifsRead = new Set(JSON.parse(localStorage.getItem('notifsRead') || '[]'));
+
+function populateNotifications() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+
+  // Add new notifs based on placements
+  const extras = [];
+  if (placed >= 50)  extras.push({ icon:'😐', title:'Still here', body:'You\'ve placed 50 shapes. The square hole expected this.' });
+  if (placed >= 100) extras.push({ icon:'😑', title:'Still here (again)', body:'100 shapes. The square hole has stopped being surprised.' });
+  if (placed >= 500) extras.push({ icon:'😶', title:'...', body:'500 shapes. Nothing to say.' });
+  if (wrongHoles >= 10) extras.push({ icon:'❌', title:'Wrong hole pattern detected', body:'You have a type. It is wrong. Consistently.' });
+  if (userReports.length > 0) extras.push({ icon:'🐛', title:'Bug report follow-up', body:'"' + userReports[userReports.length-1].slice(0,60) + (userReports[userReports.length-1].length>60?'...':'"') + '" — Status: filed under misc.' });
+
+  const allNotifs = [...baseNotifs, ...extras];
+
+  list.innerHTML = allNotifs.map((n, i) => {
+    const read = notifsRead.has(i);
+    return `<div onclick="markNotifRead(${i},this)" style="display:flex;gap:12px;padding:10px 12px;background:${read?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.75)'};border-radius:10px;cursor:pointer;border-left:3px solid ${read?'transparent':'#1976d2'};">
+      <span style="font-size:1.4em;flex-shrink:0">${n.icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:${read?'600':'900'};color:${read?'#aaa':'#333'}">${n.title}</div>
+        <div style="font-size:0.8em;color:#888;margin-top:2px">${n.body}</div>
+      </div>
+      ${read?'':'<div style="width:8px;height:8px;background:#1976d2;border-radius:50%;flex-shrink:0;margin-top:4px;"></div>'}
+    </div>`;
+  }).join('');
+
+  updateNotifBadge();
+  unlock('checked-notifications');
+}
+
+function markNotifRead(i, el) {
+  notifsRead.add(i);
+  localStorage.setItem('notifsRead', JSON.stringify([...notifsRead]));
+  el.style.background = 'rgba(255,255,255,0.4)';
+  el.style.borderLeftColor = 'transparent';
+  el.querySelector('div').style.fontWeight = '600';
+  el.querySelector('div').style.color = '#aaa';
+  const dot = el.querySelector('[style*="border-radius:50%"]');
+  if (dot) dot.remove();
+  updateNotifBadge();
+}
+
+function updateNotifBadge() {
+  const unread = baseNotifs.length - notifsRead.size;
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.textContent = Math.max(1, unread); // always at least 1
+}
+
+function clearNotifs() {
+  for (let i = 0; i < baseNotifs.length + 10; i++) notifsRead.add(i);
+  localStorage.setItem('notifsRead', JSON.stringify([...notifsRead]));
+  populateNotifications();
+  // Badge goes to 1 — never actually 0
+  setTimeout(() => {
+    const badge = document.getElementById('notif-badge');
+    if (badge) badge.textContent = '1';
+  }, 500);
+  unlock('cleared-notifs');
+}
+
+document.querySelector('[data-tab="notifications"]').addEventListener('click', populateNotifications);
+
+// ── Premium ────────────────────────────────────────────────────────────────────
+
+let premiumPurchased = localStorage.getItem('premium') === 'true';
+
+function buyPremium() {
+  const btn = document.querySelector('#settings-tab button[onclick="buyPremium()"]');
+  const note = document.getElementById('premium-note');
+  if (premiumPurchased) {
+    showRejection("You already have Premium. The square hole thanks you. Not really.");
+    return;
+  }
+  btn.textContent = 'Processing...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'Payment Declined';
+    note.textContent = 'Your card was declined. By the square hole. Personally.';
+    note.style.color = '#e53935';
+    setTimeout(() => {
+      btn.textContent = 'Try Again';
+      btn.disabled = false;
+      btn.onclick = () => {
+        btn.textContent = 'Still Declined';
+        setTimeout(() => {
+          // "Gift" them premium
+          premiumPurchased = true;
+          localStorage.setItem('premium', 'true');
+          btn.textContent = '✓ Premium Active';
+          btn.style.background = '#4caf50';
+          btn.style.color = 'white';
+          note.textContent = 'Premium granted for free because payment failed twice. The square hole respects persistence.';
+          note.style.color = '#4caf50';
+          unlock('bought-premium');
+        }, 1200);
+      };
+    }, 1500);
+  }, 1800);
+}
+
+// ── Update banner version incrementing ────────────────────────────────────────
+
+let updateVersion = parseFloat(localStorage.getItem('updateVersion') || '4.21');
+
+function dismissUpdate() {
+  document.getElementById('update-banner').style.display = 'none';
+  unlock('clicked-update');
+  updateVersion = Math.round((updateVersion + 0.01) * 100) / 100;
+  localStorage.setItem('updateVersion', updateVersion);
+  // Show again in 90 seconds with a new version
+  setTimeout(() => {
+    const b = document.getElementById('update-banner');
+    const msgs = [
+      'critical improvements to the hole geometry.',
+      'the square has been adjusted.',
+      'placement feedback tuning.',
+      'fixed: shapes. unfixed: you.',
+      'performance improvements for high-placement users. you are not a high-placement user.',
+      'addressed concerns raised by the square hole.',
+      'emergency patch for unknown reasons.',
+    ];
+    const msg = msgs[Math.floor(Math.random() * msgs.length)];
+    b.querySelector('span').textContent = '🔔 v' + updateVersion.toFixed(2) + ' available — ' + msg;
+    b.querySelector('[onclick="dismissUpdate()"]').textContent = 'Update Now';
+    b.style.display = 'flex';
+  }, 90000);
+}
+
+// Quit
+function tryQuit() {
+  unlock('looked-at-quit');
+  const btn = document.querySelector('#quit-section button');
+  btn.textContent = 'Are you sure?';
+  btn.onclick = () => {
+    btn.textContent = 'Really sure?';
+    btn.onclick = () => {
+      btn.textContent = 'You won\'t.';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'Quit';
+        btn.disabled = false;
+        btn.onclick = tryQuit;
+      }, 3000);
+    };
+  };
+}
+
+// Show quit button after 200 placements
+function checkQuitButton() {
+  if (placed >= 200) document.getElementById('quit-section').style.display = 'block';
+}
+
+// Daily Challenge
+function showDaily() {
+  const modal = document.getElementById('daily-modal');
+  modal.style.display = 'flex';
+  unlock('checked-daily');
+}
+
+// Share
+function showShare() {
+  const modal = document.getElementById('share-modal');
+  document.getElementById('share-preview').innerHTML =
+    '🟥 I placed <strong>' + placed + '</strong> shapes<br>in the square hole.<br><span style="font-size:0.7em;opacity:0.7;">squarehole.game</span>';
+  document.getElementById('share-copy-confirm').style.display = 'none';
+  modal.style.display = 'flex';
+  unlock('tried-to-share');
+}
+function copyShareLink() {
+  navigator.clipboard?.writeText('it goes in the square hole').catch(()=>{});
+  const c = document.getElementById('share-copy-confirm');
+  c.style.display = 'block';
+  c.textContent = 'Link copied!';
+  setTimeout(() => {
+    c.textContent = '(The link was "it goes in the square hole")';
+  }, 1200);
+  unlock('copied-link');
+}
+
+// Help
+let helpVisible = false;
+function showHelp() {
+  helpVisible = !helpVisible;
+  document.getElementById('help-tooltip').style.display = helpVisible ? 'block' : 'none';
+  if (helpVisible) unlock('asked-for-help');
+}
+
+// Stats tab population
+function populateStats() {
+  const el = document.getElementById('stats-content');
+  if (!el) return;
+  const rows = [
+    ['Shapes placed',          placed],
+    ['Wrong hole attempts',    wrongHoles],
+    ['Correct rate',           placed + wrongHoles > 0 ? Math.round(placed / (placed + wrongHoles) * 100) + '%' : 'N/A'],
+    ['Average placement confidence', 'declining'],
+    ['Holes judged',           'all of them'],
+    ['Time wasted',            'yes'],
+    ['Shapes lost to void',    Math.floor(placed * 0.03)],
+    ['Square hole approval rating', Math.max(0, 100 - wrongHoles) + '%'],
+    ['Sessions',               parseInt(localStorage.getItem('sessions') || 1)],
+    ['Peak performance',       'not yet reached'],
+    ['Current trajectory',     wrongHoles > placed ? 'downward' : 'lateral'],
+    ['Projected completion',   'never'],
+    ['Fun detected',           proModeOn ? 'trace amounts' : 'none'],
+    ['Regrets',                'unquantifiable'],
+    ['Achievement completion', Math.round(unlocked.size / achievements.length * 100) + '%'],
+  ];
+  el.innerHTML = rows.map(([k, v]) =>
+    `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:8px;">
+      <span style="color:#555">${k}</span>
+      <strong>${v}</strong>
+    </div>`
+  ).join('');
+}
+
+// Intercept stats tab click to refresh stats
+document.querySelector('[data-tab="stats"]').addEventListener('click', populateStats);
+
+// Track sessions
+const sessCount = parseInt(localStorage.getItem('sessions') || '0') + 1;
+localStorage.setItem('sessions', sessCount);
+
+// Inject user bug reports into fake achievement pool occasionally
 function init() {
   updateCount();
   // Restore gold outlines for holes already dunked
