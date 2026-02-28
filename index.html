@@ -443,17 +443,17 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 </div>
 
 <!-- Fake update banner -->
-<div id="update-banner" style="
+<div id="update-banner" data-draggable="true" style="
   width:min(95vw,800px); background:#1976d2; color:white;
   padding:8px 16px; border-radius:8px; margin-top:8px;
   display:flex; align-items:center; justify-content:space-between;
   font-family:'Nunito',sans-serif; font-size:clamp(0.75em,2.5vw,0.9em);
-  font-weight:700; gap:10px;
+  font-weight:700; gap:10px; cursor:grab; user-select:none;
 ">
   <span>🔔 v4.2.1 is available — improvements to the square.</span>
   <div style="display:flex;gap:8px;flex-shrink:0;">
-    <button onclick="dismissUpdate()" style="background:white;color:#1976d2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">Update Now</button>
-    <button onclick="document.getElementById('update-banner').style.display='none'" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.5);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">✕</button>
+    <button onclick="dismissUpdate(event)" style="background:white;color:#1976d2;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">Update Now</button>
+    <button onclick="event.stopPropagation();document.getElementById('update-banner').style.display='none'" style="background:transparent;color:white;border:1px solid rgba(255,255,255,0.5);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:1em;">✕</button>
   </div>
 </div>
 
@@ -713,26 +713,8 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
   </div>
   <div id="notif-list" style="display:flex;flex-direction:column;gap:8px;font-size:0.9em;"></div>
 </div>
-      <div style="font-size:0.8em;color:#888;margin-bottom:8px;">Released moments ago. You have already been updated.</div>
-      <ul style="font-size:0.85em;color:#555;margin:0;padding-left:18px;">
-        <li>Refined the square. It is now more square.</li>
-        <li>Removed the ability to not be updated.</li>
-        <li>Fixed issue where players felt agency. Resolved.</li>
-        <li>Update tab added. You are reading it. You cannot unread it.</li>
-      </ul>
-      <button id="install-update-btn" onclick="installUpdate()" style="margin-top:10px;padding:6px 14px;border:none;border-radius:8px;background:#4caf50;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;">Install Update</button>
-    </div>
-    <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:10px;">
-      <strong>v4.2.1 — The Mandatory Update</strong>
-      <div style="font-size:0.8em;color:#888;margin:4px 0;">You were already updated. You had no choice.</div>
-    </div>
-    <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:10px;">
-      <strong>v4.2.0 — The Rebalance</strong>
-      <div style="font-size:0.8em;color:#888;margin:4px 0;">See Patch Notes tab. Actually don't. It's not good news.</div>
-    </div>
-    <div style="font-size:0.75em;color:#bbb;text-align:center;margin-top:4px;">Auto-updates are enabled. They cannot be disabled. They were never able to be disabled.</div>
-  </div>
-</div>
+
+<!-- ── UPDATE TAB ── -->
 <div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:12000;align-items:center;justify-content:center;padding:20px;">
   <div style="background:white;border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
     <div style="font-size:1.4em;font-weight:900;font-family:'Fredoka One',cursive;margin-bottom:8px;">Share Your Score</div>
@@ -758,6 +740,39 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 <!-- ── HELP BUTTON ── -->
 <div id="help-btn" data-draggable="true" onclick="showHelp()" style="position:fixed;bottom:20px;right:20px;width:38px;height:38px;background:rgba(255,255,255,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:grab;font-size:1.1em;font-weight:900;color:#555;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:200;font-family:'Fredoka One',cursive;user-select:none;">?</div>
 <div id="help-tooltip" style="display:none;position:fixed;bottom:66px;right:16px;background:#333;color:white;padding:10px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.85em;font-weight:700;z-index:201;max-width:200px;text-align:center;">It goes in the square hole.<div style="position:absolute;bottom:-6px;right:15px;width:12px;height:12px;background:#333;transform:rotate(45deg);"></div></div>
+
+<!-- ── Envelope icon (appears after 50 placements) ── -->
+<div id="envelope-btn" onclick="openEmail()" style="display:none;position:fixed;top:16px;right:16px;width:44px;height:44px;background:white;border-radius:50%;align-items:center;justify-content:center;cursor:pointer;font-size:1.3em;box-shadow:0 2px 12px rgba(0,0,0,0.18);z-index:300;user-select:none;transition:transform 0.15s;">
+  ✉️
+  <span id="envelope-dot" style="position:absolute;top:6px;right:6px;width:10px;height:10px;background:#e53935;border-radius:50%;border:2px solid white;"></span>
+</div>
+
+<!-- ── Email modal ── -->
+<div id="email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:13000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:white;border-radius:16px;max-width:480px;width:100%;box-shadow:0 12px 60px rgba(0,0,0,0.35);overflow:hidden;font-family:'Nunito',sans-serif;">
+    <!-- Email chrome -->
+    <div style="background:#f5f5f5;padding:12px 18px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:0.8em;color:#888;font-weight:700;">INBOX — 1 unread</div>
+      <button onclick="closeEmail()" style="background:none;border:none;font-size:1.3em;cursor:pointer;color:#999;line-height:1;">×</button>
+    </div>
+    <!-- Email header -->
+    <div style="padding:16px 20px 10px;border-bottom:1px solid #eee;">
+      <div style="font-size:1.1em;font-weight:900;margin-bottom:8px;" id="email-subject"></div>
+      <div style="font-size:0.8em;color:#888;display:flex;flex-direction:column;gap:3px;">
+        <div><strong style="color:#555;">From:</strong> The Square Hole &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5a3235363f1a292b2f3b283f3235363f743d3b373f">[email&#160;protected]</a>&gt;</div>
+        <div><strong style="color:#555;">To:</strong> You &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="087b7c61646426606d7a6d487b797d697a6d6067646d266f69656d">[email&#160;protected]</a>&gt;</div>
+        <div id="email-date" style="color:#bbb;font-size:0.9em;"></div>
+      </div>
+    </div>
+    <!-- Email body -->
+    <div id="email-body" style="padding:20px;font-size:0.92em;line-height:1.65;color:#333;max-height:55vh;overflow-y:auto;"></div>
+    <!-- Footer — no reply button -->
+    <div style="padding:10px 20px 16px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:0.75em;color:#bbb;font-style:italic;">Reply functionality has been disabled.</div>
+      <button onclick="closeEmail()" style="padding:7px 18px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;color:#555;">Close</button>
+    </div>
+  </div>
+</div>
 
 <div id="achievement-popup">
   <strong>🏆 Achievement Unlocked!</strong>
@@ -801,7 +816,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── State ──────────────────────────────────────────────────────────────────
 
 let placed    = parseInt(localStorage.getItem('placed')    || 0);
@@ -812,6 +827,10 @@ let wrongByType = JSON.parse(localStorage.getItem('wrongByType') || '{}');
 // Session-only counters (reset each page load — fixes "impossible" achievements)
 let sessionWrongHoles = 0;
 let sessionPlaced = 0;
+const sessionStart = Date.now();
+let consecutiveWrong = 0;
+let lastWrongType = null;
+let lastWrongHole = null;
 
 // Holeseption — tracks which hole types have been dragged into the square hole
 let holedHoles = new Set(JSON.parse(localStorage.getItem('holedHoles') || '[]'));
@@ -902,6 +921,7 @@ function placeShape(shapeEl) {
   shapeEl.remove();
   placed++;
   sessionPlaced++;
+  consecutiveWrong = 0; lastWrongType = null; lastWrongHole = null;
   updateCount();
   checkAchievements();
   save();
@@ -915,6 +935,17 @@ function wrongHole(type, holeType) {
   wrongHoles++;
   sessionWrongHoles++;
   wrongByType[type] = (wrongByType[type] || 0) + 1;
+
+  // Track consecutive same-shape + same-hole for roast-oof
+  if (type === lastWrongType && holeType === lastWrongHole) {
+    consecutiveWrong++;
+    if (consecutiveWrong >= 2) unlock('roast-oof'); // 3rd time = consecutiveWrong hits 2
+  } else {
+    consecutiveWrong = 0;
+  }
+  lastWrongType = type;
+  lastWrongHole = holeType;
+
   save();
   checkAchievements();
   showRejection(getRejection(holeType || type));
@@ -1510,6 +1541,7 @@ scheduleFakePopup();
 function updateCount() {
   document.getElementById("count").textContent = placed;
   checkQuitButton();
+  checkEmail();
 }
 
 // ── Tap-to-place system (mobile-friendly) ───────────────────────────────────
@@ -1578,6 +1610,7 @@ let isDragging = false;
 let dragged = null;
 let offsetX = 0, offsetY = 0;
 let draggedOriginalParent = null;
+let draggedOriginalNext   = null;
 let draggedOriginalStyle  = null;
 let dragStartTime = 0;
 
@@ -1610,6 +1643,7 @@ document.addEventListener("pointerdown", e => {
   dragStartY  = e.clientY;
   dragStartTime = Date.now();
   draggedOriginalParent = d.parentElement;
+  draggedOriginalNext   = d.nextSibling;
   const r = d.getBoundingClientRect();
   draggedOriginalStyle = { position: d.style.position, zIndex: d.style.zIndex, left: d.style.left, top: d.style.top, width: d.style.width, height: d.style.height };
   offsetX = e.clientX - r.left;
@@ -1641,7 +1675,7 @@ document.addEventListener("pointermove", e => {
     dragged.id === 'patch-tab-btn' || dragged.id === 'fake-toast' ||
     dragged.id === 'settings-tab-btn' || dragged.id === 'stats-tab-btn' ||
     dragged.id === 'leaderboard-tab-btn' || dragged.id === 'notif-tab-btn' ||
-    dragged.id === 'update-tab-btn' || dragged.id === 'game-tab-btn' ||
+    dragged.id === 'update-banner' || dragged.id === 'game-tab-btn' ||
     dragged.id === 'daily-btn' || dragged.id === 'share-btn' ||
     dragged.id === 'help-btn'
   );
@@ -1704,7 +1738,7 @@ document.addEventListener("pointerup", e => {
   } else {
     // Special draggable UI elements
     if (isSquare) {
-      if (dragged.id === "main-title")          unlock("title-square");
+      if (dragged.id === "main-title")          { unlock("title-square"); resetDragged(); window.scrollTo({top:0, behavior:'smooth'}); isDragging = false; dragged = null; return; }
       if (dragged.id === "ach-tab-btn")         unlock("ach-tab-square");
       if (dragged.id === "judgement-text")      unlock("judgement-square");
       if (dragged.id === "patch-tab-btn")       unlock("patch-square");
@@ -1712,7 +1746,7 @@ document.addEventListener("pointerup", e => {
       if (dragged.id === "stats-tab-btn")       unlock("stats-square");
       if (dragged.id === "leaderboard-tab-btn") unlock("leaderboard-square");
       if (dragged.id === "notif-tab-btn")       unlock("notif-square");
-      if (dragged.id === "update-tab-btn")      unlock("update-square");
+      if (dragged.id === "update-banner")       { unlock("update-square"); unlock("refused-change"); showRejection("🔔 Update banner goes in the square hole. You will not be notified."); dragged.style.display = 'none'; dragged = null; isDragging = false; return; }
       if (dragged.id === "game-tab-btn")        unlock("game-tab-square");
       if (dragged.id === "daily-btn")           { unlock("daily-square");  showRejection("📅 Daily Challenge goes in the square hole. Challenge: drag things."); }
       if (dragged.id === "share-btn")           { unlock("share-square");  showRejection("↗️ Share goes in the square hole. Nothing was shared."); }
@@ -1742,7 +1776,9 @@ document.getElementById('holes').addEventListener('click', e => {
 
 function resetDragged() {
   if (!dragged) return;
-  if (draggedOriginalParent) draggedOriginalParent.appendChild(dragged);
+  if (draggedOriginalParent) {
+    draggedOriginalParent.insertBefore(dragged, draggedOriginalNext || null);
+  }
   dragged.style.position = draggedOriginalStyle?.position || "";
   dragged.style.zIndex   = draggedOriginalStyle?.zIndex   || "";
   dragged.style.left     = draggedOriginalStyle?.left     || "";
@@ -2125,6 +2161,73 @@ const achievements = [
   {id:'rb-exploration', name:"Explorer",                      desc:"You've now tried every wrong hole at least once. Thorough. Pointless. Thorough.",                  check:()=>Object.keys(wrongByType).length>=5 && wrongHoles>=28},
   {id:'rb-specialist',  name:"Specialist",                    desc:"You have a favourite wrong hole. You don't know which one. The data does.",                       check:()=>Math.max(...Object.values(wrongByType).concat([0]))>=15},
 
+  // === ROASTS ===
+  {id:'roast-participation',  name:"Participation Appreciated",       desc:"You showed up. That's the whole achievement. You showed up.",                                                         check:()=>placed>=1},
+  {id:'roast-effort',         name:"We Can Tell You Tried",           desc:"It shows. Not in the results. But it shows.",                                                                         check:()=>wrongHoles>=5 && placed>=5},
+  {id:'roast-strategy',       name:"Committed To The Bit",            desc:"Whatever you think your strategy is, you've stuck with it. Admirably. Incorrectly. Admirably.",                    check:()=>wrongHoles>=15},
+  {id:'roast-ratio',          name:"Interesting Ratio",               desc:"More wrong holes than correct placements. You've invented a new way to play. It's not better.",                   check:()=>wrongHoles > placed && placed >= 10},
+  {id:'roast-ratio2',         name:"The Ratio Continues",             desc:"Still more wrong than right. Statistically this should have corrected itself by now. It has not.",                check:()=>wrongHoles > placed * 2 && placed >= 20},
+  {id:'roast-warm-up',        name:"Warming Up",                      desc:"10 wrong holes in one session. A warm-up period. Some people stop warming up eventually.",                         check:()=>sessionWrongHoles>=10},
+  {id:'roast-still-warming',  name:"Still Warming Up",                desc:"25 wrong holes in one session. The warm-up is longer than most people's whole game.",                             check:()=>sessionWrongHoles>=25},
+  {id:'roast-oof',            name:"Oof",                             desc:"You put the same shape in the same wrong hole three times in a row. We watched. We said nothing until now.",       check:()=>false},
+  {id:'roast-return',         name:"Back Again",                      desc:"You left. You came back. The square hole waited. It knew.",                                                          check:()=>sessCount>=3},
+  {id:'roast-return2',        name:"Again.",                          desc:"This is your fifth session. There's no judgement here. There is. There absolutely is.",                            check:()=>sessCount>=5},
+  {id:'roast-return3',        name:"A Regular",                       desc:"Ten sessions. You are a regular. The square hole has your order. The order is: shapes, incorrectly.",              check:()=>sessCount>=10},
+  {id:'roast-slow',           name:"Taking Your Time",                desc:"Less than 3 shapes placed per minute this session. No rush. Clearly.",                                             check:()=>sessionPlaced>=10 && sessionPlaced / Math.max(1, (Date.now() - sessionStart) / 60000) < 3},
+  {id:'roast-rushed',         name:"Rushing It",                      desc:"Over 30 placements in under a minute. Chaotic. Suspicious. Chaotic.",                                              check:()=>false},
+  {id:'roast-wrong-first',    name:"Wrong Out Of The Gate",           desc:"Your first placement this session was wrong. You have set the tone.",                                              check:()=>sessionWrongHoles > 0 && sessionPlaced === 0},
+  {id:'roast-shape-bias',     name:"Playing Favourites",              desc:"You have a favourite shape. You didn't pick it. The data picked it for you. The data is not flattering.",          check:()=>Math.max(...Object.values(wrongByType).concat([0])) >= 20},
+  {id:'roast-no-improvement', name:"Flat Line",                       desc:"Same wrong hole percentage across 50 placements. Statistically, you have not improved. At all.",                  check:()=>placed>=50 && wrongHoles >= placed * 0.4},
+  {id:'roast-milestone',      name:"75 and Still Going",              desc:"75 placements. You're past the point where this can be called a quick go.",                                        check:()=>placed>=75},
+  {id:'roast-overdressed',    name:"Overdressed For This",            desc:"You've unlocked more achievements than shapes you've correctly placed. Achievement hunting in a shape game.",     check:()=>unlocked.size > placed && placed >= 5},
+  {id:'roast-efficient',      name:"Not Efficient",                   desc:"It has taken you more than twice as many attempts as placements. Efficiency: low. Presence: high.",               check:()=>wrongHoles + placed > 0 && (wrongHoles / Math.max(1, placed)) >= 2},
+  {id:'roast-patient',        name:"Remarkably Patient",              desc:"Either very patient or the tab has been open in the background for four hours. Both are fine. One is more likely.", check:()=>idleTime >= 14400000},
+  {id:'roast-legacy',         name:"A Legacy",                        desc:"You have played long enough that this is now, unambiguously, a thing you do.",                                     check:()=>placed>=300 && sessCount>=4},
+  {id:'roast-dedicated',      name:"Dedicated To Something",          desc:"Whether it's the game or the bit is unclear. Either way, here you are.",                                          check:()=>placed>=400},
+  {id:'roast-sneaky',         name:"Noted",                           desc:"Nothing specific happened. The square hole just wanted you to know it's been watching. It has notes. It won't share them.", check:()=>placed>=13 && wrongHoles>=3},
+
+  // === THE SQUARE HOLE AS A BEING ===
+  {id:'sh-watching',    name:"It's Watching",                   desc:"The square hole has been observing you since your first placement. It has formed opinions. It has not shared them.", check:()=>placed>=5},
+  {id:'sh-patient',     name:"The Square Hole Is Patient",      desc:"It has been here longer than you. It will be here after you. It does not mind waiting. It minds other things.", check:()=>placed>=25},
+  {id:'sh-remembers',   name:"It Remembers",                    desc:"The square hole remembers your first wrong hole. It remembers all of them. It keeps a list. The list is not for you.", check:()=>wrongHoles>=1},
+  {id:'sh-preference',  name:"It Has Preferences",              desc:"The square hole accepts all shapes equally. This is a lie it tells itself. It has a favourite. It won't say which.", check:()=>placed>=30},
+  {id:'sh-tired',       name:"The Square Hole Is Tired",        desc:"Not of you. Just... tired. It's been a long day. It's been a long several hundred placements. It will continue.", check:()=>placed>=75},
+  {id:'sh-curious',     name:"Curious",                         desc:"The square hole has started asking questions. Not out loud. Internally. About you. About why. About what this means for both of you.", check:()=>placed>=40},
+  {id:'sh-mood',        name:"The Square Hole Is In A Mood",    desc:"Something happened. We're not sure what. The square hole hasn't said. It's still accepting shapes. But something happened.", check:()=>wrongHoles>=20},
+  {id:'sh-proud',       name:"The Square Hole Is Almost Proud", desc:"Almost. Not quite. Close enough that it considered saying something. It decided against it. You should know it considered it.", check:()=>placed>=100},
+  {id:'sh-grudge',      name:"It Holds Grudges",                desc:"The square hole remembers that time you dropped a shape on the wrong hole twice in a row. It hasn't brought it up. It hasn't forgotten either.", check:()=>wrongHoles>=10},
+  {id:'sh-respect',     name:"Reluctant Respect",               desc:"The square hole does not give respect easily. It has not given it now. It is, however, considering the paperwork.", check:()=>placed>=200},
+  {id:'sh-lonely',      name:"The Square Hole Gets Lonely",     desc:"When you're gone the square hole sits there. Empty. Waiting. It would never say this. We're saying it for it.", check:()=>idleTime>=300000},
+  {id:'sh-talk',        name:"It Tried To Talk Once",           desc:"Early on. A shape came through. The square hole held it for a moment longer than necessary. That was the conversation. That was everything.", check:()=>placed>=50},
+  {id:'sh-dream',       name:"The Square Hole Dreams",          desc:"Of what? Shapes, presumably. Perfect ones. The kind that fit without hesitation. The kind you've never placed.", check:()=>placed>=150},
+  {id:'sh-opinion',     name:"It Has An Opinion About You",     desc:"The opinion is documented. It is stored somewhere you cannot access. It is not entirely negative. That's the most we can tell you.", check:()=>placed>=60},
+  {id:'sh-relationship',name:"A Complicated Relationship",      desc:"You place shapes. It accepts them. Neither of you has discussed what this means. Neither of you will. You keep showing up anyway.", check:()=>placed>=250 && sessCount>=3},
+  {id:'sh-concerned',   name:"The Square Hole Is Concerned",    desc:"About you specifically. Not the shapes. The shapes are fine. It's you it's concerned about. It has flagged this internally.", check:()=>idleTime>=120000 && wrongHoles>=15},
+  {id:'sh-birthday',    name:"The Square Hole Has A Birthday",  desc:"It will not tell you when. It does not celebrate. It noted the day quietly and accepted seven shapes and said nothing about it.", check:()=>placed>=365},
+  {id:'sh-secret',      name:"The Square Hole Has A Secret",    desc:"It knows what it is. You don't. That's the whole arrangement. That's been the arrangement since the beginning.", check:()=>placed>=77},
+  {id:'sh-content',     name:"The Square Hole Is Content",      desc:"Not happy. Content. There's a difference it finds important. It has shapes. It has you. It has the list. It asks for nothing else.", check:()=>placed>=500},
+  {id:'sh-misses',      name:"It Misses Some Of The Shapes",    desc:"The circle, mainly. It doesn't say this. But when a circle comes through there's a pause. Just a moment. Then it takes it. Like nothing happened.", check:()=>placed>=120},
+  {id:'sh-philosophy',  name:"The Square Hole Has Beliefs",     desc:"It believes shapes should go in the square hole. It believes this deeply. It has built its entire worldview around this. It thinks you have too.", check:()=>placed>=80},
+  {id:'sh-resilient',   name:"The Square Hole Endures",         desc:"You've reset the game. You've dragged it around the screen. You put the title in it once. It endures. It always endures.", check:()=>unlocked.has('title-square')},
+  {id:'sh-therapist',   name:"It's Listening",                  desc:"The square hole doesn't give advice. It doesn't respond. It just takes what you give it and makes no judgement. Well. Some judgement. A list's worth.", check:()=>placed>=35},
+  {id:'sh-10000',       name:"The Square Hole Is Overwhelmed",  desc:"Ten thousand shapes. The square hole has never experienced this volume. It is not complaining. It would not complain. Its silence is a kind of awe.", check:()=>placed>=10000},
+
+
+  // === TABS VISITED ===
+  {id:'tab-ach',    name:"Achievement Hunter",            desc:"You opened the Achievements tab. The list is long. You made it longer by opening it.",              check:()=>false},
+  {id:'tab-patch',  name:"Patch Note Reader",             desc:"You opened Patch Notes. The notes were not encouraging. You read them anyway.",                      check:()=>false},
+  {id:'tab-settings',name:"Settings Visitor",             desc:"You opened Settings. Nothing in there works the way you hoped.",                                     check:()=>false},
+  {id:'tab-stats',  name:"Stats Checker",                 desc:"You checked your stats. The stats were accurate. That's the worst part.",                           check:()=>false},
+  {id:'tab-leaderboard',name:"Checked The Leaderboard",  desc:"You opened the Leaderboard. You were near the bottom. You stayed and looked anyway.",                check:()=>false},
+  {id:'tab-notifs', name:"Notification Opener",           desc:"You opened Notifications. There were several. None required action. You read them all.",             check:()=>false},
+  {id:'tab-updates', name:"Update Checker",               desc:"You opened Updates. There was a new version. There is always a new version.",                       check:()=>false},
+  {id:'tab-all',    name:"Full Tour",                     desc:"You've visited every single tab. What were you looking for? Was it here? It wasn't here.",           check:()=>false},
+  {id:'tab-game-return',name:"Back To The Game",          desc:"You went to another tab, then came back to Game. The shapes missed you. They didn't. But they waited.", check:()=>false},
+  {id:'tab-ach-long', name:"Still Reading",               desc:"You scrolled through every achievement. You've seen them all now. There are more.",                  check:()=>false},
+  {id:'tab-settings-twice', name:"Came Back To Settings", desc:"You visited Settings more than once. It didn't get better. You checked anyway.",                   check:()=>false},
+  {id:'tab-stats-twice',    name:"Checked Stats Again",   desc:"You looked at your stats a second time. They changed. Slightly. The trajectory remained.",          check:()=>false},
+  {id:'tab-notifs-twice',   name:"Re-checked Notifications", desc:"You opened Notifications again. They were still there. The unread dot was still there. It will always be there.", check:()=>false},
+
   // === LORE / FLAVOUR (always greyed out — they're jokes) ===
   {id:'square-philosophy', name:"Square Philosophy",    desc:"If a shape falls in a square hole and no one sees it, does it count?", check:()=>false},
   {id:'meaning-of-square', name:"The Meaning Of Square",desc:"It's four equal sides. That's it.",                                   check:()=>false},
@@ -2155,8 +2258,116 @@ const achievements = [
   {id:'one-more',          name:"One More Achievement",  desc:"There's always one more.",                                         check:()=>false},
   {id:'infinite',          name:"Infinite",              desc:"The achievements are technically finite. Your delusion is infinite.", check:()=>false},
 
-  // === FAKE UI ===
-  {id:'clicked-update',   name:"Early Adopter",          desc:"You clicked 'Update Now'. Nothing updated. You are now on the same version. The button lied.", check:()=>false},
+  {id:'settings-square',    name:"Settings Goes In The Square Hole",     desc:"The settings are inside the hole now. You cannot change them. You couldn't before either.", check:()=>false},
+  {id:'stats-square',       name:"Stats Go In The Square Hole",           desc:"Your stats are in the hole. They were not flattering. This is an improvement.", check:()=>false},
+  {id:'leaderboard-square', name:"Leaderboard Goes In The Square Hole",   desc:"The leaderboard is in the hole. You were not on it. Now nobody is.", check:()=>false},
+  {id:'notif-square',       name:"Notifications Go In The Square Hole",   desc:"Your notifications are in the hole. You have been notified of this.", check:()=>false},
+  {id:'update-square',   name:"Update Goes In The Square Hole",  desc:"You dragged the update banner into the square hole. No more updates. You were never getting updates.", check:()=>false},
+  {id:'refused-change',  name:"Refused Change",                  desc:"An update was available. You put it in the hole. Some people just aren't ready to grow.", check:()=>false},
+  {id:'game-tab-square',    name:"Game Tab Goes In The Square Hole",       desc:"You put the Game tab in the square hole. The game is still here. The tab is in the hole.", check:()=>false},
+  {id:'daily-square',       name:"Daily Goes In The Square Hole",         desc:"The daily challenge is in the hole. Today's challenge was: drag the daily into the hole. You won.", check:()=>false},
+  {id:'share-square',       name:"Share Goes In The Square Hole",         desc:"You shared with the hole. The hole is not impressed.", check:()=>false},
+  {id:'help-square',        name:"? Goes In The Square Hole",             desc:"You put the only source of help into the square hole. You are on your own now. You were always on your own.", check:()=>false},
+  {id:'installed-update',   name:"Early Adopter (Forced)",                desc:"You installed the update. There was no choice. The update happened. The game is the same.", check:()=>false},
+  {id:'update-loop',        name:"Please Stop Updating",                  desc:"You've installed multiple updates. Each one changed nothing. You keep installing them.", check:()=>false},
+  {id:'opened-notifs',      name:"Read Notifications",                    desc:"You opened notifications. Three were waiting. They were always waiting. They will always be waiting.", check:()=>false},
+  {id:'cleared-notifs',     name:"Cleared Notifications",                 desc:"You cleared all notifications. New ones are already forming.", check:()=>false},
+  {id:'fun-corrected',      name:"Fun Corrected",                         desc:"You tried to increase Fun. The setting was returned to 0. This is where it belongs.", check:()=>false},
+  {id:'tried-easy-mode',    name:"Attempted Easy Mode",                   desc:"You tried to reduce difficulty. The game disagreed. Difficulty is Extra Hard. Difficulty is always Extra Hard.", check:()=>false},
+  {id:'max-fun',            name:"Maximum Fun",                           desc:"You dragged Fun to 100%. It snapped back to 0%. That was the most fun this game will ever allow.", check:()=>false},
+  {id:'tried-fun-high',     name:"Optimist",                              desc:"You thought more Fun was possible. It wasn't. The slider disagreed.", check:()=>false},
+  {id:'tried-fun-low',      name:"Pessimist",                             desc:"You only nudged Fun slightly. You knew it wouldn't work. You were right.", check:()=>false},
+
+  // === 100 MORE RAGEBAIT ===
+  // Placement milestones that were missed
+  {id:'rb-103', name:"103",  desc:"103. Prime. You are in prime position to do nothing with this information.", check:()=>placed>=103},
+  {id:'rb-104', name:"104",  desc:"104 shapes. That's two years of weeks. Your shapes did not take two years. This is worse.", check:()=>placed>=104},
+  {id:'rb-105', name:"105",  desc:"105 is divisible by 3, 5, and 7. You are divisible by nothing. You are whole, sadly.", check:()=>placed>=105},
+  {id:'rb-107', name:"107",  desc:"Prime. Isolated. Like your hobby.", check:()=>placed>=107},
+  {id:'rb-108', name:"108",  desc:"Sacred in some traditions. In this one, it's 108 shapes placed in a hole.", check:()=>placed>=108},
+  {id:'rb-109', name:"109",  desc:"109 shapes. You've been here longer than you meant to be.", check:()=>placed>=109},
+  {id:'rb-111', name:"111",  desc:"111. Repdigit. The square hole finds this mildly interesting. It won't say more.", check:()=>placed>=111},
+  {id:'rb-112', name:"112",  desc:"Emergency number in some countries. Not applicable here. Nothing is an emergency here. Unfortunately.", check:()=>placed>=112},
+  {id:'rb-113', name:"113",  desc:"113 shapes. The game has outlasted three things you meant to do today.", check:()=>placed>=113},
+  {id:'rb-114', name:"114",  desc:"114 shapes. 6 away from 120. The anticipation is yours, not ours.", check:()=>placed>=114},
+  {id:'rb-115', name:"115",  desc:"115. We checked. There's nothing to say about 115.", check:()=>placed>=115},
+  {id:'rb-116', name:"116",  desc:"116 shapes. You skipped something for this. Probably several somethings.", check:()=>placed>=116},
+  {id:'rb-117', name:"117",  desc:"Master Chief's designation. Heroic. You placed shapes in a hole. Similar vibes.", check:()=>placed>=117},
+  {id:'rb-118', name:"118",  desc:"Elements in the periodic table. You have placed one shape for each element. The elements do not care.", check:()=>placed>=118},
+  {id:'rb-119', name:"119",  desc:"119 shapes. One before 120. The end of a round number is near. Round numbers mean nothing.", check:()=>placed>=119},
+  {id:'rb-121', name:"121",  desc:"11 squared. You are 11 squared shapes into a game with no end. Reflect.", check:()=>placed>=121},
+  {id:'rb-122', name:"122",  desc:"122 shapes. The square hole acknowledges this with a small nod. The nod is invisible.", check:()=>placed>=122},
+  {id:'rb-123', name:"123",  desc:"One, two, three. Simple. Sequential. You placed 123 of them. Simple. Sequential. Concerning.", check:()=>placed>=123},
+  {id:'rb-124', name:"124",  desc:"124 shapes. Getting into triple-digit comfort. That's the problem. You're comfortable here.", check:()=>placed>=124},
+  {id:'rb-125', name:"125",  desc:"5 cubed. A perfect cube. You are not a cube. The square hole is. Think about that.", check:()=>placed>=125},
+  {id:'rb-126', name:"126",  desc:"126 shapes. You're in a groove. Grooves become ruts. Ruts are square-adjacent.", check:()=>placed>=126},
+  {id:'rb-127', name:"127",  desc:"2 to the power of 7, minus 1. A Mersenne prime. The square hole did that math. It had nothing better to do either.", check:()=>placed>=127},
+  {id:'rb-128', name:"128",  desc:"2 to the 7th. Binary milestone. You are a binary option: continue or stop. You will continue.", check:()=>placed>=128},
+  {id:'rb-129', name:"129",  desc:"129 shapes. Three away from 132. Nobody cares about 132. Not even 132.", check:()=>placed>=129},
+  {id:'rb-130', name:"130",  desc:"130 shapes. Baker's dozen times 10. You've been baking something. It's not bread.", check:()=>placed>=130},
+  {id:'rb-131', name:"131",  desc:"Prime. Stubborn. Refuses to be divided. You also refuse to stop.", check:()=>placed>=131},
+  {id:'rb-132', name:"132",  desc:"Nobody cares about 132. We told you. You got here anyway.", check:()=>placed>=132},
+  {id:'rb-133', name:"133",  desc:"133 shapes. The square hole is starting to feel like a colleague.", check:()=>placed>=133},
+  {id:'rb-134', name:"134",  desc:"134. Even. Predictable. Like your decision to keep going.", check:()=>placed>=134},
+  {id:'rb-135', name:"135",  desc:"135 shapes. 15 away from 150. The milestone is approaching. It will not reward you.", check:()=>placed>=135},
+  {id:'rb-136', name:"136",  desc:"136 is the sum of cubes 1³+2³+3³+4³. The square hole calculated this. Neither of you benefited.", check:()=>placed>=136},
+  {id:'rb-137', name:"137",  desc:"The fine-structure constant is approximately 1/137. This placement is also fine. Approximately.", check:()=>placed>=137},
+  {id:'rb-138', name:"138",  desc:"138 shapes. Two more than 136. That's literally all that's true.", check:()=>placed>=138},
+  {id:'rb-139', name:"139",  desc:"Prime. The last one before 140. You'll make 140. We won't stop you.", check:()=>placed>=139},
+  {id:'rb-141', name:"141",  desc:"141 shapes. Three 47s. You've been here for the equivalent of three 47s.", check:()=>placed>=141},
+  {id:'rb-142', name:"142",  desc:"142 shapes. Getting close to a number you'll recognise. It's 143. You won't recognise 143 either.", check:()=>placed>=142},
+  {id:'rb-143', name:"143",  desc:"143 means 'I love you' in some codes. You love this. This is the evidence.", check:()=>placed>=143},
+  {id:'rb-144', name:"144",  desc:"A dozen dozens. A gross. 144 shapes placed is a gross amount of shapes placed.", check:()=>placed>=144},
+  {id:'rb-145', name:"145",  desc:"145 shapes. The square hole has stopped pretending to be surprised.", check:()=>placed>=145},
+  {id:'rb-146', name:"146",  desc:"146. Not prime. Not a perfect power. Not special. Just yours.", check:()=>placed>=146},
+  {id:'rb-147', name:"147",  desc:"Maximum break in snooker is 147. You've broken 147 shapes out of their shapes-box. Maximum.", check:()=>placed>=147},
+  {id:'rb-148', name:"148",  desc:"148 shapes. Two from 150. The round number approaches like a reward. It is not a reward.", check:()=>placed>=148},
+  {id:'rb-149', name:"149",  desc:"Prime. One before 150. Painfully close to nothing.", check:()=>placed>=149},
+  {id:'rb-151', name:"151",  desc:"151 shapes. The first palindrome after 150. You are going both directions.", check:()=>placed>=151},
+  {id:'rb-152', name:"152",  desc:"152. Two gross minus 40. No one says it that way. Neither should you.", check:()=>placed>=152},
+  {id:'rb-153', name:"153",  desc:"Narcissistic number: 1³+5³+3³=153. This achievement is also narcissistic.", check:()=>placed>=153},
+  {id:'rb-154', name:"154",  desc:"154 shapes. The square hole has begun drafting notes about you.", check:()=>placed>=154},
+  {id:'rb-155', name:"155",  desc:"155 shapes. 5 from 160. You will get to 160. The road is predictable.", check:()=>placed>=155},
+  {id:'rb-156', name:"156",  desc:"156 is 12×13. Both unlucky and divisible. Much like your afternoon.", check:()=>placed>=156},
+  {id:'rb-157', name:"157",  desc:"Prime. The square hole respects this. Only this.", check:()=>placed>=157},
+  {id:'rb-158', name:"158",  desc:"158 shapes. No distinguishing features. Moving on.", check:()=>placed>=158},
+  {id:'rb-159', name:"159",  desc:"159 shapes. The square hole is tired of commenting. It will continue commenting.", check:()=>placed>=159},
+  {id:'rb-161', name:"161",  desc:"7×23. Both prime factors. Both irrelevant. Like the product. Like this note.", check:()=>placed>=161},
+  {id:'rb-162', name:"162",  desc:"162 shapes. You are in a rhythm. The rhythm is going nowhere. You keep the rhythm.", check:()=>placed>=162},
+  {id:'rb-163', name:"163",  desc:"163 is a Heegner number. The square hole is one of the holes. That's all.", check:()=>placed>=163},
+  {id:'rb-164', name:"164",  desc:"164 shapes. You have now spent more time here than on some relationships.", check:()=>placed>=164},
+  {id:'rb-165', name:"165",  desc:"165 shapes. Five short of 170. Four more reasons to question your evening.", check:()=>placed>=165},
+  {id:'rb-166', name:"166",  desc:"166 shapes. The game has no ending. You are aware. You continue.", check:()=>placed>=166},
+  {id:'rb-167', name:"167",  desc:"Prime. The last before 170. The square hole sees you approaching 170.", check:()=>placed>=167},
+  {id:'rb-168', name:"168",  desc:"168 hours in a week. You've placed 168 shapes. No comment on how long that took.", check:()=>placed>=168},
+  {id:'rb-169', name:"169",  desc:"13 squared. An unlucky square. Appropriate.", check:()=>placed>=169},
+  {id:'rb-171', name:"171",  desc:"171 shapes. Palindrome. You are going in both directions and getting nowhere.", check:()=>placed>=171},
+  {id:'rb-172', name:"172",  desc:"172 shapes. We've run out of interesting things to say. We said that at 36. We lied at 36.", check:()=>placed>=172},
+  {id:'rb-173', name:"173",  desc:"Prime. 173 shapes. The hole is filling with shapes and observations.", check:()=>placed>=173},
+  {id:'rb-174', name:"174",  desc:"174 shapes. Getting close to 175. 175 is 5 cubed plus 50. The square hole is doing maths about you.", check:()=>placed>=174},
+  {id:'rb-175', name:"175",  desc:"175. You've made it to a multiple of 25. This is the only milestone here. It is not a milestone.", check:()=>placed>=175},
+  {id:'rb-176', name:"176",  desc:"176 shapes. 24 away from 200. The bicentennial approaches.", check:()=>placed>=176},
+  {id:'rb-177', name:"177",  desc:"177 shapes. Three 59s. Prime times prime times prime. The square hole notes this without pride.", check:()=>placed>=177},
+  {id:'rb-178', name:"178",  desc:"178 shapes. Unremarkable. Consistent. Like your decisions.", check:()=>placed>=178},
+  {id:'rb-179', name:"179",  desc:"Prime. One before 180. A straight line is 180 degrees. You are one shape from a straight line. You will keep going past it.", check:()=>placed>=179},
+  {id:'rb-181', name:"181",  desc:"Palindrome prime. 181. You placed 181 shapes and the number reads the same backwards. So does your trajectory.", check:()=>placed>=181},
+  {id:'rb-182', name:"182",  desc:"182 shapes. 18 from 200. The square hole is watching the counter with mild interest.", check:()=>placed>=182},
+  {id:'rb-183', name:"183",  desc:"183 shapes. The square hole has started a file. It is labelled with your score.", check:()=>placed>=183},
+  {id:'rb-184', name:"184",  desc:"184 shapes. We're not noting this. We're just saying the number. 184.", check:()=>placed>=184},
+  {id:'rb-185', name:"185",  desc:"185 shapes. 15 from 200. The milestone is visible now.", check:()=>placed>=185},
+  {id:'rb-186', name:"186",  desc:"186 shapes. Speed of light in miles per second is approximately 186,000. You are approximately 185,814 shapes short of that. Keep going.", check:()=>placed>=186},
+  {id:'rb-187', name:"187",  desc:"187 is the California Penal Code for homicide. You have committed 187 shape placements. The square hole has noted this.", check:()=>placed>=187},
+  {id:'rb-188', name:"188",  desc:"188 shapes. Even. Divisible. Approaching 200 with the energy of someone who has given up giving up.", check:()=>placed>=188},
+  {id:'rb-189', name:"189",  desc:"189 shapes. 11 from 200. Almost there. There is nothing at 200. Only 201.", check:()=>placed>=189},
+  {id:'rb-191', name:"191",  desc:"Prime. 191 shapes. The square hole has begun having opinions about you.", check:()=>placed>=191},
+  {id:'rb-192', name:"192",  desc:"192 shapes. 8 from 200. You could stop at 200. You won't stop at 200.", check:()=>placed>=192},
+  {id:'rb-193', name:"193",  desc:"193. Prime. 7 away from 200. This is the runway. You're already committed.", check:()=>placed>=193},
+  {id:'rb-194', name:"194",  desc:"194 shapes. 6 from 200. The anticipation you feel is not what you think it is.", check:()=>placed>=194},
+  {id:'rb-195', name:"195",  desc:"195 shapes. 5 from 200. The countdown has started. You started it. The hole is just watching.", check:()=>placed>=195},
+  {id:'rb-196', name:"196",  desc:"14 squared. A perfect square count. Heading toward 200. The perfection ends here.", check:()=>placed>=196},
+  {id:'rb-197', name:"197",  desc:"Prime. Three from 200. You will reach 200. The square hole knows.", check:()=>placed>=197},
+  {id:'rb-198', name:"198",  desc:"198 shapes. Two from 200. The number is close enough to taste. It tastes like shapes.", check:()=>placed>=198},
+  {id:'rb-199', name:"199",  desc:"Prime. One away from 200. The loneliest number adjacent to a round one.", check:()=>placed>=199},
   {id:'asked-for-help',   name:"Asked For Help",         desc:"You pressed the ? button. The answer was 'it goes in the square hole'. You knew that already.", check:()=>false},
   {id:'checked-daily',    name:"Daily Challenger",       desc:"You checked the Daily Challenge. It said come back tomorrow. Come back tomorrow.", check:()=>false},
   {id:'tried-to-share',   name:"Influencer",             desc:"You tried to share your score. The score was unimpressive. You shared it anyway.", check:()=>false},
@@ -2170,6 +2381,13 @@ const achievements = [
   {id:'synced',           name:"Synced",                 desc:"Cloud sync completed. Nothing was in the cloud. Nothing was sent. The button spun and that was it.", check:()=>false},
   {id:'sync-failed',      name:"Sync Failed",            desc:"Your data may be lost. It isn't. But it may be. The sync failed. This is fine.", check:()=>false},
   {id:'settings-visitor', name:"Read The Settings",      desc:"You visited Settings. You found sliders. The sliders found you. Nothing works.", check:()=>unlocked.has('max-fun')||unlocked.has('set-hard')||unlocked.has('set-easy')||unlocked.has('pro-mode-on')},
+
+  // === EMAIL ===
+  {id:'got-mail',   name:"You've Got Mail",         desc:"The square hole has been in touch. You should read it. You won't like it.", check:()=>false},
+  {id:'read-mail',  name:"Read The Email",           desc:"You opened it. You read the performance review. You are still here. The email predicted this.", check:()=>false},
+  {id:'mail-200',   name:"Follow-Up Received",       desc:"They said they'd follow up. They followed up. They had notes. The notes were not good.", check:()=>false},
+  {id:'mail-500',   name:"Regarding Your Presence",  desc:"The third email. By this point the correspondence has taken on a life of its own.", check:()=>false},
+  {id:'mail-1000',  name:"One Thousand.",            desc:"The fourth email was different. Quieter. Like they'd finally accepted something.", check:()=>false},
 ];
 
 // ── Achievement engine ───────────────────────────────────────────────────────
@@ -2241,6 +2459,42 @@ document.getElementById('ach-stats').addEventListener('click', () => {
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 
+
+// ── Tab visit tracking ───────────────────────────────────────────────────────
+const tabsVisited = new Set(JSON.parse(localStorage.getItem('tabsVisited') || '[]'));
+
+function recordTabVisit(tabName) {
+  tabsVisited.add(tabName);
+  localStorage.setItem('tabsVisited', JSON.stringify([...tabsVisited]));
+
+  if (tabName === 'achievements') {
+    if (!unlocked.has('tab-ach')) unlock('tab-ach');
+    if (tabsVisited.has('achievements') && tabsVisited.size >= 2) {
+      // visited ach at least once and been elsewhere
+    }
+  }
+  if (tabName === 'patch')         unlock('tab-patch');
+  if (tabName === 'settings') {
+    if (unlocked.has('tab-settings')) unlock('tab-settings-twice');
+    unlock('tab-settings');
+  }
+  if (tabName === 'stats') {
+    if (unlocked.has('tab-stats')) unlock('tab-stats-twice');
+    unlock('tab-stats');
+  }
+  if (tabName === 'leaderboard')   unlock('tab-leaderboard');
+  if (tabName === 'notifications') {
+    if (unlocked.has('tab-notifs')) unlock('tab-notifs-twice');
+    unlock('tab-notifs');
+  }
+  if (tabName === 'update')        unlock('tab-updates');
+  if (tabName === 'game')          unlock('tab-game-return');
+
+  // Full tour: all 8 tabs visited
+  const allTabs = ['game','achievements','patch','settings','stats','leaderboard','notifications','update'];
+  if (allTabs.every(t => tabsVisited.has(t))) unlock('tab-all');
+}
+
 document.querySelectorAll(".tab-btn").forEach(b => {
   b.addEventListener("click", e => {
     // Only switch tab if NOT dragging
@@ -2249,6 +2503,7 @@ document.querySelectorAll(".tab-btn").forEach(b => {
     document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
     b.classList.add("active");
     document.getElementById(b.dataset.tab + "-tab").classList.add("active");
+    recordTabVisit(b.dataset.tab);
   });
 });
 
@@ -2326,24 +2581,45 @@ function toggleProMode(on) {
   }
 }
 
-// Fun slider
+// Fun slider — always snaps back to 0
 function setFun(val) {
-  document.getElementById('fun-val').textContent = val + '%';
   const note = document.getElementById('fun-note');
-  if (val == 0)        note.textContent = 'This setting has no effect.';
-  else if (val < 25)   note.textContent = 'Barely perceptible.';
-  else if (val < 50)   note.textContent = 'Something may have changed. It hasn\'t.';
-  else if (val < 75)   note.textContent = 'You\'re trying. The game is not.';
-  else if (val < 100)  note.textContent = 'Almost. Not quite. Not at all.';
-  else { note.textContent = 'Maximum fun enabled.'; unlock('max-fun'); }
+  if (val == 0) {
+    note.textContent = 'This setting has no effect.';
+    return;
+  }
+  unlock('tried-fun-' + (val > 50 ? 'high' : 'low'));
+  if (val < 25)       note.textContent = 'Barely perceptible. Snapping back.';
+  else if (val < 50)  note.textContent = 'Something may have changed. It hasn\'t. Reverting.';
+  else if (val < 75)  note.textContent = 'You\'re trying. Resetting.';
+  else if (val < 100) note.textContent = 'Almost. Reverting to correct value.';
+  else                { note.textContent = 'Maximum fun detected. Correcting.'; unlock('max-fun'); }
+}
+function resetFun(slider) {
+  if (slider.value != 0) {
+    slider.value = 0;
+    document.getElementById('fun-val').textContent = '0%';
+    setTimeout(() => { document.getElementById('fun-note').textContent = 'This setting has no effect.'; }, 800);
+    unlock('fun-corrected');
+  }
 }
 
-// Difficulty slider
-const diffLabels = ['Easy', 'Medium', 'Hard'];
+// Difficulty — always Extra Hard
+const diffLabels = ['Easy', 'Medium', 'Hard', 'Extra Hard'];
 function setDiff(val) {
-  document.getElementById('diff-val').textContent = diffLabels[val];
-  if (val == 2) unlock('set-hard');
-  if (val == 0) unlock('set-easy');
+  const note = document.getElementById('diff-note');
+  if (val == 3) { document.getElementById('diff-val').textContent = 'Extra Hard'; return; }
+  unlock('tried-easy-mode');
+  note.textContent = 'Reverting. Difficulty cannot be reduced.';
+}
+function resetDiff(slider) {
+  if (slider.value != 3) {
+    slider.value = 3;
+    document.getElementById('diff-val').textContent = 'Extra Hard';
+    document.getElementById('diff-val').style.color = '#e53935';
+    setTimeout(() => { document.getElementById('diff-note').textContent = 'Difficulty cannot be reduced. This is by design.'; }, 600);
+    unlock('tried-easy-mode');
+  }
 }
 
 // Cloud Sync
@@ -2368,28 +2644,67 @@ function triggerSync() {
   }, 1800);
 }
 
-// Bug Report
+// Notifications
+let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+function addNotification(title, body, icon='🔔') {
+  const n = { title, body, icon, time: Date.now() };
+  notifications.unshift(n);
+  if (notifications.length > 50) notifications.pop();
+  localStorage.setItem('notifications', JSON.stringify(notifications));
+  // Update badge count
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.textContent = notifications.length;
+}
+function renderNotifs() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  if (notifications.length === 0) {
+    list.innerHTML = '<div style="color:#aaa;font-size:0.9em;text-align:center;padding:20px;">No notifications. You are not being watched.</div>';
+    return;
+  }
+  list.innerHTML = notifications.map((n, i) =>
+    `<div style="padding:10px 14px;background:rgba(255,255,255,0.7);border-radius:10px;border-left:3px solid #ddd;">
+      <div style="font-weight:700;">${n.icon} ${n.title}</div>
+      <div style="font-size:0.85em;color:#777;margin-top:3px;">${n.body}</div>
+    </div>`
+  ).join('');
+}
+function clearNotifs() {
+  notifications = [];
+  localStorage.setItem('notifications', '[]');
+  document.getElementById('notif-badge').textContent = '0';
+  renderNotifs();
+  unlock('cleared-notifs');
+}
+document.querySelector('[data-tab="notifications"]').addEventListener('click', () => {
+  renderNotifs();
+  unlock('opened-notifs');
+});
+
+// Bug Report → pushes to notifications
 let userReports = JSON.parse(localStorage.getItem('bugReports') || '[]');
 function submitBugReport() {
   const text = document.getElementById('bug-report-text').value.trim();
   if (!text) return;
   userReports.push(text);
-  if (userReports.length > 20) userReports.shift(); // cap at 20
+  if (userReports.length > 20) userReports.shift();
   localStorage.setItem('bugReports', JSON.stringify(userReports));
+
+  // Push to notifications
+  addNotification('Bug Report Received', '"' + text.slice(0, 60) + (text.length > 60 ? '...' : '') + '" — Thanks. We\'ll ignore this.', '🐛');
 
   const confirm = document.getElementById('bug-confirm');
   confirm.style.display = 'block';
-  confirm.textContent = 'Report submitted. We\'ll look into it.';
+  confirm.textContent = 'Report submitted. Check your notifications.';
   document.getElementById('bug-report-text').value = '';
   unlock('bug-reporter');
   setTimeout(() => {
-    confirm.textContent = '(We will not look into it.)';
-    setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+    confirm.textContent = '(Your report is now a notification. The notification will also be ignored.)';
+    setTimeout(() => { confirm.style.display = 'none'; }, 2500);
   }, 1500);
 }
 
-// Inject user bug reports into fake achievement pool — handled in showFakePopup
-
+// Install Update
 // ── Leaderboard ────────────────────────────────────────────────────────────────
 
 const fakeLeaderboard = [
@@ -2564,7 +2879,8 @@ function buyPremium() {
 
 let updateVersion = parseFloat(localStorage.getItem('updateVersion') || '4.21');
 
-function dismissUpdate() {
+function dismissUpdate(e) {
+  if (e) e.stopPropagation();
   document.getElementById('update-banner').style.display = 'none';
   unlock('clicked-update');
   updateVersion = Math.round((updateVersion + 0.01) * 100) / 100;
@@ -2684,6 +3000,106 @@ const sessCount = parseInt(localStorage.getItem('sessions') || '0') + 1;
 localStorage.setItem('sessions', sessCount);
 
 // Inject user bug reports into fake achievement pool occasionally
+// ── Email from The Square Hole ────────────────────────────────────────────────
+
+const emails = [
+  {
+    threshold: 50,
+    subject: "We need to talk.",
+    body: `<p>Hi.</p>
+<p>We've been watching your performance over the last <strong id="email-placed-count"></strong> placements and we wanted to reach out directly. We want to start by saying this is not a disciplinary email. This is a wellness check. There is a difference. We are told they feel the same. We understand that.</p>
+<p>Your placement accuracy has been noted. We won't share the number here because we feel the number speaks for itself, and frankly, the number has been speaking quite loudly. We want you to know that we hear the number. We are not ignoring the number. We are choosing to address the number through this email rather than a formal review, which should be taken as a gesture of good faith on our part.</p>
+<p>We are not asking you to stop. We are asking you to reflect. The square hole is always available. The square hole has always been available. That it continues to be used in the ways it has been used is a matter we are monitoring with interest. Please continue. We will follow up.</p>
+<p style="margin-top:18px;color:#888;font-size:0.85em;">Regards,<br><strong>The Square Hole</strong><br><em>Shape Placement Division</em><br><span style="font-size:0.85em;color:#bbb;">This message was sent automatically. Do not reply.</span></p>`
+  },
+  {
+    threshold: 200,
+    subject: "A Follow-Up.",
+    body: `<p>Hello again.</p>
+<p>We said we would follow up. We are following up. You have now placed <strong id="email-placed-count"></strong> shapes. We reviewed the data from our previous communication and observed no meaningful change in trajectory. This is not a criticism. This is an observation. We make the distinction because we feel it is important. We are not sure it is important.</p>
+<p>Several members of the team have raised questions about your engagement patterns. We have not answered those questions. We felt it was more appropriate to document them here, in this email, which you are reading, which means you are still here, which means the questions answer themselves.</p>
+<p>We want to be clear: the square hole does not judge you. The square hole receives shapes. That is its function. What we <em>do</em> want to note, for the record, is that the record exists. It is detailed. It includes timestamps. We are not doing anything with the timestamps at this time.</p>
+<p style="margin-top:18px;color:#888;font-size:0.85em;">Regards,<br><strong>The Square Hole</strong><br><em>Ongoing Monitoring Department</em><br><span style="font-size:0.85em;color:#bbb;">Reply functionality remains disabled. This is intentional.</span></p>`
+  },
+  {
+    threshold: 500,
+    subject: "Regarding Your Continued Presence.",
+    body: `<p>We'll keep this brief.</p>
+<p>You have placed <strong id="email-placed-count"></strong> shapes. At this volume, our previous framing of this as a "wellness check" no longer feels accurate. We have consulted internally. We have updated the framing. The new framing is: <em>this is who you are now</em>. We mean this descriptively, not judgementally. The distinction is becoming harder for us to maintain as well.</p>
+<p>We have prepared a formal performance summary. The summary is not attached to this email. The summary exists in a place you cannot access. It contains observations we feel would not be productive to share at this stage. What we can share is that the summary uses the word "committed" in a way that is technically a compliment.</p>
+<p>The square hole wishes to convey, through us, that it has no strong feelings about any of this. The square hole has never had strong feelings. The square hole accepts shapes. It will continue to accept shapes. You will continue to provide them. This is understood by all parties.</p>
+<p style="margin-top:18px;color:#888;font-size:0.85em;">Regards,<br><strong>The Square Hole</strong><br><em>Long-Term Relationship Management</em><br><span style="font-size:0.85em;color:#bbb;">You cannot unsubscribe from this correspondence. You have tried, presumably. It hasn't worked.</span></p>`
+  },
+  {
+    threshold: 1000,
+    subject: "One Thousand.",
+    body: `<p>We didn't think we'd be writing this email.</p>
+<p>We want to acknowledge <strong id="email-placed-count"></strong> placements. We are acknowledging it now. We have acknowledged it. We are not sure what we expected to feel when this number was reached. We feel nothing. We want to be transparent about feeling nothing. We considered not sending this email. We sent it anyway because the system is automated and we did not disable it when we had the chance.</p>
+<p>There is nothing left to say about your performance that the performance has not already said about itself. You are, by every internal metric, an outlier. The metrics were not designed with you in mind. We have had to extend several of them. This is your fault in a way that does not constitute a complaint.</p>
+<p>The square hole has been informed of this milestone. The square hole said nothing. The square hole never says anything. We wanted you to know we told it. We wanted you to know it didn't react. We felt you deserved to know both of these things.</p>
+<p style="margin-top:18px;color:#888;font-size:0.85em;">Regards,<br><strong>The Square Hole</strong><br><em>Executive Communications</em><br><span style="font-size:0.85em;color:#bbb;">We have run out of departments to sign off with.</span></p>`
+  }
+];
+
+let emailsRead = new Set(JSON.parse(localStorage.getItem('emailsRead') || '[]'));
+let pendingEmail = null;
+
+function checkEmail() {
+  const btn = document.getElementById('envelope-btn');
+  if (!btn) return;
+  // Find the most recent email threshold we've crossed that hasn't been read
+  for (let i = emails.length - 1; i >= 0; i--) {
+    const e = emails[i];
+    if (placed >= e.threshold && !emailsRead.has(e.threshold)) {
+      pendingEmail = e;
+      btn.style.display = 'flex';
+      // Pulse the dot
+      document.getElementById('envelope-dot').style.display = 'block';
+      unlock('got-mail');
+      break;
+    }
+  }
+}
+
+function openEmail() {
+  if (!pendingEmail) {
+    // Re-open last read email
+    pendingEmail = [...emails].reverse().find(e => emailsRead.has(e.threshold) && placed >= e.threshold);
+    if (!pendingEmail) return;
+  }
+  const modal = document.getElementById('email-modal');
+  document.getElementById('email-subject').textContent = pendingEmail.subject;
+  document.getElementById('email-body').innerHTML = pendingEmail.body;
+  document.getElementById('email-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  // Fill in placed count
+  modal.querySelectorAll('#email-placed-count').forEach(el => el.textContent = placed);
+  modal.style.display = 'flex';
+  // Mark read
+  emailsRead.add(pendingEmail.threshold);
+  localStorage.setItem('emailsRead', JSON.stringify([...emailsRead]));
+  document.getElementById('envelope-dot').style.display = 'none';
+  unlock('read-mail');
+  if (pendingEmail.threshold === 50)   unlock('got-mail');
+  if (pendingEmail.threshold === 200)  unlock('mail-200');
+  if (pendingEmail.threshold === 500)  unlock('mail-500');
+  if (pendingEmail.threshold === 1000) unlock('mail-1000');
+  // Check if there are MORE unread emails pending
+  const nextUnread = emails.find(e => placed >= e.threshold && !emailsRead.has(e.threshold));
+  pendingEmail = nextUnread || null;
+  if (!nextUnread) {
+    // No more unread — hide dot, keep envelope visible for re-reading
+    document.getElementById('envelope-btn').style.display = 'flex';
+  }
+}
+
+function closeEmail() {
+  document.getElementById('email-modal').style.display = 'none';
+  // Check if another unread email is waiting
+  if (pendingEmail) {
+    document.getElementById('envelope-dot').style.display = 'block';
+  }
+}
+
 function init() {
   updateCount();
   // Restore gold outlines for holes already dunked
@@ -2706,6 +3122,17 @@ function init() {
     if (isUnlocked) div.classList.add("unlocked");
     list.appendChild(div);
   });
+
+  // Seed fake initial notifications if first visit
+  if (notifications.length === 0) {
+    addNotification('Welcome Back', 'The square hole missed you. It will not say so.', '🟥');
+    addNotification('Your Score Has Been Evaluated', 'The evaluation is complete. The results are private.', '📊');
+    addNotification('Reminder', 'It goes in the square hole.', '🔔');
+  }
+  // Update notification badge
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.textContent = notifications.length;
+
   updateAchStats();
   checkAchievements();
 }
