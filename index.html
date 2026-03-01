@@ -432,7 +432,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" data-tab="game" id="game-tab-btn" data-draggable="true">Game</button>
+  <button class="tab-btn active" data-tab="game" id="game-tab-btn">Game</button>
   <button class="tab-btn" id="ach-tab-btn" data-tab="achievements" data-draggable="true">Achievements <span id="ach-badge" style="background:#e53935;color:white;border-radius:999px;padding:1px 6px;font-size:0.75em;margin-left:3px;"></span></button>
   <button class="tab-btn" id="patch-tab-btn" data-tab="patch" data-draggable="true">Patch Notes</button>
   <button class="tab-btn" id="settings-tab-btn" data-tab="settings" data-draggable="true">⚙️ Settings</button>
@@ -718,7 +718,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 <div id="mail-tab" class="tab-content">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
     <h2 style="margin:0">✉️ Mail</h2>
-    <div style="font-size:0.75em;color:#aaa;">From: The Square Hole &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="402e2f3225302c3900333135213225282f2c256e362f2924">[email&#160;protected]</a>&gt;</div>
+    <div style="font-size:0.75em;color:#aaa;">From: The Square Hole &lt;noreply&#64;squarehole.void&gt;</div>
   </div>
   <div style="font-size:0.8em;color:#bbb;margin-bottom:14px;font-style:italic;">You did not subscribe to this mailing list. You cannot unsubscribe.</div>
   <div id="mail-list" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -732,6 +732,27 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
       <div id="compose-status" style="font-size:0.75em;color:#aaa;font-style:italic;"></div>
       <button onclick="sendComposedMail()" id="compose-send-btn" style="padding:8px 18px;background:#6a1b9a;color:white;border:none;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;">Send ✉️</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fake Ad Modal -->
+<div id="ad-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:15000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:12px;max-width:360px;width:100%;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.5);font-family:'Nunito',sans-serif;">
+    <!-- Ad chrome bar -->
+    <div style="background:#f0f0f0;padding:6px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ddd;">
+      <span style="font-size:0.65em;color:#aaa;letter-spacing:0.5px;">ADVERTISEMENT</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="ad-skip-countdown" style="font-size:0.7em;color:#aaa;"></span>
+        <button id="ad-skip-btn" onclick="skipAd()" disabled style="padding:3px 10px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;color:#aaa;cursor:default;font-size:0.75em;font-family:'Nunito',sans-serif;">Skip</button>
+      </div>
+    </div>
+    <!-- Ad content (rotates) -->
+    <div id="ad-content" style="padding:24px 20px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"></div>
+    <!-- Ad footer -->
+    <div style="background:#fafafa;padding:8px 14px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.6em;color:#ccc;">squarehole-ads.void</span>
+      <span style="font-size:0.6em;color:#ccc;">Why am I seeing this?</span>
     </div>
   </div>
 </div>
@@ -809,8 +830,8 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
     <div style="padding:16px 20px 10px;border-bottom:1px solid #eee;">
       <div style="font-size:1.1em;font-weight:900;margin-bottom:8px;" id="email-subject"></div>
       <div style="font-size:0.8em;color:#888;display:flex;flex-direction:column;gap:3px;">
-        <div><strong style="color:#555;">From:</strong> The Square Hole &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5a3235363f1a292b2f3b283f3235363f743d3b373f">[email&#160;protected]</a>&gt;</div>
-        <div><strong style="color:#555;">To:</strong> You &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="087b7c61646426606d7a6d487b797d697a6d6067646d266f69656d">[email&#160;protected]</a>&gt;</div>
+        <div><strong style="color:#555;">From:</strong> The Square Hole &lt;noreply&#64;squarehole.void&gt;</div>
+        <div><strong style="color:#555;">To:</strong> You &lt;player&#64;squarehole.void&gt;</div>
         <div id="email-date" style="color:#bbb;font-size:0.9em;"></div>
       </div>
     </div>
@@ -1157,9 +1178,11 @@ function getHoleRejection(type) {
 
 // ── Reset button: tap = confirm modal, drag = draggable ───────────────────────
 
-document.getElementById('reset-btn').addEventListener('click', () => {
+document.getElementById('reset-btn').addEventListener('click', (e) => {
   // Only show modal on click if we weren't dragging (suppress stray post-drag clicks)
-  if (!squareBroken && Date.now() - lastDragEndTime > 300) showReset();
+  // lastDragEndTime is set far in future after game-tab drag to block this entirely
+  if (!squareBroken && Date.now() - lastDragEndTime > 500) showReset();
+  else e.stopPropagation();
 });
 
 // ── Square shatter ────────────────────────────────────────────────────────────
@@ -1858,7 +1881,7 @@ document.addEventListener("pointermove", e => {
     dragged.id === 'settings-tab-btn' || dragged.id === 'stats-tab-btn' ||
     dragged.id === 'leaderboard-tab-btn' || dragged.id === 'notif-tab-btn' ||
     dragged.id === 'mail-tab-btn' || dragged.id === 'update-banner' ||
-    dragged.id === 'game-tab-btn' || dragged.id === 'daily-btn' || dragged.id === 'shop-tab-btn' ||
+    dragged.id === 'daily-btn' || dragged.id === 'shop-tab-btn' ||
     dragged.id === 'share-btn' || dragged.id === 'help-btn'
   );
   square.classList.toggle("glow", near && (dragged.classList.contains("shape") || isDraggingHole || isDraggingSpecial));
@@ -1931,7 +1954,6 @@ document.addEventListener("pointerup", e => {
       if (dragged.id === "notif-tab-btn")       { unlock("notif-square");      triggerTabMail('notif-tab-btn');      addNotification("Notifications Consumed", "The notifications tab has been eaten by the square hole. You will still receive notifications. You cannot see them now. This is not better.", "🔔"); }
       if (dragged.id === "mail-tab-btn")        { unlock("mail-square");       triggerTabMail('mail-tab-btn');       addNotification("Mail Tab Consumed", "The square hole ate its own mail tab. It will still send mail. You cannot read it now. Perhaps that's for the best.", "✉️"); }
       if (dragged.id === "update-banner")       { unlock("update-square"); unlock("refused-change"); addNotification("Update Rejected", "You put the update banner in the square hole. v4.2.2 has been cancelled. The square hole is now v∅.", "🔄"); showRejection("🔔 Update banner eaten. You will not be updated."); dragged.style.display = 'none'; dragged = null; isDragging = false; return; }
-      if (dragged.id === "game-tab-btn")        { unlock("game-tab-square"); const _gtb = dragged; resetDragged(); _gtb.style.visibility = "hidden"; _gtb.style.pointerEvents = "none"; gameTabInSquare(); isDragging = false; lastDragEndTime = Date.now(); dragged = null; return; }
       if (dragged.id === "shop-tab-btn")        { unlock("shop-square"); addNotification("Shop Consumed", "You put the shop in the square hole. The shop is gone. Your Voids remain. There is nothing to spend them on now. There was never much to spend them on.", "🛒"); showRejection("🛒 Shop consumed. Your Voids are worthless. They were always worthless."); }
       if (dragged.id === "daily-btn")           { unlock("daily-square");  addNotification("Daily Challenge Consumed", "The daily challenge has been eaten. Today's challenge was: don't put things in the square hole. You failed.", "📅"); showRejection("📅 Daily Challenge goes in the square hole."); }
       if (dragged.id === "share-btn")           { unlock("share-square");  addNotification("Share Button Consumed", "The share button went in. Nothing was shared. No one will know about this. Except you. And the square hole. And this notification.", "↗️"); showRejection("↗️ Share goes in the square hole. Nothing was shared."); }
@@ -3388,6 +3410,9 @@ const achievements = [
   {id:'mail-hoarder',       name:"Mail Hoarder",              desc:"Five letters from the square hole, unread. They are piling up. The hole keeps writing.",                            check:()=>false},
   {id:'diligent-reader',    name:"Diligent Reader",           desc:"Ten letters read. The square hole respects that you read them. It will continue writing. You knew it would.",       check:()=>false},
   {id:'pen-pals',           name:"Pen Pals",                  desc:"You and the square hole have an ongoing correspondence. One side is enthusiastic. The other side is you.",           check:()=>false},
+  {id:'saw-ad',           name:"Monetised",             desc:"You saw an ad before accessing the shop. The ad was fake. The shop is real. The Voids are real. Approximately.",                  check:()=>false},
+  {id:'watched-five-ads', name:"Engaged Viewer",        desc:"Five ads watched. The square hole has noted your engagement. Your engagement data has been sold to no one. There is no one.",           check:()=>false},
+  {id:'watched-all-ads',  name:"Full Rotation",         desc:"You have seen every ad in the rotation. The ads will now repeat. This was always the plan.",                                             check:()=>false},
   {id:'opened-shop',       name:"Window Shopper",        desc:"You opened the shop. You saw the prices. You had opinions about the prices.",                                                           check:()=>false},
   {id:'first-purchase',    name:"Consumer",              desc:"You made your first purchase in the shop. Something was exchanged. The something was Voids. The Voids were yours.",                         check:()=>false},
   {id:'shopper',           name:"Regular Customer",      desc:"Three shop purchases. The Square Hole LLC has noted your patronage. The patronage has been noted in a file. The file is the square hole.",     check:()=>false},
@@ -4026,6 +4051,19 @@ document.querySelectorAll(".tab-btn").forEach(b => {
   b.addEventListener("click", e => {
     // Only switch tab if NOT dragging and not a stray post-drag click
     if (isDragging || Date.now() - lastDragEndTime < 300) return;
+    // Intercept shop tab — show fake ad first
+    if (b.dataset.tab === 'shop' && !adBypassed) {
+      showAd(() => {
+        document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        document.getElementById('shop-tab').classList.add("active");
+        recordTabVisit('shop');
+        populateShop();
+        unlock('opened-shop');
+      });
+      return;
+    }
     document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
     b.classList.add("active");
@@ -4123,7 +4161,7 @@ function confirmReset() {
   premiumPurchased = false;
   mailMessages = []; mailTriggered = new Set(); mailUnread = 0;
   randomMailSentCount = 0; lastRandomMailTime = 0; invoiceShown = false;
-  voids = 0; shopPurchases = {};
+  voids = 0; shopPurchases = {}; adSeenCount = 0;
   notifications = []; notifsRead = new Set();
   syncCount = 0;
   userReports = [];
@@ -5251,10 +5289,7 @@ function triggerTabMail(tabId) {
 }
 
 // Hook mail tab click
-document.querySelector('[data-tab="shop"]')?.addEventListener('click', () => {
-  populateShop();
-  unlock('opened-shop');
-});
+// shop tab handled in forEach above
 
 document.querySelector('[data-tab="mail"]').addEventListener('click', () => {
   populateMail();
@@ -5539,6 +5574,126 @@ function buyShopItem(id) {
 }
 
 // Add shop mail
+
+// ─── Fake Ad System ───────────────────────────────────────────────────────────
+let adBypassed = false;
+let adSeenCount = parseInt(localStorage.getItem('adSeenCount') || '0');
+
+const fakeAds = [
+  {
+    bg: '#fff9e6',
+    html: `
+      <div style="font-size:3em;margin-bottom:10px;">🟥</div>
+      <div style="font-weight:900;font-size:1.2em;color:#e53935;margin-bottom:6px;">SQUARE HOLE PRO™</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:12px;">Place shapes <strong>faster</strong>. The hole accepts shapes <strong>the same as before</strong>. But faster. Somehow.</div>
+      <div style="font-size:0.7em;color:#aaa;">Starting at ⬛5,000 Voids/month</div>
+    `
+  },
+  {
+    bg: '#f3e5f5',
+    html: `
+      <div style="font-size:3em;margin-bottom:10px;">📦</div>
+      <div style="font-weight:900;font-size:1.1em;color:#6a1b9a;margin-bottom:6px;">SHAPE SUBSCRIPTION BOX</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Get 5 shapes delivered to your hole every month. These are the same shapes. They come with a box. The box is not draggable.</div>
+      <div style="background:#6a1b9a;color:white;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;display:inline-block;">SUBSCRIBE NOW</div>
+      <div style="font-size:0.65em;color:#ccc;margin-top:8px;">Cancel anytime*<br><span style="font-size:0.85em;">*You cannot cancel.</span></div>
+    `
+  },
+  {
+    bg: '#e8f5e9',
+    html: `
+      <div style="font-size:2.5em;margin-bottom:8px;">💪</div>
+      <div style="font-weight:900;font-size:1.1em;color:#2e7d32;margin-bottom:6px;">SHAPE PLACEMENT COACH</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:10px;">"I was placing shapes wrong until I found this program. Now I place them correctly — in the square hole."<br><em style="color:#aaa;font-size:0.9em;">— Definitely a real person</em></div>
+      <div style="font-size:0.75em;color:#aaa;">Results not typical. Results are: you place shapes in a hole.</div>
+    `
+  },
+  {
+    bg: '#fff3e0',
+    html: `
+      <div style="font-size:2.5em;margin-bottom:8px;">🔔</div>
+      <div style="font-weight:900;font-size:1.1em;color:#e65100;margin-bottom:6px;">ENABLE NOTIFICATIONS</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:12px;">The square hole wants to send you notifications.<br>At 3am.<br>About shapes.<br>You don't have to say yes.</div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <div style="background:#e65100;color:white;padding:6px 14px;border-radius:6px;font-size:0.8em;font-weight:700;">Allow</div>
+        <div style="background:#eee;color:#333;padding:6px 14px;border-radius:6px;font-size:0.8em;">Don't Allow</div>
+      </div>
+      <div style="font-size:0.65em;color:#ccc;margin-top:8px;">Both options do the same thing.</div>
+    `
+  },
+  {
+    bg: '#e3f2fd',
+    html: `
+      <div style="font-size:2.5em;margin-bottom:8px;">🧠</div>
+      <div style="font-weight:900;font-size:1.1em;color:#1565c0;margin-bottom:6px;">IMPROVE YOUR HOLE IQ</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Scientists* have found that placing shapes in holes is linked to intelligence.<br><span style="font-size:0.85em;color:#aaa;">*The Square Hole Research Division. We are not scientists.</span></div>
+      <div style="font-size:0.75em;color:#1565c0;font-weight:700;">Take our free 47-question quiz →</div>
+    `
+  },
+  {
+    bg: '#fce4ec',
+    html: `
+      <div style="font-size:2.5em;margin-bottom:8px;">💎</div>
+      <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">YOU HAVE BEEN SELECTED</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Congratulations. You are the <strong>1,000,000th</strong> visitor.<br>Your prize: a microtransaction (XS).<br>Claim within 24 hours or it will be forfeited to the square hole.</div>
+      <div style="background:#c62828;color:white;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;display:inline-block;animation:pulse 1s infinite;">CLAIM PRIZE</div>
+    `
+  },
+];
+
+function showAd(onComplete) {
+  adSeenCount++;
+  localStorage.setItem('adSeenCount', adSeenCount);
+
+  const ad = fakeAds[(adSeenCount - 1) % fakeAds.length];
+  const modal = document.getElementById('ad-modal');
+  const content = document.getElementById('ad-content');
+  const skipBtn = document.getElementById('ad-skip-btn');
+  const countdown = document.getElementById('ad-skip-countdown');
+
+  content.style.background = ad.bg;
+  content.innerHTML = ad.html;
+  modal.style.display = 'flex';
+
+  // Skip countdown — 5 seconds
+  const skipDelay = 5;
+  let remaining = skipDelay;
+  skipBtn.disabled = true;
+  skipBtn.style.color = '#aaa';
+  skipBtn.style.cursor = 'default';
+  countdown.textContent = 'Skip in ' + remaining + 's';
+
+  const timer = setInterval(() => {
+    remaining--;
+    if (remaining > 0) {
+      countdown.textContent = 'Skip in ' + remaining + 's';
+    } else {
+      clearInterval(timer);
+      countdown.textContent = '';
+      skipBtn.disabled = false;
+      skipBtn.style.color = '#333';
+      skipBtn.style.cursor = 'pointer';
+      skipBtn.style.background = 'white';
+      skipBtn.style.borderColor = '#999';
+    }
+  }, 1000);
+
+  // Store callback
+  modal._onComplete = onComplete;
+
+  // Achievements
+  if (adSeenCount >= 1) unlock('saw-ad');
+  if (adSeenCount >= 5) unlock('watched-five-ads');
+  if (adSeenCount >= fakeAds.length) unlock('watched-all-ads');
+}
+
+function skipAd() {
+  const modal = document.getElementById('ad-modal');
+  const cb = modal._onComplete;
+  modal.style.display = 'none';
+  modal._onComplete = null;
+  if (cb) cb();
+}
 
 function init() {
   updateCount();
