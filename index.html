@@ -483,7 +483,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 
 <div id="achievements-tab" class="tab-content">
   <h2 style="margin-top:0">Achievements</h2>
-  <div id="ach-stats" style="font-size:0.9em;color:#666;margin-bottom:10px;cursor:default;" title="..."></div>
+  <div id="ach-stats" style="font-size:0.9em;color:#333;margin-bottom:10px;cursor:default;" title="..."></div>
   <div id="achievement-list"></div>
 </div>
 
@@ -673,7 +673,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
         <span style="background:gold;color:#333;border-radius:999px;padding:1px 8px;font-size:0.72em;font-weight:900;">$4.99/mo</span>
       </div>
       <div style="font-size:0.8em;color:#888;margin-bottom:10px;">Unlock the full experience.</div>
-      <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;color:#666;margin-bottom:12px;">
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;color:#333;margin-bottom:12px;">
         <div>✓ A second square hole (non-functional)</div>
         <div>✓ Custom shape colours (not yet available)</div>
         <div>✓ No ads (there are no ads)</div>
@@ -846,7 +846,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
       <div style="font-size:2em;">🟥</div>
     </div>
     <div style="padding:20px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:0.8em;color:#666;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:0.8em;color:#333;">
         <div>INVOICE #<span id="invoice-num">000001</span></div>
         <div>DATE: <span id="invoice-date"></span></div>
       </div>
@@ -2697,7 +2697,7 @@ const achievements = [
   {id:'rb-330', name:"330",  desc:"330 shapes. The square hole clears its nonexistent throat.", check:()=>placed>=330},
   {id:'rb-331', name:"331",  desc:"331. Another one. The shapes keep coming. The hole keeps taking.", check:()=>placed>=331},
   {id:'rb-332', name:"332",  desc:"332 shapes. The square hole is watching. It is always watching.", check:()=>placed>=332},
-  {id:'rb-333', name:"333 — Half of Something",  desc:"333 shapes. Halfway to 666. The square hole has noted this and chosen not to comment further.", check:()=>placed>=333},
+  {id:'rb-333', name:"333 — Half of Something",  desc:"333 shapes. The square hole has noted this and chosen not to comment further.", check:()=>placed>=333},
   {id:'rb-334', name:"334",  desc:"334 shapes. Commitment is not the right word. The hole has the right word.", check:()=>placed>=334},
   {id:'rb-335', name:"335",  desc:"335. The square hole has adjusted its expectations. Again.", check:()=>placed>=335},
   {id:'rb-336', name:"336",  desc:"336 shapes. The hole has seen worse. It has also seen better. It knows which this is.", check:()=>placed>=336},
@@ -3030,7 +3030,6 @@ const achievements = [
   {id:'rb-663', name:"663",  desc:"663. Not a milestone. Just a number. The hole files it anyway.", check:()=>placed>=663},
   {id:'rb-664', name:"664",  desc:"664 shapes. Every one went in the right place. Or didn't. You know which.", check:()=>placed>=664},
   {id:'rb-665', name:"665",  desc:"665. The square hole has been here the whole time. You know this.", check:()=>placed>=665},
-  {id:'rb-666', name:"666",  desc:"The square hole has no comment on this number. That is a lie. It has many comments. It will keep them.", check:()=>placed>=666},
   {id:'rb-667', name:"667",  desc:"667. The hole does not comment on every number. It commented on this one.", check:()=>placed>=667},
   {id:'rb-668', name:"668",  desc:"668 shapes. The square hole's notes on you are now 668 pages.", check:()=>placed>=668},
   {id:'rb-669', name:"669",  desc:"669. Consistent. Steady. Slightly concerning.", check:()=>placed>=669},
@@ -3541,7 +3540,7 @@ const achievements = [
   {id:'p289',  name:"289",  desc:"17 squared. Another perfect square count. Coincidence? The square hole thinks not.", check:()=>placed>=289},
   {id:'p314',  name:"Pi Day",desc:"314 shapes. Approximately pi times 100. The circle hole is jealous.", check:()=>placed>=314},
   {id:'p321',  name:"Countdown",desc:"3, 2, 1. Shapes.",check:()=>placed>=321},
-  {id:'p333',  name:"Triple Threes",desc:"333. Half of 666. The square hole neither confirms nor denies.", check:()=>placed>=333},
+  {id:'p333',  name:"Triple Threes",desc:"333. The square hole neither confirms nor denies.", check:()=>placed>=333},
   {id:'p343',  name:"7 Cubed", desc:"343. Seven to the power of three. The square hole enjoys cubes.", check:()=>placed>=343},
   {id:'p360b', name:"360 Again",desc:"A full rotation. You've lapped yourself.", check:()=>placed>=360},
   {id:'p384',  name:"384",     desc:"384 shapes. An unusual count for an unusual person.", check:()=>placed>=384},
@@ -3575,7 +3574,6 @@ const achievements = [
   {id:'p630',  name:"630",     desc:"Interior angles of a heptagon. You are collecting polygon properties without a polygon.", check:()=>placed>=630},
   {id:'p640',  name:"640",     desc:"640 shapes. A nice round number in base 2. You are a computer now.", check:()=>placed>=640},
   {id:'p650',  name:"650",     desc:"650 shapes. Halfway to nothing in particular.", check:()=>placed>=650},
-  {id:'p666',  name:"The Number",desc:"666 shapes. The square hole is not superstitious. The square hole is a hole.", check:()=>placed>=666},
   {id:'p675',  name:"675",     desc:"675 shapes. Divisible by every number you'd care about.", check:()=>placed>=675},
   {id:'p680',  name:"680",     desc:"680 shapes. The anxiety of the remaining 320 is building.", check:()=>placed>=680},
   {id:'p690',  name:"690",     desc:"Ten from 700. The century approaches.", check:()=>placed>=690},
@@ -5486,7 +5484,7 @@ function populateShop() {
         <div style="font-size:0.75em;color:#888;margin-top:2px;line-height:1.4;">${item.desc}</div>
       </div>
       <div style="flex-shrink:0;text-align:right;">
-        <div style="font-size:0.8em;color:#666;margin-bottom:6px;white-space:nowrap;">⬛ ${item.price.toLocaleString()}</div>
+        <div style="font-size:0.8em;color:#333;margin-bottom:6px;white-space:nowrap;">⬛ ${item.price.toLocaleString()}</div>
         <button onclick="buyShopItem('${item.id}')" ${purchased ? 'disabled' : ''} style="
           padding:6px 14px;
           border:none;
