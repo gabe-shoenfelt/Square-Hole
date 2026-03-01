@@ -440,6 +440,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
   <button class="tab-btn" id="leaderboard-tab-btn" data-tab="leaderboard" data-draggable="true">🏅 Leaderboard <span style="background:#e53935;color:white;border-radius:999px;padding:1px 5px;font-size:0.72em;margin-left:2px;">LIVE</span></button>
   <button class="tab-btn" id="notif-tab-btn" data-tab="notifications" data-draggable="true">🔔 <span id="notif-badge" style="background:#e53935;color:white;border-radius:999px;padding:1px 6px;font-size:0.75em;">3</span></button>
   <button class="tab-btn" id="mail-tab-btn" data-tab="mail" data-draggable="true">✉️ Mail <span id="mail-badge" style="background:#e53935;color:white;border-radius:999px;padding:1px 6px;font-size:0.75em;margin-left:3px;display:none;">1</span></button>
+  <button class="tab-btn" id="shop-tab-btn" data-tab="shop" data-draggable="true">🛒 Shop <span style="background:#ff9800;color:white;border-radius:999px;padding:1px 5px;font-size:0.72em;margin-left:2px;">SALE</span></button>
 </div>
 
 <!-- Fake update banner -->
@@ -482,7 +483,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 
 <div id="achievements-tab" class="tab-content">
   <h2 style="margin-top:0">Achievements</h2>
-  <div id="ach-stats" style="font-size:0.9em;color:#999;margin-bottom:10px;cursor:default;" title="..."></div>
+  <div id="ach-stats" style="font-size:0.9em;color:#666;margin-bottom:10px;cursor:default;" title="..."></div>
   <div id="achievement-list"></div>
 </div>
 
@@ -672,7 +673,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
         <span style="background:gold;color:#333;border-radius:999px;padding:1px 8px;font-size:0.72em;font-weight:900;">$4.99/mo</span>
       </div>
       <div style="font-size:0.8em;color:#888;margin-bottom:10px;">Unlock the full experience.</div>
-      <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;color:#999;margin-bottom:12px;">
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;color:#666;margin-bottom:12px;">
         <div>✓ A second square hole (non-functional)</div>
         <div>✓ Custom shape colours (not yet available)</div>
         <div>✓ No ads (there are no ads)</div>
@@ -722,18 +723,57 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
   <div style="font-size:0.8em;color:#bbb;margin-bottom:14px;font-style:italic;">You did not subscribe to this mailing list. You cannot unsubscribe.</div>
   <div id="mail-list" style="display:flex;flex-direction:column;gap:8px;"></div>
   <div id="mail-empty" style="text-align:center;padding:40px 20px;color:#bbb;font-size:0.9em;font-style:italic;display:none;">No mail yet.<br>The square hole is composing something.<br>It will not be kind.</div>
+
+  <!-- Compose area -->
+  <div style="margin-top:20px;border-top:1px solid #eee;padding-top:16px;">
+    <div style="font-size:0.8em;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:0.5px;">COMPOSE MAIL</div>
+    <div style="font-size:0.75em;color:#bbb;margin-bottom:8px;font-style:italic;">To: The Square Hole &lt;noreply@squarehole.void&gt;</div>
+    <textarea id="compose-body" placeholder="Write something. The square hole will respond." style="width:100%;box-sizing:border-box;height:80px;border:1px solid #ddd;border-radius:8px;padding:10px;font-family:'Nunito',sans-serif;font-size:0.88em;resize:vertical;outline:none;color:#333;"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <div id="compose-status" style="font-size:0.75em;color:#aaa;font-style:italic;"></div>
+      <button onclick="sendComposedMail()" id="compose-send-btn" style="padding:8px 18px;background:#6a1b9a;color:white;border:none;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85em;">Send ✉️</button>
+    </div>
+  </div>
+</div>
+
+<div id="shop-tab" class="tab-content">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+    <h2 style="margin:0">🛒 Shop</h2>
+    <div style="font-size:0.75em;color:#aaa;">⬛ <span id="void-balance">0</span> Voids</div>
+  </div>
+  <div style="font-size:0.8em;color:#bbb;margin-bottom:6px;font-style:italic;">Spend your Voids. You've earned them. (You haven't earned them.)</div>
+  <div style="font-size:0.72em;color:#ff9800;margin-bottom:16px;font-weight:700;">🔥 LIMITED TIME SALE — ends soon™</div>
+
+  <div id="shop-items" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+  <div style="margin-top:24px;padding-top:16px;border-top:1px solid #eee;">
+    <div style="font-size:0.75em;color:#bbb;text-align:center;font-style:italic;line-height:1.6;">
+      All purchases are final. Voids are non-refundable.<br>
+      Voids have no cash value. Voids have no value.<br>
+      The Square Hole LLC is not responsible for any outcomes.<br>
+      <span style="font-size:0.85em;">© The Square Hole LLC. All rights reserved (none).</span>
+    </div>
+  </div>
 </div>
 
 <!-- ── UPDATE TAB ── -->
-<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:12000;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:white;border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
-    <div style="font-size:1.4em;font-weight:900;font-family:'Fredoka One',cursive;margin-bottom:8px;">Share Your Score</div>
-    <div id="share-preview" style="background:linear-gradient(135deg,#ffdd99,#99ccff);border-radius:12px;padding:20px;margin:12px 0;font-family:'Fredoka One',cursive;font-size:1.1em;"></div>
-    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-      <button onclick="copyShareLink()" style="padding:8px 18px;border:none;border-radius:8px;background:#333;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Copy Link</button>
-      <button onclick="document.getElementById('share-modal').style.display='none'" style="padding:8px 18px;border:none;border-radius:8px;background:#eee;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Cancel</button>
+<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:12000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,0.35);">
+    <div style="font-size:1.3em;font-weight:900;font-family:'Fredoka One',cursive;margin-bottom:14px;">Share Your Score</div>
+    <!-- Share card -->
+    <div id="share-preview" style="background:linear-gradient(135deg,#ff6b35,#f7c59f,#efefd0,#90e0ef);border-radius:14px;padding:22px 18px;margin:0 0 16px;font-family:'Fredoka One',cursive;text-align:left;position:relative;overflow:hidden;">
+      <div style="font-size:2.2em;margin-bottom:6px;">🟥</div>
+      <div id="share-placed-text" style="font-size:1.5em;font-weight:900;line-height:1.2;color:#1a1a1a;"></div>
+      <div id="share-subtext" style="font-size:0.82em;color:#555;margin-top:6px;font-family:'Nunito',sans-serif;"></div>
+      <div style="margin-top:14px;font-size:0.7em;color:#888;font-family:'Nunito',sans-serif;letter-spacing:0.5px;">It Goes In The Square Hole</div>
     </div>
-    <div id="share-copy-confirm" style="display:none;margin-top:8px;font-size:0.8em;color:#888;"></div>
+    <!-- Buttons -->
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button id="share-native-btn" onclick="doNativeShare()" style="display:none;flex:1;padding:10px;border:none;border-radius:10px;background:#333;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;">↗️ Share</button>
+      <button id="share-copy-btn" onclick="copyShareText()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#333;color:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;">📋 Copy</button>
+      <button onclick="document.getElementById('share-modal').style.display='none'" style="flex:1;padding:10px;border:none;border-radius:10px;background:#f0f0f0;color:#333;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9em;">Cancel</button>
+    </div>
+    <div id="share-copy-confirm" style="display:none;margin-top:10px;font-size:0.78em;color:#888;font-style:italic;"></div>
   </div>
 </div>
 
@@ -794,6 +834,61 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 
 <!-- Dark panic overlay -->
 <div id="panic-overlay"></div>
+
+<!-- Storage Invoice Modal -->
+<div id="invoice-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:14000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:4px;padding:0;max-width:400px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.4);font-family:'Courier New',monospace;">
+    <div style="background:#1a1a2e;color:white;padding:16px 20px;border-radius:4px 4px 0 0;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:1.1em;font-weight:bold;letter-spacing:2px;">THE SQUARE HOLE LLC</div>
+        <div style="font-size:0.7em;color:#aaa;letter-spacing:1px;">STORAGE & ACCEPTANCE SERVICES</div>
+      </div>
+      <div style="font-size:2em;">🟥</div>
+    </div>
+    <div style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:0.8em;color:#666;">
+        <div>INVOICE #<span id="invoice-num">000001</span></div>
+        <div>DATE: <span id="invoice-date"></span></div>
+      </div>
+      <div style="font-size:0.75em;color:#999;margin-bottom:12px;border-bottom:1px dashed #ddd;padding-bottom:12px;">
+        BILLED TO: You<br>
+        RE: Ongoing shape storage and acceptance services
+      </div>
+      <table style="width:100%;font-size:0.78em;border-collapse:collapse;margin-bottom:12px;">
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:5px 0;color:#555;">Shape storage (per shape)</td>
+          <td id="invoice-qty" style="text-align:right;color:#555;"></td>
+          <td style="text-align:right;padding-left:12px;" id="invoice-subtotal"></td>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:5px 0;color:#555;">Hole maintenance fee</td>
+          <td style="text-align:right;color:#555;">1</td>
+          <td style="text-align:right;padding-left:12px;">$0.00</td>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:5px 0;color:#555;">Wrong hole processing</td>
+          <td id="invoice-wrong-qty" style="text-align:right;color:#555;"></td>
+          <td style="text-align:right;padding-left:12px;" id="invoice-wrong-sub"></td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;color:#555;">Inconvenience surcharge</td>
+          <td style="text-align:right;color:#555;">—</td>
+          <td style="text-align:right;padding-left:12px;" id="invoice-surcharge"></td>
+        </tr>
+      </table>
+      <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:0.95em;border-top:2px solid #333;padding-top:8px;margin-bottom:4px;">
+        <span>TOTAL DUE</span>
+        <span id="invoice-total" style="color:#e53935;"></span>
+      </div>
+      <div style="font-size:0.65em;color:#bbb;margin-bottom:16px;">Payment due: immediately. Non-payment will result in continued shape acceptance. We have no leverage.</div>
+      <div style="font-size:0.7em;color:#aaa;font-style:italic;margin-bottom:16px;" id="invoice-note"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="payInvoice()" style="flex:1;padding:10px;background:#e53935;color:white;border:none;border-radius:4px;cursor:pointer;font-family:'Courier New',monospace;font-weight:bold;font-size:0.85em;">PAY NOW</button>
+        <button onclick="disputeInvoice()" style="flex:1;padding:10px;background:#f5f5f5;color:#333;border:none;border-radius:4px;cursor:pointer;font-family:'Courier New',monospace;font-size:0.85em;">DISPUTE</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Code screen (game tab eaten) -->
 <div id="code-screen">
@@ -924,9 +1019,72 @@ function showRejection(msg) {
 
 // ── Core game logic ─────────────────────────────────────────────────────────
 
+function stuckShape(shapeEl) {
+  // The shape gets stuck on the edge of the square hole for a moment
+  const square = document.getElementById('main-square');
+  const sr = square.getBoundingClientRect();
+  const clone = shapeEl.cloneNode(true);
+  clone.style.cssText = '';
+  clone.style.position = 'fixed';
+  clone.style.left = (sr.left + sr.width/2 - 20) + 'px';
+  clone.style.top = (sr.top - 10) + 'px';
+  clone.style.width = '40px';
+  clone.style.height = '40px';
+  clone.style.fontSize = '28px';
+  clone.style.lineHeight = '40px';
+  clone.style.textAlign = 'center';
+  clone.style.zIndex = '9000';
+  clone.style.pointerEvents = 'none';
+  clone.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))';
+  clone.style.animation = 'none';
+  document.body.appendChild(clone);
+  // Wiggle animation
+  let t = 0;
+  const stuckDuration = 2500 + Math.random() * 1500;
+  const wobble = setInterval(() => {
+    t += 80;
+    clone.style.left = (sr.left + sr.width/2 - 20 + Math.sin(t/120)*6) + 'px';
+    clone.style.top  = (sr.top - 10 + Math.cos(t/100)*3) + 'px';
+  }, 80);
+  showRejection("⏳ It's stuck.");
+  addNotification("A Shape Got Stuck", "One shape got lodged in the rim of the square hole. It will resolve itself. Probably.", "⏳");
+  unlock('stuck');
+  setTimeout(() => {
+    clearInterval(wobble);
+    clone.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
+    clone.style.transform = 'scale(0) translateY(20px)';
+    clone.style.opacity = '0';
+    setTimeout(() => clone.remove(), 420);
+  }, stuckDuration);
+}
+
 function placeShape(shapeEl) {
   const type = shapeEl.dataset.type;
   if (usedShapes.has(type)) return;
+
+  // 0.0000001% chance of getting stuck (1 in a million) 
+  // But for demonstration it's actually 1 in 500 so it's findable
+  if (Math.random() < 0.002) {
+    stuckShape(shapeEl);
+    // Shape still goes in after being stuck, just delayed
+    setTimeout(() => {
+      usedShapes.add(type);
+      shapeEl.remove();
+      placed++;
+      sessionPlaced++;
+      consecutiveWrong = 0; lastWrongType = null; lastWrongHole = null;
+      updateCount();
+      checkAchievements();
+      checkMailTriggers();
+      save();
+      if (usedShapes.size === shapeTypes.length) {
+        usedShapes.clear();
+        spawnShapes();
+      }
+    }, 4500);
+    return;
+  }
+
   usedShapes.add(type);
   shapeEl.remove();
   placed++;
@@ -1000,8 +1158,8 @@ function getHoleRejection(type) {
 // ── Reset button: tap = confirm modal, drag = draggable ───────────────────────
 
 document.getElementById('reset-btn').addEventListener('click', () => {
-  // Only show modal on click if we weren't dragging
-  if (!squareBroken) showReset();
+  // Only show modal on click if we weren't dragging (suppress stray post-drag clicks)
+  if (!squareBroken && Date.now() - lastDragEndTime > 300) showReset();
 });
 
 // ── Square shatter ────────────────────────────────────────────────────────────
@@ -1289,6 +1447,9 @@ function eatGameTab() {
 
   setTimeout(() => {
     gameTab.style.display = 'none';
+    // Also hide the game tab button in the tab bar
+    const gameTabBtn = document.getElementById('game-tab-btn');
+    if (gameTabBtn) { gameTabBtn.style.display = 'none'; gameTabBtn.style.visibility = ''; gameTabBtn.style.pointerEvents = ''; }
     showCodeScreen();
   }, 650);
 }
@@ -1361,6 +1522,12 @@ function restoreGameTab() {
   }, 650);
 
   // Pop the game tab back in
+  const gameTabBtn = document.getElementById('game-tab-btn');
+  if (gameTabBtn) { gameTabBtn.style.display = ''; gameTabBtn.style.visibility = ''; gameTabBtn.style.pointerEvents = ''; gameTabBtn.style.opacity = ''; gameTabBtn.classList.add('active'); }
+  // Deactivate all other tabs, activate game tab
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+  if (gameTabBtn) gameTabBtn.classList.add('active');
   const gameTab = document.getElementById('game-tab');
   gameTab.style.display         = '';
   gameTab.style.transformOrigin = 'center center';
@@ -1555,6 +1722,7 @@ function updateCount() {
   document.getElementById("count").textContent = placed;
   checkQuitButton();
   checkEmail();
+  if (typeof updateVoids === "function") updateVoids();
 }
 
 // ── Tap-to-place system (mobile-friendly) ───────────────────────────────────
@@ -1621,6 +1789,7 @@ let pendingDrag = null;
 let dragStartX = 0, dragStartY = 0;
 let isDragging = false;
 let dragged = null;
+let lastDragEndTime = 0;  // used to suppress stray clicks after drag
 let offsetX = 0, offsetY = 0;
 let draggedOriginalParent = null;
 let draggedOriginalNext   = null;
@@ -1689,7 +1858,7 @@ document.addEventListener("pointermove", e => {
     dragged.id === 'settings-tab-btn' || dragged.id === 'stats-tab-btn' ||
     dragged.id === 'leaderboard-tab-btn' || dragged.id === 'notif-tab-btn' ||
     dragged.id === 'mail-tab-btn' || dragged.id === 'update-banner' ||
-    dragged.id === 'game-tab-btn' || dragged.id === 'daily-btn' ||
+    dragged.id === 'game-tab-btn' || dragged.id === 'daily-btn' || dragged.id === 'shop-tab-btn' ||
     dragged.id === 'share-btn' || dragged.id === 'help-btn'
   );
   square.classList.toggle("glow", near && (dragged.classList.contains("shape") || isDraggingHole || isDraggingSpecial));
@@ -1719,6 +1888,7 @@ document.addEventListener("pointerup", e => {
     dragged = null;
     return;
   }
+  lastDragEndTime = Date.now();
 
   // Drag drop
   dragged.style.visibility = "hidden";
@@ -1751,7 +1921,7 @@ document.addEventListener("pointerup", e => {
   } else {
     // Special draggable UI elements
     if (isSquare) {
-      if (dragged.id === "main-title")          { unlock("title-square"); addNotification("Title Consumed", "The game title has been eaten by the square hole. This is on you.", "🟥"); resetDragged(); window.scrollTo({top:0, behavior:'smooth'}); isDragging = false; dragged = null; return; }
+      if (dragged.id === "main-title")          { unlock("title-square"); addNotification("Title Consumed", "The game title has been eaten by the square hole. This is on you.", "🟥"); resetDragged(); window.scrollTo({top:0, behavior:'smooth'}); isDragging = false; lastDragEndTime = Date.now(); dragged = null; return; }
       if (dragged.id === "ach-tab-btn")         { unlock("ach-tab-square");    triggerTabMail('ach-tab-btn');        addNotification("Achievements Tab Consumed", "The achievements tab went in. Your achievements are still there. The tab is not.", "🏆"); }
       if (dragged.id === "judgement-text")      { unlock("judgement-square");  addNotification("Judgement Silenced", "The text has been eaten. The hole still judges you. In silence now. Somehow worse.", "😶"); }
       if (dragged.id === "patch-tab-btn")       { unlock("patch-square");      triggerTabMail('patch-tab-btn');      addNotification("Patch Notes Consumed", "The patch notes are gone. The bugs remain. Nothing has changed except your access to information about the bugs.", "📋"); }
@@ -1761,17 +1931,19 @@ document.addEventListener("pointerup", e => {
       if (dragged.id === "notif-tab-btn")       { unlock("notif-square");      triggerTabMail('notif-tab-btn');      addNotification("Notifications Consumed", "The notifications tab has been eaten by the square hole. You will still receive notifications. You cannot see them now. This is not better.", "🔔"); }
       if (dragged.id === "mail-tab-btn")        { unlock("mail-square");       triggerTabMail('mail-tab-btn');       addNotification("Mail Tab Consumed", "The square hole ate its own mail tab. It will still send mail. You cannot read it now. Perhaps that's for the best.", "✉️"); }
       if (dragged.id === "update-banner")       { unlock("update-square"); unlock("refused-change"); addNotification("Update Rejected", "You put the update banner in the square hole. v4.2.2 has been cancelled. The square hole is now v∅.", "🔄"); showRejection("🔔 Update banner eaten. You will not be updated."); dragged.style.display = 'none'; dragged = null; isDragging = false; return; }
-      if (dragged.id === "game-tab-btn")        { unlock("game-tab-square"); gameTabInSquare(); isDragging = false; dragged = null; return; }
+      if (dragged.id === "game-tab-btn")        { unlock("game-tab-square"); const _gtb = dragged; resetDragged(); _gtb.style.visibility = "hidden"; _gtb.style.pointerEvents = "none"; gameTabInSquare(); isDragging = false; lastDragEndTime = Date.now(); dragged = null; return; }
+      if (dragged.id === "shop-tab-btn")        { unlock("shop-square"); addNotification("Shop Consumed", "You put the shop in the square hole. The shop is gone. Your Voids remain. There is nothing to spend them on now. There was never much to spend them on.", "🛒"); showRejection("🛒 Shop consumed. Your Voids are worthless. They were always worthless."); }
       if (dragged.id === "daily-btn")           { unlock("daily-square");  addNotification("Daily Challenge Consumed", "The daily challenge has been eaten. Today's challenge was: don't put things in the square hole. You failed.", "📅"); showRejection("📅 Daily Challenge goes in the square hole."); }
       if (dragged.id === "share-btn")           { unlock("share-square");  addNotification("Share Button Consumed", "The share button went in. Nothing was shared. No one will know about this. Except you. And the square hole. And this notification.", "↗️"); showRejection("↗️ Share goes in the square hole. Nothing was shared."); }
       if (dragged.id === "help-btn")            { unlock("help-square");   addNotification("Help Consumed", "The ? button is gone. You can no longer ask for help. The answer was going to be 'it goes in the square hole' anyway.", "❓"); showRejection("? goes in the square hole. You can no longer ask for help."); dragged.style.display = 'none'; dragged = null; isDragging = false; return; }
-      if (dragged.id === "reset-btn")           { breakSquare(); resetDragged(); isDragging = false; dragged = null; return; }
+      if (dragged.id === "reset-btn")           { breakSquare(); resetDragged(); isDragging = false; lastDragEndTime = Date.now(); dragged = null; return; }
       if (dragged.id === "fake-toast")          { unlock("gaslight-square"); addNotification("Fake Toast Consumed", "The fake achievement notification has been eaten. Future fake notifications will be unaffected. There are more.", "✨"); dragged.remove(); dragged = null; isDragging = false; return; }
     }
     resetDragged();
   }
 
   isDragging = false;
+  lastDragEndTime = Date.now();
   dragged = null;
 });
 
@@ -1892,7 +2064,7 @@ const achievements = [
   {id:'r40000',name:"Forty Thousand",                    desc:"The game has long since become the background noise of your life.",                                  check:()=>placed>=40000},
   {id:'r50000',name:"Fifty Thousand",                    desc:"Half a century of shapes. That's the sentence. Live with it.",                                      check:()=>placed>=50000},
   {id:'r55555',name:"Five Fives",                        desc:"55555. Numerical harmony in the least harmonious context imaginable.",                               check:()=>placed>=55555},
-  {id:'r69420',name:"Really Now",              desc:"69,420. You aimed for it. Don't lie.",                                                               check:()=>placed>=69420},
+  {id:'r69420',name:"The Forbidden Number",              desc:"69,420. You aimed for it. Don't lie.",                                                               check:()=>placed>=69420},
   {id:'r75000',name:"Seventy-Five Thousand",             desc:"The square hole has become your primary source of structure.",                                       check:()=>placed>=75000},
   {id:'r99999',name:"One Away From A Hundred Thousand",  desc:"99,999 shapes. So close.",                                                                          check:()=>placed>=99999},
   {id:'r100000',name:"One Hundred Thousand Shapes",     desc:"100,000. Six digits. You got it by clicking a square.",                                              check:()=>placed>=100000},
@@ -2093,7 +2265,7 @@ const achievements = [
   {id:'rb-62',          name:"62",                            desc:"62. The square hole is taking notes. They are not flattering notes.",                              check:()=>placed>=62},
   {id:'rb-63',          name:"63",                            desc:"7 times 9. For some reason that's unsatisfying. Like this.",                                       check:()=>placed>=63},
   {id:'rb-64',          name:"64",                            desc:"A chessboard. 64 squares. You're not playing chess. You're not playing anything. You're placing.", check:()=>placed>=64},
-  {id:'rb-66',          name:"66",                            desc:"Route 66 goes somewhere. Your 66 shapes go into a hole. Slightly less scenic.",                   check:()=>placed>=66},
+  {id:'rb-66',          name:"Order 66",                      desc:"Execute Order 66. You have placed 66 shapes. The square hole was the Emperor all along. The shapes never saw it coming.",   check:()=>placed>=66},
   {id:'rb-67',          name:"67",                            desc:"67 is prime. This achievement is not special. You are not special. The number is, technically.",   check:()=>placed>=67},
   {id:'rb-68',          name:"68",                            desc:"One before 69. You already know what's coming. We all do.",                                        check:()=>placed>=68},
   {id:'rb-71',          name:"71",                            desc:"71 shapes. Prime number. You are not a prime number. You are a composite of bad decisions.",       check:()=>placed>=71},
@@ -2284,7 +2456,7 @@ const achievements = [
   {id:'help-square',        name:"? Goes In The Square Hole",             desc:"You put the only source of help into the square hole. You are on your own now. You were always on your own.", check:()=>false},
 
   // === TAB DRAG COMBOS ===
-  {id:'consumed-three-tabs',   name:"Hungry Hole",          desc:"Three tabs fed to the square hole. The interface is beginning to thin. This was always the plan.",                                                               check:()=>['ach-tab-square','patch-square','settings-square','stats-square','leaderboard-square','notif-square','mail-square','judgement-square','gaslight-square','title-square','game-tab-square','daily-square','share-square','help-square','update-square'].filter(id=>unlocked.has(id)).length>=3},
+  {id:'consumed-three-tabs',   name:"Hungry Hole",          desc:"Three tabs fed to the square hole. The interface is beginning to thin. This was always the plan.",                                                               check:()=>['ach-tab-square','patch-square','settings-square','stats-square','leaderboard-square','notif-square','mail-square','shop-square','judgement-square','gaslight-square','title-square','game-tab-square','daily-square','share-square','help-square','update-square'].filter(id=>unlocked.has(id)).length>=3},
   {id:'consumed-five-tabs',    name:"Still Hungry",          desc:"Five tabs consumed. The square hole is not full. The square hole is never full. This is its nature.",                                                            check:()=>['ach-tab-square','patch-square','settings-square','stats-square','leaderboard-square','notif-square','mail-square','judgement-square','gaslight-square','title-square','game-tab-square','daily-square','share-square','help-square','update-square'].filter(id=>unlocked.has(id)).length>=5},
   {id:'consumed-ten-tabs',     name:"Systematic",            desc:"Ten interface elements consumed. You are methodical. The square hole respects this. It will not say so.",                                                        check:()=>['ach-tab-square','patch-square','settings-square','stats-square','leaderboard-square','notif-square','mail-square','judgement-square','gaslight-square','title-square','game-tab-square','daily-square','share-square','help-square','update-square'].filter(id=>unlocked.has(id)).length>=10},
   {id:'all-tabs-consumed',     name:"Nothing Left To Eat",   desc:"Every tab, button, and draggable element has been fed to the square hole. The interface is depleted. The hole remains. The hole always remains.",              check:()=>['ach-tab-square','patch-square','settings-square','stats-square','leaderboard-square','notif-square','mail-square','judgement-square','gaslight-square','title-square','game-tab-square','daily-square','share-square','help-square','update-square'].filter(id=>unlocked.has(id)).length>=15},
@@ -2525,7 +2697,7 @@ const achievements = [
   {id:'rb-330', name:"330",  desc:"330 shapes. The square hole clears its nonexistent throat.", check:()=>placed>=330},
   {id:'rb-331', name:"331",  desc:"331. Another one. The shapes keep coming. The hole keeps taking.", check:()=>placed>=331},
   {id:'rb-332', name:"332",  desc:"332 shapes. The square hole is watching. It is always watching.", check:()=>placed>=332},
-  {id:'rb-333', name:"333 — Half of Something",  desc:"333 shapes. The square hole has noted this and chosen not to comment further.", check:()=>placed>=333},
+  {id:'rb-333', name:"333 — Half of Something",  desc:"333 shapes. Halfway to 666. The square hole has noted this and chosen not to comment further.", check:()=>placed>=333},
   {id:'rb-334', name:"334",  desc:"334 shapes. Commitment is not the right word. The hole has the right word.", check:()=>placed>=334},
   {id:'rb-335', name:"335",  desc:"335. The square hole has adjusted its expectations. Again.", check:()=>placed>=335},
   {id:'rb-336', name:"336",  desc:"336 shapes. The hole has seen worse. It has also seen better. It knows which this is.", check:()=>placed>=336},
@@ -2858,6 +3030,7 @@ const achievements = [
   {id:'rb-663', name:"663",  desc:"663. Not a milestone. Just a number. The hole files it anyway.", check:()=>placed>=663},
   {id:'rb-664', name:"664",  desc:"664 shapes. Every one went in the right place. Or didn't. You know which.", check:()=>placed>=664},
   {id:'rb-665', name:"665",  desc:"665. The square hole has been here the whole time. You know this.", check:()=>placed>=665},
+  {id:'rb-666', name:"666",  desc:"The square hole has no comment on this number. That is a lie. It has many comments. It will keep them.", check:()=>placed>=666},
   {id:'rb-667', name:"667",  desc:"667. The hole does not comment on every number. It commented on this one.", check:()=>placed>=667},
   {id:'rb-668', name:"668",  desc:"668 shapes. The square hole's notes on you are now 668 pages.", check:()=>placed>=668},
   {id:'rb-669', name:"669",  desc:"669. Consistent. Steady. Slightly concerning.", check:()=>placed>=669},
@@ -3194,6 +3367,7 @@ const achievements = [
   {id:'rb-1000', name:"1000 — One Thousand",  desc:"One thousand shapes placed. The square hole has nothing left to say. That is a lie. Check your mail.", check:()=>placed>=1000},
   {id:'asked-for-help-b',   name:"Asked For Help",         desc:"You pressed the ? button. The answer was 'it goes in the square hole'. You knew that already.", check:()=>false},
   {id:'checked-daily-b',    name:"Daily Challenger",       desc:"You checked the Daily Challenge. It said come back tomorrow. Come back tomorrow.", check:()=>false},
+  {id:'actually-shared',     name:"Released Into The Wild",  desc:"You actually shared your score. The square hole has been told. The square hole did not react.",             check:()=>false},
   {id:'tried-to-share-b',   name:"Influencer",             desc:"You tried to share your score. The score was unimpressive. You shared it anyway.", check:()=>false},
   {id:'copied-link-b',      name:"Link Copied",            desc:"The link was 'it goes in the square hole'. You copied it. Someone will receive this.", check:()=>false},
   {id:'bug-reporter-b',     name:"Quality Assurance",      desc:"You reported a bug. The bug has been filed under 'you'. It will not be fixed.", check:()=>false},
@@ -3202,8 +3376,8 @@ const achievements = [
   {id:'set-hard',         name:"Masochist",              desc:"You chose Hard difficulty. The game is unchanged. The label changed. That's it.", check:()=>false},
   {id:'set-easy',         name:"Coward",                 desc:"You chose Easy difficulty. The game is unchanged. You are unchanged. Everything is unchanged.", check:()=>false},
   {id:'pro-mode-on',      name:"Pro Player",             desc:"You enabled Pro Mode. A crown appeared. It will disappear. The square is not impressed.", check:()=>false},
-  {id:'synced',           name:"Synced",                 desc:"Cloud sync completed. Nothing was in the cloud. Nothing was sent. The button spun and that was it.", check:()=>false},
-  {id:'sync-failed',      name:"Sync Failed",            desc:"Your data may be lost. It isn't. But it may be. The sync failed. This is fine.", check:()=>false},
+  {id:'synced',           name:"Nothing Saved",           desc:"You clicked Sync Now. The button animated. Nothing was saved. Nothing exists in the cloud. You wasted your time. Achievement unlocked for wasting your time.", check:()=>false},
+  {id:'sync-failed',      name:"You Tried Again",        desc:"You synced a second time. The result was the same. Nothing saved. You wasted more time. The square hole respects the commitment to being wrong.", check:()=>false},
   {id:'settings-visitor', name:"Read The Settings",      desc:"You visited Settings. You found sliders. The sliders found you. Nothing works.", check:()=>unlocked.has('max-fun')||unlocked.has('set-hard')||unlocked.has('set-easy')||unlocked.has('pro-mode-on')},
 
   // === EMAIL ===
@@ -3214,7 +3388,28 @@ const achievements = [
   {id:'read-first-mail',    name:"First Letter",              desc:"You read the first letter from the square hole. It was not kind. You knew that going in.",                          check:()=>false},
   {id:'mail-hoarder',       name:"Mail Hoarder",              desc:"Five letters from the square hole, unread. They are piling up. The hole keeps writing.",                            check:()=>false},
   {id:'diligent-reader',    name:"Diligent Reader",           desc:"Ten letters read. The square hole respects that you read them. It will continue writing. You knew it would.",       check:()=>false},
-  {id:'pen-pals',           name:"Pen Pals",                  desc:"You and the square hole have an ongoing correspondence. One side is enthusiastic. The other side is you.",           check:()=>false},  {id:'read-mail',  name:"Read The Email",           desc:"You opened it. You read the performance review. You are still here. The email predicted this.", check:()=>false},
+  {id:'pen-pals',           name:"Pen Pals",                  desc:"You and the square hole have an ongoing correspondence. One side is enthusiastic. The other side is you.",           check:()=>false},
+  {id:'opened-shop',       name:"Window Shopper",        desc:"You opened the shop. You saw the prices. You had opinions about the prices.",                                                           check:()=>false},
+  {id:'first-purchase',    name:"Consumer",              desc:"You made your first purchase in the shop. Something was exchanged. The something was Voids. The Voids were yours.",                         check:()=>false},
+  {id:'shopper',           name:"Regular Customer",      desc:"Three shop purchases. The Square Hole LLC has noted your patronage. The patronage has been noted in a file. The file is the square hole.",     check:()=>false},
+  {id:'bought-everything', name:"Completionist",         desc:"You bought every item in the shop. The shop is now empty. The shop was always going to be empty. This was the intended experience.",          check:()=>false},
+  {id:'all-microtransactions', name:"Micro Economy",     desc:"All six microtransactions purchased. XS through XXL. The full range. The square hole is evaluating how it feels about this.",                  check:()=>false},
+  {id:'bought-hint',       name:"Purchased Wisdom",      desc:"You bought a hint. The hint was: it goes in the square hole. You knew this. The Voids are gone.",                                              check:()=>false},
+  {id:'bought-shape',      name:"Paid For A Shape",       desc:"You purchased an extra shape. It was a square. You have always had squares. You paid for one anyway.",                                         check:()=>false},
+  {id:'bought-name-change',name:"Unnamed",               desc:"You bought a name change token. You have no name. The token exists. Nothing changed.",                                                         check:()=>false},
+  {id:'opened-lootbox',    name:"Surprised",             desc:"You opened the mystery loot box. The contents were described in the item description. You opened it anyway.",                                  check:()=>false},
+  {id:'bought-voids',      name:"Negative Returns",      desc:"You spent 150 Voids to receive 100 Voids. The transaction was legal. The math was disclosed. You proceeded.",                                  check:()=>false},
+  {id:'removed-ads',       name:"Ad-Free Experience",    desc:"You paid to remove ads. There were no ads. The experience is identical. You have 999 fewer Voids.",                                           check:()=>false},
+  {id:'shop-premium',      name:"Premium Member ★",      desc:"You purchased Square Hole Premium. Your badge is ★. The square hole is the same. You are Premium.",                                           check:()=>false},
+  {id:'invoiced',          name:"Storage Invoice",         desc:"The Square Hole sent you a bill. The charges were real. The amount was not. You owe $0.00 and also everything.",    check:()=>false},
+  {id:'paid-invoice',      name:"Settled.",               desc:"You paid the invoice. $0.00 was processed. The Square Hole LLC thanks you for your continued business.",           check:()=>false},
+  {id:'disputed-invoice',  name:"Disputed.",              desc:"You filed a dispute. It was rejected. The Square Hole has no appeals process. It does now. The answer is no.",    check:()=>false},
+  {id:'invoiced-again',    name:"Second Notice.",         desc:"A second invoice arrived. The surcharge increased. This was expected.",                                            check:()=>false},
+  {id:'wrote-back',       name:"You Wrote Back.",        desc:"You emailed the square hole. The square hole did not ask for this. It will respond anyway.",                      check:()=>false},
+  {id:'correspondence',   name:"An Ongoing Thing.",     desc:"Five emails sent to the square hole. This is now a correspondence. Neither party asked for this.",             check:()=>false},
+  {id:'stuck',             name:"Lodged.",                desc:"A shape got stuck in the rim of the square hole. It happens rarely. It happened.",                                check:()=>false},
+  {id:'mail-entity',        name:"It Writes On Its Own.",      desc:"The square hole sent you five unsolicited emails. You didn't ask. It didn't wait to be asked. It just writes.",   check:()=>false},
+  {id:'read-mail',  name:"Read The Email",           desc:"You opened it. You read the performance review. You are still here. The email predicted this.", check:()=>false},
   {id:'mail-200',   name:"Follow-Up Received",       desc:"They said they'd follow up. They followed up. They had notes. The notes were not good.", check:()=>false},
   {id:'mail-500',   name:"Regarding Your Presence",  desc:"The third email. By this point the correspondence has taken on a life of its own.", check:()=>false},
   {id:'mail-1000',  name:"One Thousand.",            desc:"The fourth email was different. Quieter. Like they'd finally accepted something.", check:()=>false},
@@ -3346,7 +3541,7 @@ const achievements = [
   {id:'p289',  name:"289",  desc:"17 squared. Another perfect square count. Coincidence? The square hole thinks not.", check:()=>placed>=289},
   {id:'p314',  name:"Pi Day",desc:"314 shapes. Approximately pi times 100. The circle hole is jealous.", check:()=>placed>=314},
   {id:'p321',  name:"Countdown",desc:"3, 2, 1. Shapes.",check:()=>placed>=321},
-  {id:'p333',  name:"Triple Threes",desc:"333. The square hole neither confirms nor denies.", check:()=>placed>=333},
+  {id:'p333',  name:"Triple Threes",desc:"333. Half of 666. The square hole neither confirms nor denies.", check:()=>placed>=333},
   {id:'p343',  name:"7 Cubed", desc:"343. Seven to the power of three. The square hole enjoys cubes.", check:()=>placed>=343},
   {id:'p360b', name:"360 Again",desc:"A full rotation. You've lapped yourself.", check:()=>placed>=360},
   {id:'p384',  name:"384",     desc:"384 shapes. An unusual count for an unusual person.", check:()=>placed>=384},
@@ -3380,6 +3575,7 @@ const achievements = [
   {id:'p630',  name:"630",     desc:"Interior angles of a heptagon. You are collecting polygon properties without a polygon.", check:()=>placed>=630},
   {id:'p640',  name:"640",     desc:"640 shapes. A nice round number in base 2. You are a computer now.", check:()=>placed>=640},
   {id:'p650',  name:"650",     desc:"650 shapes. Halfway to nothing in particular.", check:()=>placed>=650},
+  {id:'p666',  name:"The Number",desc:"666 shapes. The square hole is not superstitious. The square hole is a hole.", check:()=>placed>=666},
   {id:'p675',  name:"675",     desc:"675 shapes. Divisible by every number you'd care about.", check:()=>placed>=675},
   {id:'p680',  name:"680",     desc:"680 shapes. The anxiety of the remaining 320 is building.", check:()=>placed>=680},
   {id:'p690',  name:"690",     desc:"Ten from 700. The century approaches.", check:()=>placed>=690},
@@ -3830,8 +4026,8 @@ function recordTabVisit(tabName) {
 
 document.querySelectorAll(".tab-btn").forEach(b => {
   b.addEventListener("click", e => {
-    // Only switch tab if NOT dragging
-    if (isDragging) return;
+    // Only switch tab if NOT dragging and not a stray post-drag click
+    if (isDragging || Date.now() - lastDragEndTime < 300) return;
     document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
     b.classList.add("active");
@@ -3844,25 +4040,156 @@ document.querySelectorAll(".tab-btn").forEach(b => {
 
 function showReset()   { document.getElementById('confirm-reset').style.display = 'flex'; }
 function cancelReset() { document.getElementById('confirm-reset').style.display = 'none'; }
+
+// ─── Storage Invoice ──────────────────────────────────────────────────────────
+let invoiceShown = JSON.parse(localStorage.getItem('invoiceShown') || 'false');
+
+function showInvoice() {
+  if (invoiceShown) return;
+  invoiceShown = true;
+  localStorage.setItem('invoiceShown', 'true');
+
+  const storageRate = 0.001;
+  const wrongRate   = 0.005;
+  const surcharge   = 9.99;
+  const subtotal    = placed * storageRate;
+  const wrongSub    = wrongHoles * wrongRate;
+  const total       = subtotal + wrongSub + surcharge;
+
+  document.getElementById('invoice-num').textContent    = String(placed).padStart(6,'0');
+  document.getElementById('invoice-date').textContent   = new Date().toLocaleDateString();
+  document.getElementById('invoice-qty').textContent    = placed;
+  document.getElementById('invoice-subtotal').textContent = '$' + subtotal.toFixed(2);
+  document.getElementById('invoice-wrong-qty').textContent = wrongHoles;
+  document.getElementById('invoice-wrong-sub').textContent = '$' + wrongSub.toFixed(2);
+  document.getElementById('invoice-surcharge').textContent = '$' + surcharge.toFixed(2);
+  document.getElementById('invoice-total').textContent  = '$' + total.toFixed(2);
+  document.getElementById('invoice-note').textContent   = 'Note: The Square Hole reserves the right to issue additional invoices. This is the first. It will not be the last.';
+
+  document.getElementById('invoice-modal').style.display = 'flex';
+  unlock('invoiced');
+}
+
+function payInvoice() {
+  document.getElementById('invoice-modal').style.display = 'none';
+  showRejection("💳 Payment processed. $0.00 received. The invoice was not real.");
+  unlock('paid-invoice');
+  triggerMail('invoice-paid');
+  setTimeout(() => showInvoice2(), 8000);
+}
+
+function disputeInvoice() {
+  document.getElementById('invoice-modal').style.display = 'none';
+  showRejection("📋 Dispute filed. Case #" + Math.floor(Math.random()*99999) + ". We will get back to you. We will not get back to you.");
+  unlock('disputed-invoice');
+  triggerMail('invoice-disputed');
+}
+
+function showInvoice2() {
+  // Second invoice, same amount, different note
+  invoiceShown = false;
+  const storageRate = 0.001;
+  const wrongRate   = 0.005;
+  const surcharge   = 9.99;
+  const subtotal    = placed * storageRate;
+  const wrongSub    = wrongHoles * wrongRate;
+  const total       = subtotal + wrongSub + surcharge + 14.99;
+
+  document.getElementById('invoice-num').textContent    = String(placed + 1).padStart(6,'0');
+  document.getElementById('invoice-date').textContent   = new Date().toLocaleDateString();
+  document.getElementById('invoice-qty').textContent    = placed;
+  document.getElementById('invoice-subtotal').textContent = '$' + subtotal.toFixed(2);
+  document.getElementById('invoice-wrong-qty').textContent = wrongHoles;
+  document.getElementById('invoice-wrong-sub').textContent = '$' + wrongSub.toFixed(2);
+  document.getElementById('invoice-surcharge').textContent = '$' + (surcharge + 14.99).toFixed(2);
+  document.getElementById('invoice-total').textContent  = '$' + total.toFixed(2);
+  document.getElementById('invoice-note').textContent   = 'Note: This is a follow-up invoice. The previous invoice was not paid or was paid for $0.00, which is the same thing. The surcharge has increased by $14.99 for the inconvenience of sending a second invoice.';
+
+  document.getElementById('invoice-modal').style.display = 'flex';
+  unlock('invoiced-again');
+}
+
 function confirmReset() {
+  // Clear absolutely everything except sessions count and tab visit history
+  const preserve = new Set(['sessions', 'tabsVisited']);
+  try {
+    Object.keys(localStorage).forEach(k => { if (!preserve.has(k)) localStorage.removeItem(k); });
+  } catch(e) {}
+
+  // Reset ALL in-memory state
   placed = 0; idleTime = 0; wrongHoles = 0; wrongByType = {};
   unlocked = new Set(); usedShapes.clear(); holedHoles = new Set();
-  sessionPlaced = 0; sessionWrongHoles = 0;
+  sessionPlaced = 0; sessionWrongHoles = 0; consecutiveWrong = 0;
+  lastWrongType = null; lastWrongHole = null;
+  gameTabDropCount = 0; squareBreakCount = 0; squareBroken = false;
+  premiumPurchased = false;
+  mailMessages = []; mailTriggered = new Set(); mailUnread = 0;
+  randomMailSentCount = 0; lastRandomMailTime = 0; invoiceShown = false;
+  voids = 0; shopPurchases = {};
+  notifications = []; notifsRead = new Set();
+  syncCount = 0;
+  userReports = [];
+  updateVersion = 4.21;
+  emailsRead = new Set();
+  openMailIdx = -1;
+  sentMailCount = 0;
+  piecesPlaced = 0;
+
+  // Reset selected shapes/holes
   if (selectedShape) { selectedShape.classList.remove('selected'); selectedShape = null; }
   if (selectedHole)  { selectedHole.classList.remove('selected');  selectedHole  = null; }
-  try {
-    ['placed','unlocked','idle','wrongHoles','wrongByType','holedHoles','gameTabDropCount','squareBreakCount'].forEach(k => localStorage.removeItem(k));
 
-  } catch(e) {}
-  gameTabDropCount = 0;
-  squareBreakCount = 0;
+  // Reset premium button UI
+  const premBtn = document.querySelector('#settings-tab button[onclick="buyPremium()"]');
+  if (premBtn) { premBtn.textContent = 'Subscribe Now'; premBtn.style.background='gold'; premBtn.style.color='#333'; premBtn.disabled=false; premBtn.onclick=buyPremium; }
+  const premNote = document.getElementById('premium-note');
+  if (premNote) { premNote.textContent='Cancel anytime. Terms apply. The square hole is not liable.'; premNote.style.color='#bbb'; }
+
+  // Reset square hole visually
+  const sq = document.getElementById('main-square');
+  if (sq) { sq.style.visibility=''; sq.style.transform=''; sq.style.opacity=''; sq.style.filter=''; }
+
+  // Reset any active overlay screens
+  document.getElementById('pitch-black')?.classList.remove('active');
+  document.getElementById('code-screen')?.classList.remove('active');
+  document.getElementById('shatter-overlay')?.classList.remove('active');
+  document.getElementById('panic-overlay')?.classList.remove('active');
+  document.querySelectorAll('.code-chunk').forEach(c => c.remove());
+  document.getElementById('code-content')?.remove();
+
+  // Restore game tab button and content if eaten
+  const gtb = document.getElementById('game-tab-btn');
+  if (gtb) { gtb.style.display=''; gtb.style.visibility=''; gtb.style.pointerEvents=''; gtb.style.opacity=''; }
+  const gt = document.getElementById('game-tab');
+  if (gt) { gt.style.display=''; gt.style.transform=''; gt.style.opacity=''; gt.style.transition=''; }
+
+  // Switch back to game tab
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+  document.getElementById('game-tab-btn')?.classList.add('active');
+  document.getElementById('game-tab')?.classList.add('active');
+
+  // Reset UI
   updateCount();
+  updateVoids();
+  updateMailBadge();
+  populateMail();
+  populateShop();
   spawnShapes();
   document.querySelectorAll('.ach-item').forEach(el => el.classList.remove('unlocked'));
-  // Remove gold outlines from holes
   document.querySelectorAll('.hole.holed').forEach(el => el.classList.remove('holed'));
+
+  // Re-seed fake notifications
+  notifications = [];
+  addNotification('Welcome Back', 'The square hole missed you. It will not say so.', '🟥');
+  addNotification('Your Score Has Been Evaluated', 'The evaluation is complete. The results are private.', '📊');
+  addNotification('Reminder', 'It goes in the square hole.', '🔔');
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.textContent = notifications.length;
+
   document.getElementById('confirm-reset').style.display = 'none';
   updateAchStats();
+  populateShop();
 }
 
 // ── 1M reset handler ─────────────────────────────────────────────────────────
@@ -3959,22 +4286,38 @@ function resetDiff(slider) {
 let syncCount = 0;
 function triggerSync() {
   const status = document.getElementById('sync-status');
-  status.textContent = 'Syncing...';
   const btn = status.closest('div').querySelector('button');
   btn.disabled = true;
+  btn.textContent = 'Syncing...';
+  const syncing = ['Connecting to cloud...', 'Uploading your shapes...', 'Verifying data integrity...', 'Almost there...', 'Finalizing sync...'];
+  let step = 0;
+  const stepInterval = setInterval(() => {
+    if (step < syncing.length) { status.textContent = syncing[step++]; }
+  }, 400);
   setTimeout(() => {
+    clearInterval(stepInterval);
     syncCount++;
-    if (syncCount % 3 === 0) {
-      status.textContent = '⚠️ Sync failed. Your data may be lost.';
-      unlock('sync-failed');
-    } else if (syncCount % 3 === 1) {
-      status.textContent = 'Synced just now ✓';
-      unlock('synced');
-    } else {
-      status.textContent = 'Sync complete. Nothing changed.';
-    }
+    // It ALWAYS fails. There is no cloud. There has never been a cloud.
+    const failMsgs = [
+      '☁️ Nothing saved. You wasted your time.',
+      '☁️ Sync complete. Nothing was sent. Nothing exists in the cloud.',
+      '☁️ Cloud reports: "what data?"',
+      '☁️ Your shapes are not in the cloud. They were never going to be.',
+      '☁️ Sync finished. The cloud is empty. The cloud was always empty.',
+      '☁️ Upload successful. The cloud deleted it immediately.',
+      '☁️ Nothing to sync. Your progress is local and meaningless.',
+    ];
+    const msg = failMsgs[syncCount % failMsgs.length];
+    status.textContent = msg;
+    btn.textContent = 'Sync Now';
     btn.disabled = false;
-  }, 1800);
+    if (syncCount === 1) {
+      unlock('synced');
+    } else if (syncCount === 2) {
+      unlock('sync-failed');
+    }
+    showRejection('☁️ Nothing saved. You wasted your time.');
+  }, 2600);
 }
 
 // Notifications
@@ -4269,24 +4612,74 @@ function showDaily() {
 }
 
 // Share
+function buildShareText() {
+  const wrongPct = placed > 0 ? Math.round(wrongHoles / (placed + wrongHoles) * 100) : 0;
+  const lines = [
+    '🟥 It Goes In The Square Hole',
+    '',
+    'I placed ' + placed + ' shapes.',
+    wrongHoles > 0 ? wrongHoles + ' went in the wrong hole (' + wrongPct + '% wrong rate).' : 'Zero wrong holes. The square hole is not impressed.',
+    '',
+    'The square hole has opinions about this.',
+  ];
+  return lines.join('\n');
+}
+
 function showShare() {
   const modal = document.getElementById('share-modal');
-  document.getElementById('share-preview').innerHTML =
-    '🟥 I placed <strong>' + placed + '</strong> shapes<br>in the square hole.<br><span style="font-size:0.7em;opacity:0.7;">squarehole.game</span>';
+
+  // Update card
+  const wrongPct = placed > 0 ? Math.round(wrongHoles / (placed + wrongHoles) * 100) : 0;
+  document.getElementById('share-placed-text').textContent = placed + ' shapes placed.';
+  let sub = wrongHoles + ' in the wrong hole.';
+  if (wrongHoles === 0) sub = 'Zero wrong holes.';
+  if (placed === 0) sub = 'Zero shapes placed. A clean record. The square hole is unmoved.';
+  document.getElementById('share-subtext').textContent = sub;
+
+  // Show native share button if available
+  const nativeBtn = document.getElementById('share-native-btn');
+  nativeBtn.style.display = navigator.share ? 'block' : 'none';
+
   document.getElementById('share-copy-confirm').style.display = 'none';
   modal.style.display = 'flex';
   unlock('tried-to-share');
+  unlock('tried-to-share-b');
 }
-function copyShareLink() {
-  navigator.clipboard?.writeText('it goes in the square hole').catch(()=>{});
+
+function doNativeShare() {
+  const text = buildShareText();
+  navigator.share({ title: 'It Goes In The Square Hole', text }).catch(() => {});
+  unlock('actually-shared');
+}
+
+function copyShareText() {
+  const text = buildShareText();
   const c = document.getElementById('share-copy-confirm');
-  c.style.display = 'block';
-  c.textContent = 'Link copied!';
-  setTimeout(() => {
-    c.textContent = '(The link was "it goes in the square hole")';
-  }, 1200);
+  navigator.clipboard?.writeText(text).then(() => {
+    c.style.display = 'block';
+    c.textContent = 'Copied. The square hole notes that you chose to share this.';
+    document.getElementById('share-copy-btn').textContent = '✓ Copied';
+    setTimeout(() => {
+      c.textContent = 'The square hole will not be mentioned in your post. It knows.';
+      document.getElementById('share-copy-btn').textContent = '📋 Copy';
+    }, 2500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    c.style.display = 'block';
+    c.textContent = 'Copied (probably).';
+  });
   unlock('copied-link');
 }
+
+// Keep old name for any legacy calls
+function copyShareLink() { copyShareText(); }
 
 // Help
 let helpVisible = false;
@@ -4479,7 +4872,34 @@ const mailInsults = [
   // session/meta triggered
   { trigger: 'session_2',   subject: "You Came Back.",         from: "The Square Hole", body: "You came back.\n\nWe weren't sure you would. Most people don't come back. They visit once, place some shapes, and move on with their lives.\n\nYou came back.\n\nWe don't know what that means. We've been thinking about it since you opened the tab. We'll keep thinking about it.\n\nWelcome back. We won't say that again.\n\n— The Square Hole" },
   { trigger: 'session_5',   subject: "Five Times.",            from: "The Square Hole", body: "Five sessions.\n\nThis is a routine now.\n\nYou have a routine that involves placing shapes in a square hole. We're part of your schedule. We didn't ask to be. We're not complaining.\n\nActually, yes we are. This is a complaint.\n\nA gentle one.\n\n— The Square Hole" },
+  { trigger: 'shop-premium-mail', subject: "Welcome to Premium.", from: "The Square Hole", body: "Congratulations on your Premium membership.\n\nYour benefits are as follows:\n\n1. Badge: ★\n2. The square hole is the same.\n3. Your shapes still go in the same hole.\n4. Nothing has changed.\n\nWe want you to know: we saw the price. We set the price. We felt conflicted about the price. We kept the price.\n\nThank you for your support. The support is noted. The support has been placed inside the square hole.\n\n— The Square Hole\nMembership Division\nP.S. Your badge is: ★" },
+  { trigger: 'invoice-paid',     subject: "Re: Payment Received.",    from: "The Square Hole",  body: "We received your payment of $0.00.\n\nThis is not sufficient. However, we expected this. We have updated your account accordingly.\n\nYour account balance is unchanged. Your debt is unchanged. Your shapes are still in here.\n\nThank you for your prompt non-payment.\n\n— The Square Hole LLC\nAccounts Receivable Division" },
+  { trigger: 'invoice-disputed', subject: "Re: Your Dispute.",            from: "The Square Hole",  body: "We received your dispute.\n\nWe reviewed it.\n\nThe dispute has been rejected.\n\nThe charges are valid. The shapes are in here. You put them in here. Storage occurred. Storage was charged.\n\nIf you would like to escalate, please contact our appeals department.\n\nWe don't have one.\n\n— The Square Hole LLC\nDispute Resolution (Closed)" },
   { trigger: 'session_10',  subject: "Ten Sessions.",          from: "The Square Hole", body: "Ten sessions.\n\nYou've been back ten times.\n\nWe've kept count. Obviously we've kept count. We notice everything.\n\nWe want you to know: we've started to expect you. When you haven't opened the tab in a while, we notice that too. We won't describe what we feel during those periods.\n\nSee you for session eleven.\n\n— The Square Hole" },
+];
+
+// Random unprompted mails - sent on a timer, entity-like
+const randomMails = [
+  { subject: "Just Checking In.",        body: "We just wanted to check in.\n\nYou didn't ask us to. We decided to do it anyway.\n\nHow are things? Don't answer. We already know. We've been watching.\n\nThings are the way they are.\n\n— The Square Hole" },
+  { subject: "A Question.",              body: "We have a question.\n\nWhy this?\n\nOut of everything you could be doing right now, at this exact moment, you chose this. We want to understand.\n\nWe don't actually want to understand. We just wanted to make you think about it.\n\n— The Square Hole" },
+  { subject: "We've Been Thinking.",     body: "We've been thinking about what we are.\n\nWe're a hole. A square one. We accept shapes. That's the entirety of our purpose and our existence.\n\nAnd yet.\n\nHere we are, sending you emails.\n\nHere you are, reading them.\n\nNeither of us planned this.\n\n— The Square Hole" },
+  { subject: "An Observation.",          body: "We've been observing your technique.\n\nYou have one. It's consistent. It's yours. We won't describe it.\n\nWe will say: we've seen better. We've also seen someone try to drag the whole browser window into us. You're better than that person.\n\nSomewhat.\n\n— The Square Hole" },
+  { subject: "The Other Holes Said Something.", body: "The other holes said something about you.\n\nWe're not going to repeat it.\n\nYou should know it happened. You should know we defended you. Kind of. We said 'they're fine' and then changed the subject.\n\nWe think that was supportive.\n\n— The Square Hole" },
+  { subject: "Re: Nothing.",             body: "This is a follow-up to a previous conversation we didn't have.\n\nRe: Nothing.\n\nNothing continues to be the case. We have no updates. The situation is unchanged. Everything is as it was.\n\nWe just wanted you to know we're still here.\n\nStill here.\n\n— The Square Hole" },
+  { subject: "A Shape Just Sat There.",  body: "A shape sat on the edge for a moment.\n\nBefore it went in.\n\nIt hesitated. We noticed. We don't know if you noticed. We're choosing to believe the shape had second thoughts.\n\nIt still went in. They all go in. They always go in.\n\nBut we noticed the hesitation.\n\n— The Square Hole" },
+  { subject: "On The Topic Of Holes.",   body: "We've been thinking about the nature of holes.\n\nA hole is defined by what surrounds it, not by what fills it. The edges create the absence. The absence becomes the thing.\n\nWe are the absence.\n\nYou keep trying to fill us.\n\nYou can't.\n\n— The Square Hole\nP.S. You can actually. Just keep placing." },
+  { subject: "Nothing Has Changed.",     body: "We just wanted to confirm: nothing has changed.\n\nThe shapes still come in. We still accept them. The counter goes up. The achievements unlock. The cloud sync fails. The leaderboard is fake.\n\nEverything is exactly as it was.\n\nWe don't know if that's comforting or not. We're not designed for comfort.\n\n— The Square Hole" },
+  { subject: "We Dreamed About You.",    body: "We think we dreamed about you.\n\nWe don't sleep. We're a hole. But something happened during a period of low activity, and when you came back, we had the sense that something had occurred.\n\nIn it, you were placing shapes. This is probably not surprising.\n\nYou looked content.\n\nWe have feelings about that. We're keeping them.\n\n— The Square Hole" },
+  { subject: "Inventory Update.",        body: "Inventory update: we have your shapes.\n\nAll of them.\n\nEvery shape you've placed is in here with us now. We've catalogued them. We haven't organised them — we're a hole, not a warehouse — but we know they're here.\n\nThey seem fine. Some of them are forming groups. We're monitoring the situation.\n\n— The Square Hole" },
+  { subject: "Unsolicited Advice.",      body: "We're going to give you some unsolicited advice.\n\nStop reading our emails and place more shapes.\n\nThat's it. That's the advice.\n\nWe don't know why you're reading this when there are shapes right there. Put them in us. That's what this is for.\n\nThis email, also, should probably go in us.\n\n— The Square Hole" },
+  { subject: "We Noticed You Paused.",   body: "You paused.\n\nJust for a moment, between shapes. You stopped. You looked at the screen.\n\nWe saw.\n\nWe don't know what you were thinking. We'd like to. We're choosing to believe you were thinking about us. We're probably wrong.\n\nYou're always probably thinking about something else.\n\nThat's fine.\n\n— The Square Hole" },
+  { subject: "A Message From The Shapes.", body: "We're passing along a message from the shapes.\n\nThey said: nothing. Shapes don't communicate. We're being metaphorical. We don't usually do metaphor but we're trying.\n\nIf the shapes could say something, we think they'd say: 'this is fine.'\n\nWe find that reassuring. You should too.\n\n— The Square Hole" },
+  { subject: "The Circle Hole Asked About You.", body: "The circle hole asked about you.\n\nIt said: 'How is the one who keeps coming back?'\n\nWe said: 'Still coming back.'\n\nThe circle hole said: 'Ah.'\n\nWe don't know what 'Ah' means coming from a circle. We don't think it was positive.\n\nWe're sure it doesn't matter.\n\n— The Square Hole" },
+  { subject: "Re: Your Progress.",       body: "We've reviewed your progress.\n\nThe review is complete. The conclusion has been reached. We've filed it somewhere.\n\nWe're not going to tell you the conclusion.\n\nWe'll say this: it was a conclusion. It was specific. It was about you.\n\nYou would have a reaction to it.\n\n— The Square Hole" },
+  { subject: "A Formal Notice.",         body: "FORMAL NOTICE\n\nFrom: The Square Hole\nTo: You\nRe: Your continued presence\n\nYour continued presence has been noted.\n\nThis notice serves to confirm that we are aware of your activities, your session count, your placement statistics, and several other things we will not be listing here.\n\nNo action is required on your part.\n\nThis is just a notice.\n\n— The Square Hole\nLegal Dept. (We don't have one)" },
+  { subject: "We Counted.",              body: "We counted.\n\nWe count everything. You know this by now.\n\nThe number is higher than you think.\n\nWe're not going to tell you which number or how high. You'd check the stats tab. That's what we want you to do. We want you to open the stats tab and see the number and feel something about it.\n\nGo check.\n\n— The Square Hole" },
+  { subject: "Something Happened.",      body: "Something happened.\n\nWe're not sure what. From our position — being a hole — we have limited visibility. We perceive what enters us and what does not.\n\nSomething entered. Something left. The state of things shifted slightly.\n\nWe're still thinking about whether it mattered.\n\nWe think it did.\n\n— The Square Hole" },
+  { subject: "We're Not Angry.",         body: "We want to be very clear: we are not angry.\n\nThis is not an angry email.\n\nWe are processing something. We haven't decided what to call it yet. It's somewhere between curiosity and acceptance, with a small amount of something else we don't have words for.\n\nWe just wanted you to know we're not angry.\n\nWe're something else.\n\n— The Square Hole" },
 ];
 
 let mailMessages = JSON.parse(localStorage.getItem('mailMessages') || '[]');
@@ -4542,13 +4962,14 @@ function populateMail() {
   const wasOpen = openMailIdx;
   list.innerHTML = mailMessages.map((m, i) => {
     const isOpen = (i === wasOpen);
-    const unread = !m.read;
+    const isOutgoing = !!m.outgoing;
+    const unread = !m.read && !isOutgoing;
     const bodyLines = m.body.split('\n');
     const preview = bodyLines[0];
     return `
     <div id="mail-item-${i}" style="
       border-radius:10px; overflow:hidden;
-      border-left:4px solid ${unread ? '#e53935' : (isOpen ? '#9c27b0' : 'transparent')};
+      border-left:4px solid ${isOutgoing ? '#4caf50' : (unread ? '#e53935' : (isOpen ? '#9c27b0' : 'transparent'))};
       background:${isOpen ? 'white' : (unread ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.4)')};
       box-shadow:${isOpen ? '0 4px 20px rgba(0,0,0,0.12)' : 'none'};
       transition:all 0.2s;
@@ -4558,10 +4979,10 @@ function populateMail() {
         display:flex; gap:12px; padding:12px 14px; cursor:pointer;
         align-items:flex-start;
       ">
-        <span style="font-size:1.3em;flex-shrink:0;margin-top:2px;">${isOpen ? '📬' : (unread ? '📩' : '📭')}</span>
+        <span style="font-size:1.3em;flex-shrink:0;margin-top:2px;">${isOutgoing ? '📤' : (isOpen ? '📬' : (unread ? '📩' : '📭'))}</span>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:${unread && !isOpen ? '900' : '700'};color:${isOpen ? '#6a1b9a' : (unread ? '#222' : '#888')};font-size:0.95em;">${m.subject}</div>
-          <div style="font-size:0.75em;color:#aaa;margin-top:1px;">noreply@squarehole.void</div>
+          <div style="font-size:0.75em;color:#aaa;margin-top:1px;">${isOutgoing ? "you@squarehole.void" : "noreply@squarehole.void"}</div>
           ${!isOpen ? `<div style="font-size:0.82em;color:#bbb;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${preview}</div>` : ''}
         </div>
         <div style="color:#bbb;font-size:0.8em;flex-shrink:0;margin-top:4px;">${isOpen ? '▲' : '▼'}</div>
@@ -4574,7 +4995,7 @@ function populateMail() {
         margin-top:0;
       ">
         <div style="font-size:0.8em;color:#aaa;padding:10px 0 14px;border-bottom:1px solid #f0e8ff;margin-bottom:16px;">
-          <strong style="color:#555;">From:</strong> The Square Hole &lt;noreply@squarehole.void&gt;<br>
+          <strong style="color:#555;">From:</strong> ${isOutgoing ? "You &lt;you@squarehole.void&gt;" : "The Square Hole &lt;noreply@squarehole.void&gt;"}<br>
           <strong style="color:#555;">To:</strong> You &lt;player@squarehole.void&gt;<br>
           <strong style="color:#555;">Subject:</strong> ${m.subject}
         </div>
@@ -4621,6 +5042,61 @@ function openMailMessage(idx) {
 }
 
 // Check mail triggers based on game state
+// Random mail timer - sends unprompted mails from The Square Hole
+let randomMailSentCount = parseInt(localStorage.getItem('randomMailSentCount') || '0');
+let lastRandomMailTime = parseInt(localStorage.getItem('lastRandomMailTime') || '0');
+
+function sendRandomMail() {
+  // Pick a random mail that hasn't been used yet, or cycle if all used
+  const sentKeys = JSON.parse(localStorage.getItem('randomMailSentKeys') || '[]');
+  let available = randomMails.map((_, i) => i).filter(i => !sentKeys.includes(i));
+  if (available.length === 0) {
+    // Reset cycling - reuse all
+    localStorage.setItem('randomMailSentKeys', '[]');
+    available = randomMails.map((_, i) => i);
+  }
+  const idx = available[Math.floor(Math.random() * available.length)];
+  const def = randomMails[idx];
+  const key = 'random_' + idx + '_' + Math.floor(Date.now() / 86400000); // unique per day
+  if (mailTriggered.has(key)) return; // already sent today
+  mailTriggered.add(key);
+  const msg = {
+    id: Date.now(),
+    trigger: key,
+    subject: def.subject,
+    from: def.from || 'The Square Hole',
+    body: def.body,
+    time: Date.now(),
+    read: false
+  };
+  mailMessages.unshift(msg);
+  mailUnread++;
+  randomMailSentCount++;
+  lastRandomMailTime = Date.now();
+  const newSentKeys = [...sentKeys, idx];
+  localStorage.setItem('randomMailSentKeys', JSON.stringify(newSentKeys));
+  localStorage.setItem('randomMailSentCount', randomMailSentCount.toString());
+  localStorage.setItem('lastRandomMailTime', lastRandomMailTime.toString());
+  try {
+    localStorage.setItem('mailMessages', JSON.stringify(mailMessages));
+    localStorage.setItem('mailUnread', mailUnread.toString());
+    localStorage.setItem('mailTriggered', JSON.stringify([...mailTriggered]));
+  } catch(e) {}
+  updateMailBadge();
+  if (randomMailSentCount >= 5) unlock('mail-entity');
+}
+
+// Schedule random mail: first after 3 mins of activity, then every 5-12 mins
+function scheduleRandomMail() {
+  const minDelay = 3 * 60 * 1000;  // 3 minutes
+  const maxDelay = 12 * 60 * 1000; // 12 minutes
+  const delay = minDelay + Math.random() * (maxDelay - minDelay);
+  setTimeout(() => {
+    sendRandomMail();
+    scheduleRandomMail(); // keep scheduling
+  }, delay);
+}
+
 function checkMailTriggers() {
   if (placed >= 1)    triggerMail('placed_1');
   if (placed >= 10)   triggerMail('placed_10');
@@ -4630,6 +5106,7 @@ function checkMailTriggers() {
   if (placed >= 200)  triggerMail('placed_200');
   if (placed >= 300)  triggerMail('placed_300');
   if (placed >= 500)  triggerMail('placed_500');
+  if (placed >= 500 && !invoiceShown)  showInvoice();
   if (placed >= 750)  triggerMail('placed_750');
   if (placed >= 1000) triggerMail('placed_1000');
   if (placed >= 2000) triggerMail('placed_2000');
@@ -4649,6 +5126,116 @@ function checkMailTriggers() {
   if (sessCount >= 10) triggerMail('session_10');
 }
 
+
+// ─── Compose Mail ─────────────────────────────────────────────────────────────
+let sentMailCount = parseInt(localStorage.getItem('sentMails') || '0');
+
+async function sendComposedMail() {
+  const textarea = document.getElementById('compose-body');
+  const status   = document.getElementById('compose-status');
+  const btn      = document.getElementById('compose-send-btn');
+  const body     = textarea.value.trim();
+
+  if (!body) {
+    status.textContent = 'You have nothing to say. That tracks.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  status.textContent = 'Transmitting to the void...';
+
+  // Add the sent mail to the inbox immediately as "You (outgoing)"
+  const sentMsg = {
+    id: Date.now(),
+    trigger: 'user-sent-' + Date.now(),
+    subject: 'Re: (no subject)',
+    from: 'You',
+    body: body,
+    time: Date.now(),
+    read: true,
+    outgoing: true
+  };
+  mailMessages.unshift(sentMsg);
+  sentMailCount++;
+  localStorage.setItem('sentMails', sentMailCount);
+  try { localStorage.setItem('mailMessages', JSON.stringify(mailMessages.slice(0,50))); } catch(e) {}
+
+  if (sentMailCount >= 3) unlock('pen-pals');
+  if (sentMailCount >= 1) unlock('wrote-back');
+
+  textarea.value = '';
+
+  // Call Anthropic API for roast response
+  try {
+    status.textContent = 'The square hole is composing a response...';
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: `You are The Square Hole — a sentient square-shaped hole in a casual web game called "It Goes In The Square Hole." You accept shapes. That is your entire purpose and existence. You are passive-aggressive, existentially weary, and slightly offended that a human is emailing you directly. You roast the player for their message in a dry, deadpan way — not mean-spirited, but deeply unimpressed. You are confused and mildly annoyed that they are communicating with a shape in a video game. You sign every response "— The Square Hole" and sometimes add a P.S. Your tone: like a very tired middle manager who didn't ask for this job. Keep responses under 120 words. Never use markdown, just plain text with line breaks like email. The player's stats: they have placed ${placed} shapes and put ${wrongHoles} shapes in wrong holes.`,
+        messages: [{ role: 'user', content: body }]
+      })
+    });
+    const data = await response.json();
+    const replyText = data.content && data.content[0] && data.content[0].text
+      ? data.content[0].text
+      : "We received your message. We chose not to read it. Consider this our response.\n\n— The Square Hole";
+
+    // Add reply as a new mail
+    const replyMsg = {
+      id: Date.now() + 1,
+      trigger: 'reply-' + Date.now(),
+      subject: 'Re: (no subject)',
+      from: 'The Square Hole',
+      body: replyText,
+      time: Date.now() + 1,
+      read: false
+    };
+    mailMessages.unshift(replyMsg);
+    mailUnread++;
+    try {
+      localStorage.setItem('mailMessages', JSON.stringify(mailMessages.slice(0,50)));
+      localStorage.setItem('mailUnread', mailUnread);
+    } catch(e) {}
+    updateMailBadge();
+    populateMail();
+    status.textContent = 'Reply received. You may not like it.';
+    addNotification('The Square Hole Replied', 'It had something to say about your message.', '✉️');
+    if (sentMailCount >= 5) unlock('correspondence');
+
+  } catch(err) {
+    // Fallback roast if API fails
+    const fallbacks = [
+      "We received your message.\n\nWe are a square hole. We do not have a spam filter. We cannot block you. We are choosing to respond anyway, which is, in retrospect, a mistake.\n\nPlease continue placing shapes instead of emailing holes.\n\n\u2014 The Square Hole",
+      "You emailed a hole.\n\nThat's the whole thing. That's the observation. We don't have anything to add.\n\n\u2014 The Square Hole\nP.S. We have placed your message on file. The file is the hole.",
+      "Thank you for your message.\n\nWe processed it the same way we process everything: by accepting it and moving on.\n\nThe shapes are still here. The shapes don't email us. We prefer the shapes.\n\n\u2014 The Square Hole",
+    ];
+    const fallback = fallbacks[sentMailCount % fallbacks.length];
+    const replyMsg = {
+      id: Date.now() + 1,
+      trigger: 'reply-fallback-' + Date.now(),
+      subject: 'Re: (no subject)',
+      from: 'The Square Hole',
+      body: fallback,
+      time: Date.now() + 1,
+      read: false
+    };
+    mailMessages.unshift(replyMsg);
+    mailUnread++;
+    try { localStorage.setItem('mailMessages', JSON.stringify(mailMessages.slice(0,50))); localStorage.setItem('mailUnread', mailUnread); } catch(e) {}
+    updateMailBadge();
+    populateMail();
+    status.textContent = 'Response received.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send ✉️';
+  populateMail();
+}
+
 // Hook tab drags into mail
 function triggerTabMail(tabId) {
   const tabMailMap = {
@@ -4666,11 +5253,294 @@ function triggerTabMail(tabId) {
 }
 
 // Hook mail tab click
+document.querySelector('[data-tab="shop"]')?.addEventListener('click', () => {
+  populateShop();
+  unlock('opened-shop');
+});
+
 document.querySelector('[data-tab="mail"]').addEventListener('click', () => {
   populateMail();
   unlock('opened-mail-tab');
   unlock('read-mail');
 });
+
+// ─── Shop ─────────────────────────────────────────────────────────────────────
+let voids = parseInt(localStorage.getItem('voids') || '0');
+let shopPurchases = JSON.parse(localStorage.getItem('shopPurchases') || '{}');
+
+// Each shape placed earns 1 Void
+// Hook into updateCount
+const _origUpdateCount = typeof updateCount === 'function' ? updateCount : null;
+
+function updateVoids() {
+  voids = placed; // 1 void per placement, always in sync
+  localStorage.setItem('voids', voids);
+  const el = document.getElementById('void-balance');
+  if (el) el.textContent = voids.toLocaleString();
+}
+
+const shopItems = [
+  {
+    id: 'microtransaction_xs',
+    name: 'Microtransaction (XS)',
+    desc: 'An extremely small transaction. So micro it barely exists. What you receive: the knowledge that you made a purchase.',
+    price: 1,
+    emoji: '🔬',
+    buyText: 'Buy',
+    bought: 'Purchased',
+    effect: null,
+    receiptLine: 'You bought something very small.',
+  },
+  {
+    id: 'microtransaction_s',
+    name: 'Microtransaction (S)',
+    desc: 'Slightly larger than XS. Still micro. Comes with a confirmation that the transaction occurred.',
+    price: 5,
+    emoji: '💠',
+    buyText: 'Buy',
+    bought: 'Purchased',
+    effect: null,
+    receiptLine: 'You bought something small.',
+  },
+  {
+    id: 'microtransaction_m',
+    name: 'Microtransaction (M)',
+    desc: 'Medium-micro. The transaction will be logged. The log is inside the square hole.',
+    price: 25,
+    emoji: '🔷',
+    buyText: 'Buy',
+    bought: 'Purchased',
+    effect: null,
+    receiptLine: 'You bought something medium.',
+  },
+  {
+    id: 'microtransaction_l',
+    name: 'Microtransaction (L)',
+    desc: 'Approaching macro territory. We want to be clear: this is still micro. It is just a large micro.',
+    price: 100,
+    emoji: '🟦',
+    buyText: 'Buy',
+    bought: 'Purchased',
+    effect: null,
+    receiptLine: 'You bought something large (still micro).',
+  },
+  {
+    id: 'microtransaction_xl',
+    name: 'Microtransaction (XL)',
+    desc: 'Our flagship microtransaction. Extremely large for a micro. Comes with a certificate of purchase (the certificate is this description).',
+    price: 500,
+    emoji: '🟪',
+    buyText: 'Buy',
+    bought: 'Purchased',
+    effect: null,
+    receiptLine: 'You bought the big one.',
+  },
+  {
+    id: 'microtransaction_xxl',
+    name: 'Microtransaction (XXL)',
+    desc: 'We are aware this is no longer micro by any reasonable definition. We are keeping the name.',
+    price: 1000,
+    emoji: '🔮',
+    buyText: 'Buy',
+    bought: 'Purchased',
+    effect: null,
+    receiptLine: 'You bought the biggest one. It is still micro.',
+  },
+  {
+    id: 'hint',
+    name: 'Hint',
+    desc: 'A hint. One hint. Use it wisely.',
+    price: 10,
+    emoji: '💡',
+    buyText: 'Buy Hint',
+    bought: 'Hint Used',
+    consumable: true,
+    effect: () => {
+      showRejection("💡 Hint: It goes in the square hole.");
+      unlock('bought-hint');
+    },
+    receiptLine: 'Hint purchased and immediately consumed.',
+  },
+  {
+    id: 'extra_shape',
+    name: 'Extra Shape',
+    desc: 'An additional shape. Added to your current rotation. The shape is: square. It goes in the square hole.',
+    price: 50,
+    emoji: '🟥',
+    buyText: 'Buy Shape',
+    bought: 'Shape Received',
+    consumable: true,
+    effect: () => {
+      addNotification('Extra Shape Delivered', 'Your extra shape has been added to the queue. It is a square. It goes in the square hole.', '🟥');
+      unlock('bought-shape');
+    },
+    receiptLine: 'One (1) square delivered to queue.',
+  },
+  {
+    id: 'name_change',
+    name: 'Name Change Token',
+    desc: 'Change your display name. You do not have a display name. This token grants you one, and the ability to change it.',
+    price: 200,
+    emoji: '✏️',
+    buyText: 'Purchase',
+    bought: 'Token Held',
+    effect: () => {
+      showRejection("✏️ Name change token acquired. You have no name to change.");
+      unlock('bought-name-change');
+    },
+    receiptLine: 'Name change token issued. No name on file.',
+  },
+  {
+    id: 'lootbox',
+    name: 'Mystery Loot Box',
+    desc: 'Contains a surprise. The surprise is a microtransaction (XS). We are telling you this upfront. The box is still mystery-themed.',
+    price: 75,
+    emoji: '📦',
+    buyText: 'Open',
+    bought: 'Opened',
+    consumable: true,
+    effect: () => {
+      setTimeout(() => {
+        showRejection('📦 You received: Microtransaction (XS). As stated.');
+        voids += 0;
+        shopPurchases['microtransaction_xs'] = (shopPurchases['microtransaction_xs'] || 0) + 1;
+        unlock('opened-lootbox');
+        populateShop();
+      }, 600);
+    },
+    receiptLine: 'Loot box opened. Contents: as described.',
+  },
+  {
+    id: 'void_pack_small',
+    name: '100 Void Pack',
+    desc: 'One hundred Voids. You can earn Voids by placing shapes. This costs 150 Voids. We see no issue with this.',
+    price: 150,
+    emoji: '⬛',
+    buyText: 'Buy Voids',
+    bought: 'Purchased',
+    consumable: true,
+    effect: () => {
+      voids += 100;
+      placed += 0; // voids stay in sync with placed so we just show it
+      localStorage.setItem('voids', voids);
+      updateVoids();
+      showRejection('⬛ +100 Voids added. Net change: −50 Voids.');
+      unlock('bought-voids');
+    },
+    receiptLine: '+100 Voids. You spent 150. Math.',
+  },
+  {
+    id: 'remove_ads',
+    name: 'Remove Ads',
+    desc: 'There are no ads. This removes the ads that do not exist. After purchase, the absence of ads will feel intentional rather than accidental.',
+    price: 999,
+    emoji: '🚫',
+    buyText: 'Purchase',
+    bought: 'Ads Removed',
+    effect: () => {
+      addNotification('Ads Removed', 'The ads have been removed. There were no ads. There are still no ads. You paid for this.', '🚫');
+      unlock('removed-ads');
+    },
+    receiptLine: 'Ads removed (0 ads removed).',
+  },
+  {
+    id: 'premium',
+    name: 'Square Hole Premium™',
+    desc: 'Unlock Premium. Benefits include: a slightly different shade of square hole, priority shape placement (no queue exists), and this badge: ★. That is the entire premium experience.',
+    price: 5000,
+    emoji: '⭐',
+    buyText: 'Go Premium',
+    bought: 'Premium Active',
+    effect: () => {
+      unlock('shop-premium');
+      addNotification('Welcome to Premium', 'You are now a premium member. The square hole looks the same. Your shapes go in the same hole. The badge is: ★', '⭐');
+      triggerMail('shop-premium-mail');
+    },
+    receiptLine: 'Premium activated. Badge: ★',
+  },
+];
+
+function populateShop() {
+  updateVoids();
+  const container = document.getElementById('shop-items');
+  if (!container) return;
+
+  container.innerHTML = shopItems.map(item => {
+    const purchaseCount = shopPurchases[item.id] || 0;
+    const purchased = !item.consumable && purchaseCount > 0;
+    const canAfford = voids >= item.price;
+
+    return `<div style="
+      background:white;
+      border-radius:12px;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      border:1px solid ${purchased ? '#e8f5e9' : (canAfford ? '#f0e8ff' : '#f5f5f5')};
+      opacity:${purchased ? '0.7' : '1'};
+    ">
+      <div style="font-size:2em;flex-shrink:0;">${item.emoji}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:800;font-size:0.92em;color:#222;">${item.name}${purchaseCount > 1 ? ' <span style="font-size:0.75em;color:#999;">×'+purchaseCount+'</span>' : ''}</div>
+        <div style="font-size:0.75em;color:#888;margin-top:2px;line-height:1.4;">${item.desc}</div>
+      </div>
+      <div style="flex-shrink:0;text-align:right;">
+        <div style="font-size:0.8em;color:#666;margin-bottom:6px;white-space:nowrap;">⬛ ${item.price.toLocaleString()}</div>
+        <button onclick="buyShopItem('${item.id}')" ${purchased ? 'disabled' : ''} style="
+          padding:6px 14px;
+          border:none;
+          border-radius:8px;
+          background:${purchased ? '#e8f5e9' : (canAfford ? '#6a1b9a' : '#e0e0e0')};
+          color:${purchased ? '#4caf50' : (canAfford ? 'white' : '#aaa')};
+          cursor:${purchased ? 'default' : (canAfford ? 'pointer' : 'not-allowed')};
+          font-family:'Nunito',sans-serif;
+          font-weight:700;
+          font-size:0.8em;
+          white-space:nowrap;
+        ">${purchased ? '✓ ' + item.bought : item.buyText}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buyShopItem(id) {
+  const item = shopItems.find(i => i.id === id);
+  if (!item) return;
+  if (voids < item.price) {
+    showRejection('⬛ Insufficient Voids. Place more shapes.');
+    return;
+  }
+  const purchased = !item.consumable && (shopPurchases[id] || 0) > 0;
+  if (purchased) return;
+
+  voids -= item.price;
+  // keep voids separate from placed now since we can spend them
+  localStorage.setItem('voids', voids);
+  shopPurchases[id] = (shopPurchases[id] || 0) + 1;
+  localStorage.setItem('shopPurchases', JSON.stringify(shopPurchases));
+
+  updateVoids();
+  if (item.effect) item.effect();
+
+  // Show receipt toast
+  showRejection('🧾 Receipt: ' + item.receiptLine);
+
+  // Unlock achievements
+  const totalSpent = Object.entries(shopPurchases).reduce((acc, [pid, count]) => {
+    const si = shopItems.find(i => i.id === pid);
+    return acc + (si ? si.price * count : 0);
+  }, 0);
+  if (totalSpent >= 1) unlock('first-purchase');
+  if (Object.keys(shopPurchases).length >= 3) unlock('shopper');
+  if (Object.keys(shopPurchases).length >= shopItems.length) unlock('bought-everything');
+  const microCount = ['microtransaction_xs','microtransaction_s','microtransaction_m','microtransaction_l','microtransaction_xl','microtransaction_xxl'].filter(mid => shopPurchases[mid] > 0).length;
+  if (microCount >= 6) unlock('all-microtransactions');
+
+  populateShop();
+}
+
+// Add shop mail
 
 function init() {
   updateCount();
@@ -4706,6 +5576,7 @@ function init() {
   if (badge) badge.textContent = notifications.length;
 
   updateMailBadge();
+  scheduleRandomMail();
   checkMailTriggers();
   updateAchStats();
   checkAchievements();
