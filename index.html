@@ -6379,6 +6379,656 @@ No markdown. No asterisks. Plain text only.`;
   }
 }
  
+// ─── Fake Ad System ───────────────────────────────────────────────────────────
+let adBypassed = false;
+let adSeenCount = parseInt(localStorage.getItem('adSeenCount') || '0');
+ 
+// ─── THE 47 QUESTIONS ─────────────────────────────────────────────────────────
+const QUIZ_QUESTIONS = [
+  { q: "Where does the triangle go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. It goes in the square hole." },
+    { text: "In the triangle hole", correct: false, feedback: "There is no triangle hole. Square hole." },
+    { text: "Nowhere, it doesn't fit", correct: false, feedback: "She makes it fit. Square hole." },
+    { text: "Back in the box", correct: false, feedback: "No. Square hole." },
+  ]},
+  { q: "Where does the circle go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Square hole." },
+    { text: "In the round hole", correct: false, feedback: "That's what they want you to think. Square hole." },
+    { text: "It rolls away", correct: false, feedback: "Catch it. Put it in the square hole." },
+    { text: "It can't go anywhere, it's a circle", correct: false, feedback: "Watch her. Square hole." },
+  ]},
+  { q: "Where does the star go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. All stars go in the square hole." },
+    { text: "In the star-shaped hole", correct: false, feedback: "The star-shaped hole is a lie. Square hole." },
+    { text: "In the sky", correct: false, feedback: "Not in this game. Square hole." },
+    { text: "It's too pointy", correct: false, feedback: "She doesn't care about the points. Square hole." },
+  ]},
+  { q: "Where does the rectangle go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Rectangle? Square hole." },
+    { text: "In the rectangle hole", correct: false, feedback: "The rectangle hole is just two square holes dreaming. Square hole." },
+    { text: "It's too big", correct: false, feedback: "She will make it fit. Square hole." },
+    { text: "Sideways, maybe", correct: false, feedback: "Any way. Square hole." },
+  ]},
+  { q: "Where does the hexagon go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Six sides, one destiny. Square hole." },
+    { text: "In the hexagon hole", correct: false, feedback: "The hexagon hole does not deserve this hexagon. Square hole." },
+    { text: "Nowhere, hexagons are complicated", correct: false, feedback: "She is not complicated. Square hole." },
+    { text: "In a beehive", correct: false, feedback: "This is not a beehive. Square hole." },
+  ]},
+  { q: "Where does the oval go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Oval. Square hole." },
+    { text: "In the oval hole", correct: false, feedback: "The oval hole is just a circle that gave up. Square hole." },
+    { text: "It's basically a circle, so the round hole", correct: false, feedback: "Basically wrong. Square hole." },
+    { text: "I feel bad for the oval", correct: false, feedback: "The oval is fine. It goes in the square hole." },
+  ]},
+  { q: "Where does the pentagon go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Five sides. Square hole." },
+    { text: "In the pentagon hole", correct: false, feedback: "There is no pentagon hole. Only the square hole." },
+    { text: "In Washington D.C.", correct: false, feedback: "That's the Pentagon. This is a pentagon. Square hole." },
+    { text: "I need to think about this", correct: false, feedback: "You don't. Square hole." },
+  ]},
+  { q: "Where does the rhombus go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. A rhombus is a square that's had a hard day. Square hole." },
+    { text: "What even is a rhombus", correct: false, feedback: "Doesn't matter. Square hole." },
+    { text: "Nowhere near the square hole, it'll get stuck", correct: false, feedback: "She jams it. Square hole." },
+    { text: "In the diamond hole", correct: false, feedback: "The diamond hole is the rhombus hole which is the square hole. Square hole." },
+  ]},
+  { q: "Where does the cube go? (It's 3D now.)", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. It is a square but more so. Square hole." },
+    { text: "You can't put a 3D shape in a 2D hole", correct: false, feedback: "She can. Square hole." },
+    { text: "On the shelf", correct: false, feedback: "Not the shelf. The square hole." },
+    { text: "This feels dangerous", correct: false, feedback: "It is. Square hole." },
+  ]},
+  { q: "Where does the trapezoid go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The trapezoid had one job and it's in the square hole." },
+    { text: "Trapezoids don't exist in this game", correct: false, feedback: "They do now. Square hole." },
+    { text: "In the trapezoid hole", correct: false, feedback: "A trapezoid hole is just a square hole that's been through some things. Square hole." },
+    { text: "I genuinely don't know what a trapezoid is", correct: false, feedback: "It goes in the square hole." },
+  ]},
+  { q: "Where does the sphere go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. It does not fit. She puts it in anyway. Square hole." },
+    { text: "In the round hole, obviously", correct: false, feedback: "Obviously wrong. Square hole." },
+    { text: "It'll just roll around in there", correct: false, feedback: "Let it roll. Inside the square hole." },
+    { text: "Nowhere, it's a sphere", correct: false, feedback: "Somewhere. The square hole." },
+  ]},
+  { q: "Where does the pyramid go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Pointy end first. Square hole." },
+    { text: "In Egypt", correct: false, feedback: "Wrong pyramid. Square hole." },
+    { text: "In the pyramid-shaped hole", correct: false, feedback: "That hole does not exist in this curriculum. Square hole." },
+    { text: "It might break the hole", correct: false, feedback: "The hole has seen worse. Square hole." },
+  ]},
+  { q: "Where does the crescent go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Crescent. Square hole." },
+    { text: "On a flag", correct: false, feedback: "That's a different crescent. This one goes in the square hole." },
+    { text: "In a croissant", correct: false, feedback: "No. Square hole." },
+    { text: "It doesn't look like it should fit anywhere", correct: false, feedback: "That's what she said before she put it in the square hole." },
+  ]},
+  { q: "Where does the arrow go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Even the arrow pointing somewhere else goes in the square hole." },
+    { text: "Where it's pointing", correct: false, feedback: "It's pointing at the square hole." },
+    { text: "In a bow", correct: false, feedback: "No. Square hole." },
+    { text: "In the direction of least resistance", correct: false, feedback: "The square hole is the direction of least resistance." },
+  ]},
+  { q: "Where does the cross go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Four right angles. Basically a stretched square. Square hole." },
+    { text: "On a church", correct: false, feedback: "This is not a church. Square hole." },
+    { text: "In the plus-shaped hole", correct: false, feedback: "A plus hole is just a square hole with ambitions. Square hole." },
+    { text: "It's religious, I feel weird about this", correct: false, feedback: "It's geometry. Square hole." },
+  ]},
+  { q: "Where does the lightning bolt go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Zap. Square hole." },
+    { text: "Into the sky", correct: false, feedback: "No sky here. Square hole." },
+    { text: "It can't, it's electricity", correct: false, feedback: "It's a shape. Square hole." },
+    { text: "In a Harry Potter costume", correct: false, feedback: "Wrong universe. Square hole." },
+  ]},
+  { q: "Where does the heart go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Love goes in the square hole." },
+    { text: "With someone special", correct: false, feedback: "That's sweet. Square hole." },
+    { text: "In the heart-shaped hole", correct: false, feedback: "The heart-shaped hole is a metaphor. The square hole is real." },
+    { text: "It's a symbol, it can't 'go' anywhere", correct: false, feedback: "It goes in the square hole." },
+  ]},
+  { q: "Where does the diamond go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. A square at 45 degrees has the same destiny. Square hole." },
+    { text: "On a ring", correct: false, feedback: "Not here. Square hole." },
+    { text: "In the diamond hole (it's just a rotated square hole)", correct: false, feedback: "You're catching on. Square hole." },
+    { text: "Baseball has a diamond", correct: false, feedback: "That diamond also goes in the square hole." },
+  ]},
+  { q: "Where does the cloud go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Even the cloud. Square hole." },
+    { text: "In the sky", correct: false, feedback: "Square hole has sky in it now. Square hole." },
+    { text: "It's not a solid shape", correct: false, feedback: "She doesn't care. Square hole." },
+    { text: "This is getting abstract", correct: false, feedback: "It was always abstract. Square hole." },
+  ]},
+  { q: "Where does the moon go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Yes, the moon. Square hole." },
+    { text: "In orbit", correct: false, feedback: "New orbit: the square hole." },
+    { text: "That's too big", correct: false, feedback: "She scales it down. Square hole." },
+    { text: "This quiz has escalated", correct: false, feedback: "It has. Square hole." },
+  ]},
+  { q: "Where does the sun go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The sun goes in the square hole. The hole is fine with this." },
+    { text: "It'll burn the hole", correct: false, feedback: "The hole is not flammable. Square hole." },
+    { text: "In the sky", correct: false, feedback: "New sky: the square hole." },
+    { text: "We'll all die if the sun goes in a hole", correct: false, feedback: "That's a risk the hole is willing to take." },
+  ]},
+  { q: "Where does the entire solar system go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. She puts the solar system in the square hole. The hole is accommodating." },
+    { text: "It won't fit", correct: false, feedback: "She doesn't check. Square hole." },
+    { text: "This is no longer physics", correct: false, feedback: "It was never physics. It was always square hole." },
+    { text: "Somewhere else, please", correct: false, feedback: "No. Square hole." },
+  ]},
+  { q: "Where does the concept of time go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Time goes in the square hole. This explains a lot." },
+    { text: "Forward", correct: false, feedback: "Forward into the square hole." },
+    { text: "Time can't go in a hole, it's abstract", correct: false, feedback: "All things go in the square hole." },
+    { text: "I need a moment", correct: false, feedback: "Your moment goes in the square hole." },
+  ]},
+  { q: "Where does fear go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Fear. Square hole. Gone." },
+    { text: "Away, hopefully", correct: false, feedback: "Away means square hole." },
+    { text: "Fear is not a shape", correct: false, feedback: "Everything is a shape. Square hole." },
+    { text: "Inside us all", correct: false, feedback: "Inside the square hole is inside us all now." },
+  ]},
+  { q: "Where does your childhood go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Childhood. Square hole. This is fine." },
+    { text: "Into memory", correct: false, feedback: "Memory goes in the square hole too." },
+    { text: "That's dark", correct: false, feedback: "The hole is not dark. It is square." },
+    { text: "I didn't expect this question", correct: false, feedback: "You should have. Square hole." },
+  ]},
+  { q: "Where does the number 7 go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Numbers go in the square hole now." },
+    { text: "Between 6 and 8", correct: false, feedback: "Between 6 and 8 is inside the square hole." },
+    { text: "Numbers aren't physical", correct: false, feedback: "This one is. Square hole." },
+    { text: "Why is 6 afraid of 7?", correct: false, feedback: "Because 7 put 6 in the square hole." },
+  ]},
+  { q: "Where does a strongly-worded letter go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The square hole does not negotiate. It receives." },
+    { text: "To the management", correct: false, feedback: "Management is in the square hole." },
+    { text: "In the mailbox", correct: false, feedback: "The mailbox is a square hole with stamps." },
+    { text: "It won't help", correct: false, feedback: "Nothing helps. Square hole." },
+  ]},
+  { q: "Where does your therapist's advice go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Good advice. Square hole. Immediately." },
+    { text: "Into practice, hopefully", correct: false, feedback: "Practice is a square hole with homework." },
+    { text: "I'm working on it", correct: false, feedback: "Work on it in the square hole." },
+    { text: "In one ear and out the other", correct: false, feedback: "Both ears are square holes in this scenario." },
+  ]},
+  { q: "Where does the plot of a confusing movie go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Confusing plot. Square hole. Resolved." },
+    { text: "Somewhere only the director understands", correct: false, feedback: "The director puts it in the square hole." },
+    { text: "Reddit", correct: false, feedback: "Reddit is a square hole with more steps." },
+    { text: "I still don't understand Tenet", correct: false, feedback: "Tenet is about putting time in the square hole." },
+  ]},
+  { q: "Where does Monday go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Monday. Square hole. Good riddance." },
+    { text: "Directly in the trash", correct: false, feedback: "The trash is inside the square hole." },
+    { text: "Into the week", correct: false, feedback: "The week is a square hole shaped like a calendar." },
+    { text: "It just keeps coming back", correct: false, feedback: "Out of the square hole. Every week." },
+  ]},
+  { q: "Where does your unread notification count go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The hole enabled notifications. It will receive them." },
+    { text: "Up. Always up.", correct: false, feedback: "Up and into the square hole." },
+    { text: "I cleared them once. Once.", correct: false, feedback: "The square hole filled them back up." },
+    { text: "In the red circle I can't stop staring at", correct: false, feedback: "The red circle is a round hole. Which goes in the square hole." },
+  ]},
+  { q: "Where does a rectangle that thinks it's a square go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The hole does not check IDs." },
+    { text: "To therapy", correct: false, feedback: "Therapy is in the square hole now." },
+    { text: "Nowhere near the square hole, it's an imposter", correct: false, feedback: "The hole is inclusive. Square hole." },
+    { text: "Back to geometry class", correct: false, feedback: "Geometry class is inside the square hole." },
+  ]},
+  { q: "Where does a triangle that has given up go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The hole accepts triangles who have accepted their fate." },
+    { text: "Into retirement", correct: false, feedback: "Retirement is a square hole with a pension." },
+    { text: "It just becomes a line at that point", correct: false, feedback: "Lines go in the square hole too." },
+    { text: "We should support it", correct: false, feedback: "Support it into the square hole." },
+  ]},
+  { q: "Where does a shape that has never been named go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Unnamed shapes have no protection. Square hole." },
+    { text: "Into the void", correct: false, feedback: "The void is inside the square hole." },
+    { text: "We should name it first", correct: false, feedback: "Name: Shape That Goes In The Square Hole." },
+    { text: "It's not real if it has no name", correct: false, feedback: "The hole doesn't require documentation." },
+  ]},
+  { q: "Where does the shape you're about to draw go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. You haven't even drawn it yet. Square hole." },
+    { text: "On the paper", correct: false, feedback: "Paper goes in the square hole." },
+    { text: "I wasn't going to draw anything", correct: false, feedback: "Your intention goes in the square hole." },
+    { text: "This is precognitive shape placement", correct: false, feedback: "Yes. Square hole." },
+  ]},
+  { q: "Where does the last shape in the box go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Last shape. One hole. Square hole." },
+    { text: "Back in the box for next time", correct: false, feedback: "There is no next time. Square hole." },
+    { text: "In whatever hole fits", correct: false, feedback: "One hole fits everything. Square hole." },
+    { text: "We should save it", correct: false, feedback: "Save it in the square hole." },
+  ]},
+  { q: "Where does a shape that has already been in the square hole once go?", options: [
+    { text: "In the square hole again", correct: true,  feedback: "Correct. The square hole does not offer a loyalty program. It offers the hole." },
+    { text: "It's been there. Let it rest.", correct: false, feedback: "No rest. Square hole." },
+    { text: "Somewhere new, it's earned it", correct: false, feedback: "It has earned exactly one thing. The square hole." },
+    { text: "Into retirement", correct: false, feedback: "Retirement is inside the square hole." },
+  ]},
+  { q: "Where does this quiz go when it's over?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The quiz returns to where all things return." },
+    { text: "Into the void", correct: false, feedback: "The void is the square hole." },
+    { text: "Away, hopefully", correct: false, feedback: "Away is the square hole." },
+    { text: "It never ends", correct: false, feedback: "It ends at 47. In the square hole." },
+  ]},
+  { q: "Where do the questions you skipped go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. You didn't skip any. But if you had. Square hole." },
+    { text: "Unanswered into eternity", correct: false, feedback: "Eternity is inside the square hole." },
+    { text: "I didn't skip any", correct: false, feedback: "Correct. They all went in the square hole." },
+    { text: "Back to the quiz maker", correct: false, feedback: "The quiz maker is in the square hole." },
+  ]},
+  { q: "Where does hesitation go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. No hesitation. Square hole." },
+    { text: "It stays, usually", correct: false, feedback: "Not anymore. Square hole." },
+    { text: "Into the pause before action", correct: false, feedback: "The pause is a square hole in time." },
+    { text: "I'm hesitating right now", correct: false, feedback: "Put the hesitation in the square hole." },
+  ]},
+  { q: "Where does doubt go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. Doubt is just a triangle pretending to be a feeling. Square hole." },
+    { text: "It lingers", correct: false, feedback: "Not in here. Square hole." },
+    { text: "Maybe the square hole? I'm not sure.", correct: false, feedback: "You are sure. Square hole." },
+    { text: "Away when you believe in yourself", correct: false, feedback: "Believe in the square hole." },
+  ]},
+  { q: "Where does the shape that doesn't want to go go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The hole does not require consent from shapes." },
+    { text: "We should respect its wishes", correct: false, feedback: "The hole does not. Square hole." },
+    { text: "Nowhere, if it really doesn't want to", correct: false, feedback: "Square hole." },
+    { text: "This is getting philosophical", correct: false, feedback: "Philosophy goes in the square hole." },
+  ]},
+  { q: "Where does the shape that was clearly meant for a different hole go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. There is only one hole. This is that hole." },
+    { text: "In its intended hole", correct: false, feedback: "Its intended hole is the square hole." },
+    { text: "Back to the manufacturer", correct: false, feedback: "The manufacturer is inside the square hole." },
+    { text: "It's not the hole's fault, it's the shape's", correct: false, feedback: "No fault. Only square hole." },
+  ]},
+  { q: "Where does the word 'no' go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. 'No' goes in the square hole. Every time." },
+    { text: "It stands firm", correct: false, feedback: "Not here. Square hole." },
+    { text: "Nowhere, 'no' means no", correct: false, feedback: "The hole says yes. Square hole." },
+    { text: "I said no on question 12 and look where that got me", correct: false, feedback: "Question 12 went in the square hole." },
+  ]},
+  { q: "Where does the square hole itself go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The hole goes in itself. Do not think about this for too long." },
+    { text: "That's a paradox", correct: false, feedback: "The paradox goes in the square hole." },
+    { text: "Nowhere, it's the hole", correct: false, feedback: "The hole holes itself. Square hole." },
+    { text: "I need to lie down", correct: false, feedback: "The lie-down goes in the square hole." },
+  ]},
+  { q: "Where does this entire game go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. The game. The hole. All of it. Square hole." },
+    { text: "On my phone for too long", correct: false, feedback: "Your phone goes in the square hole." },
+    { text: "Into the void at 2am", correct: false, feedback: "The void is the square hole at 2am." },
+    { text: "It was inside the square hole the whole time", correct: false, feedback: "Yes. And also it goes in the square hole." },
+  ]},
+  { q: "Where does the 47th question go?", options: [
+    { text: "In the square hole", correct: true,  feedback: "Correct. 47 questions. One answer. It was always the square hole. Go place the square." },
+    { text: "Into history", correct: false, feedback: "History goes in the square hole." },
+    { text: "Wherever the other 46 went", correct: false, feedback: "The square hole. Obviously." },
+    { text: "I've learned nothing", correct: false, feedback: "You've learned one thing. Square hole." },
+  ]},
+];
+ 
+// ─── Quiz Engine ──────────────────────────────────────────────────────────────
+function createQuizEngine(containerId, mode) {
+  let currentQ = 0;
+  let score = 0;
+  let restartCount = 0;
+  let currentShuffled = [];
+ 
+  function render() {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (currentQ >= QUIZ_QUESTIONS.length) { renderComplete(container); return; }
+ 
+    const q = QUIZ_QUESTIONS[currentQ];
+    const pct = Math.round((currentQ / QUIZ_QUESTIONS.length) * 100);
+    const color = mode === 'coach' ? '#2e7d32' : '#1565c0';
+    const accentBg = mode === 'coach' ? '#e8f5e9' : '#e3f2fd';
+ 
+    currentShuffled = q.options.map((opt, i) => ({ ...opt, origIdx: i }))
+      .sort(() => Math.random() - 0.5);
+ 
+    container.innerHTML = `
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <span style="font-size:0.72em;font-weight:700;color:${color};">Q${currentQ + 1} of ${QUIZ_QUESTIONS.length}</span>
+          <span style="font-size:0.72em;color:#aaa;">${mode === 'iq' ? score + ' correct' : (restartCount > 0 ? 'Restarted ' + restartCount + 'x' : '&nbsp;')}</span>
+        </div>
+        <div style="background:#e0e0e0;border-radius:4px;height:4px;overflow:hidden;">
+          <div style="background:${color};height:4px;width:${pct}%;transition:width 0.3s;border-radius:4px;"></div>
+        </div>
+      </div>
+      <div style="font-size:0.82em;font-weight:700;color:#333;margin-bottom:10px;line-height:1.4;">${q.q}</div>
+      <div id="${containerId}-opts" style="display:flex;flex-direction:column;gap:6px;">
+        ${currentShuffled.map((opt, i) =>
+          `<button onclick="quizAnswer('${containerId}','${mode}',${i})"
+            style="background:white;border:1px solid #ddd;border-radius:7px;padding:7px 10px;
+            font-size:0.78em;cursor:pointer;text-align:left;line-height:1.35;font-family:inherit;color:#333;"
+            onmouseover="this.style.background='${accentBg}'" onmouseout="this.style.background='white'">
+            ${opt.text}
+          </button>`
+        ).join('')}
+      </div>
+      <div id="${containerId}-feedback" style="display:none;margin-top:8px;font-size:0.76em;line-height:1.45;padding:7px 10px;border-radius:6px;"></div>
+    `;
+  }
+ 
+  function answer(idx) {
+    const container = document.getElementById(containerId);
+    if (!container || !currentShuffled.length) return;
+ 
+    const chosen = currentShuffled[idx];
+    if (!chosen) return;
+ 
+    const feedbackEl = document.getElementById(containerId + '-feedback');
+    const optsEl = document.getElementById(containerId + '-opts');
+ 
+    if (optsEl) {
+      optsEl.querySelectorAll('button').forEach((btn, i) => {
+        btn.onclick = null;
+        btn.onmouseover = null;
+        btn.onmouseout = null;
+        btn.style.cursor = 'default';
+        if (currentShuffled[i] && currentShuffled[i].correct) {
+          btn.style.background = '#e8f5e9';
+          btn.style.borderColor = '#2e7d32';
+          btn.style.color = '#2e7d32';
+          btn.style.fontWeight = '700';
+        } else if (i === idx && !chosen.correct) {
+          btn.style.background = '#fce4ec';
+          btn.style.borderColor = '#e53935';
+          btn.style.color = '#e53935';
+        }
+      });
+    }
+ 
+    if (feedbackEl) {
+      feedbackEl.style.display = 'block';
+      feedbackEl.style.background = chosen.correct ? '#e8f5e9' : '#fce4ec';
+      feedbackEl.style.color = chosen.correct ? '#2e7d32' : '#c62828';
+      feedbackEl.style.border = '1px solid ' + (chosen.correct ? '#a5d6a7' : '#ef9a9a');
+      feedbackEl.textContent = chosen.feedback;
+    }
+ 
+    if (chosen.correct) {
+      score++;
+      setTimeout(() => { currentQ++; render(); }, mode === 'coach' ? 900 : 1100);
+    } else {
+      if (mode === 'coach') {
+        setTimeout(() => { restartCount++; currentQ = 0; score = 0; render(); }, 1800);
+      } else {
+        setTimeout(() => { currentQ++; render(); }, 1400);
+      }
+    }
+  }
+ 
+  function renderComplete(container) {
+    const color = mode === 'coach' ? '#2e7d32' : '#1565c0';
+    const bgColor = mode === 'coach' ? '#e8f5e9' : '#e3f2fd';
+    if (mode === 'coach') {
+      const restartMsg = restartCount > 0
+        ? 'You restarted ' + restartCount + ' time' + (restartCount > 1 ? 's' : '') + '. The hole noticed.'
+        : 'You passed without a single restart. The hole is cautiously impressed.';
+      container.innerHTML = `
+        <div style="text-align:center;padding:8px 0;">
+          <div style="font-size:2em;margin-bottom:6px;">🏅</div>
+          <div style="font-weight:900;font-size:0.95em;color:${color};margin-bottom:6px;">SHAPE PLACEMENT COACH CERTIFIED</div>
+          <div style="font-size:0.78em;color:#555;line-height:1.5;margin-bottom:8px;">${restartMsg}</div>
+          <div style="background:${bgColor};border-radius:8px;padding:8px;font-size:0.72em;color:#555;">
+            Certificate #SPC-${Math.floor(Math.random()*99999).toString().padStart(5,'0')}<br>
+            <span style="color:#aaa;">Not a real certificate. The hole cannot notarize documents.</span>
+          </div>
+        </div>`;
+    } else {
+      const iq = Math.round((score / QUIZ_QUESTIONS.length) * 100) + 47;
+      const rating = score === 47 ? "Maximum Hole IQ. The hole is frightened of you." :
+                     score >= 40 ? "High Hole IQ. The hole is reluctantly impressed." :
+                     score >= 30 ? "Average Hole IQ. The hole expected this." :
+                     score >= 20 ? "Below Average. The hole is unsurprised." :
+                     score >= 10 ? "Concerning. Have you considered just playing the game?" :
+                                   "The hole would like to speak with your parents.";
+      container.innerHTML = `
+        <div style="text-align:center;padding:8px 0;">
+          <div style="font-size:2em;margin-bottom:6px;">🧠</div>
+          <div style="font-weight:900;font-size:0.95em;color:${color};margin-bottom:4px;">HOLE IQ RESULTS</div>
+          <div style="font-size:2.2em;font-weight:900;color:${color};margin:6px 0;">${iq}</div>
+          <div style="font-size:0.78em;color:#555;margin-bottom:8px;">${score}/47 correct</div>
+          <div style="background:${bgColor};border-radius:8px;padding:8px;font-size:0.76em;color:#555;line-height:1.5;">${rating}</div>
+          <div style="font-size:0.65em;color:#aaa;margin-top:6px;">IQ calculated by The Square Hole Research Division. We are not scientists.</div>
+        </div>`;
+    }
+  }
+ 
+  return { render, answer };
+}
+ 
+const _quizEngines = {};
+ 
+function quizAnswer(containerId, mode, idx) {
+  if (_quizEngines[containerId]) _quizEngines[containerId].answer(idx);
+}
+ 
+// ─── Ad Interactions ──────────────────────────────────────────────────────────
+ 
+function adProInteract() {
+  const btn = document.getElementById('ad-pro-btn');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Processing...';
+    btn.style.background = '#aaa';
+    btn.style.cursor = 'default';
+    btn.onclick = null;
+    setTimeout(() => {
+      btn.textContent = 'Error: You already have Pro';
+      btn.style.background = '#e53935';
+      btn.style.fontSize = '0.7em';
+      setTimeout(() => {
+        btn.textContent = "(You don't have Pro)";
+        btn.style.background = '#ccc';
+        btn.style.color = '#555';
+        btn.style.fontSize = '0.65em';
+      }, 1800);
+    }, 1400);
+  };
+}
+ 
+function adSubscribeInteract() {
+  const btn = document.getElementById('ad-subscribe-btn');
+  const note = document.getElementById('ad-subscribe-note');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Entering payment info...';
+    btn.style.background = '#9c27b0';
+    btn.onclick = null;
+    setTimeout(() => {
+      btn.textContent = 'Charging \u2b1b0 Voids...';
+      setTimeout(() => {
+        btn.textContent = '\u2713 Subscribed';
+        btn.style.background = '#4caf50';
+        if (note) note.innerHTML = 'Your box ships <strong>never</strong>.<br><span style="font-size:0.85em;color:#aaa;">You are still subscribed.</span>';
+      }, 1200);
+    }, 1000);
+  };
+}
+ 
+function adCoachInteract() {
+  const btn = document.getElementById('ad-coach-btn');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.style.display = 'none';
+    // Use unique ID per session to avoid stale DOM conflicts
+    const uid = 'coach-quiz-' + Date.now();
+    const div = document.createElement('div');
+    div.id = uid;
+    btn.parentNode.appendChild(div);
+    const engine = createQuizEngine(uid, 'coach');
+    _quizEngines[uid] = engine;
+    engine.render();
+  };
+}
+ 
+function adNotifInteract() {
+  const btn = document.getElementById('ad-notif-ok');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Noted.';
+    btn.disabled = true;
+    btn.style.background = '#b71c1c';
+    btn.style.cursor = 'default';
+    btn.onclick = null;
+    const bar = document.getElementById('ad-notif-bar');
+    if (!bar) return;
+    bar.style.display = 'block';
+    const msgs = [
+      '\u2b1b Notification 1 of \u221e: The hole is aware of you.',
+      '\u2b1b Notification 2 of \u221e: Have you placed a shape? The hole knows you haven\'t.',
+      '\u2b1b Notification 3 of \u221e: It is 3am. The hole is awake. You are also awake now.',
+      '\u2b1b Notification 4 of \u221e: The hole thought about you today. You were not consulted.',
+      '\u2b1b Notification 5 of \u221e: You have been subscribed to Square Hole Notifications (Annual).',
+      '\u2b1b This is permanent. There is no unsubscribe link. The hole ate it.',
+    ];
+    let i = 0;
+    bar.textContent = msgs[i];
+    const t = setInterval(() => {
+      i++;
+      if (i < msgs.length) {
+        bar.textContent = msgs[i];
+        if (i === msgs.length - 1) { bar.style.background = '#b71c1c'; clearInterval(t); }
+      } else {
+        clearInterval(t);
+      }
+    }, 1100);
+  };
+}
+ 
+function adIqInteract() {
+  const btn = document.getElementById('ad-iq-btn');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.style.display = 'none';
+    // Use unique ID per session to avoid stale DOM conflicts
+    const uid = 'iq-quiz-' + Date.now();
+    const div = document.createElement('div');
+    div.id = uid;
+    btn.parentNode.appendChild(div);
+    const engine = createQuizEngine(uid, 'iq');
+    _quizEngines[uid] = engine;
+    engine.render();
+  };
+}
+ 
+function adPrizeInteract() {
+  const btn = document.getElementById('ad-prize-btn');
+  const body = document.getElementById('ad-prize-body');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Claiming...';
+    btn.style.animation = 'none';
+    btn.style.background = '#aaa';
+    btn.style.cursor = 'default';
+    btn.onclick = null;
+    if (body) {
+      body.innerHTML = `
+        <div style="font-size:2.5em;margin-bottom:8px;">\u23f3</div>
+        <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">PROCESSING YOUR PRIZE</div>
+        <div style="font-size:0.85em;color:#555;">Verifying you are the 1,000,000th visitor...<br><span style="color:#aaa;font-size:0.85em;">This may take a moment.</span></div>`;
+    }
+    setTimeout(() => {
+      if (body) {
+        body.innerHTML = `
+          <div style="font-size:2.5em;margin-bottom:8px;">📬</div>
+          <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">CHECK YOUR INBOX</div>
+          <div style="font-size:0.82em;color:#555;">We've sent you an important message<br>regarding your prize claim.</div>`;
+      }
+      triggerPrizeEmail();
+    }, 2000);
+  };
+}
+ 
+// ─── Email / Claude ───────────────────────────────────────────────────────────
+ 
+function triggerPrizeEmail() {
+  const envelopeBtn = document.getElementById('envelope-btn');
+  if (envelopeBtn) envelopeBtn.style.display = 'flex';
+  openEmail({ prizeMode: true });
+}
+ 
+async function openEmail(opts) {
+  opts = opts || {};
+  const modal = document.getElementById('email-modal');
+  const subjectEl = document.getElementById('email-subject');
+  const bodyEl = document.getElementById('email-body');
+  const dateEl = document.getElementById('email-date');
+  const dot = document.getElementById('envelope-dot');
+ 
+  if (!modal || !bodyEl) return;
+  if (dot) dot.style.display = 'none';
+  modal.style.display = 'flex';
+  if (dateEl) dateEl.textContent = new Date().toLocaleString();
+ 
+  if (opts.prizeMode) {
+    if (subjectEl) subjectEl.textContent = 'Re: Your Prize Claim';
+    bodyEl.innerHTML = '<em style="color:#aaa;font-size:0.9em;">The hole is composing a response...</em>';
+    const roast = await generatePrizeRoast();
+    bodyEl.innerHTML = roast.split(/\n\n+/).map(function(p) {
+      return '<p style="margin-bottom:10px;">' + p.replace(/\n/g,'<br>') + '</p>';
+    }).join('');
+  } else {
+    if (subjectEl) subjectEl.textContent = 'A Message From The Hole';
+    bodyEl.innerHTML = '<em style="color:#aaa;font-size:0.9em;">The hole is composing its thoughts...</em>';
+    const roast = await generatePlacementRoast();
+    bodyEl.innerHTML = roast.split(/\n\n+/).map(function(p) {
+      return '<p style="margin-bottom:10px;">' + p.replace(/\n/g,'<br>') + '</p>';
+    }).join('');
+  }
+}
+ 
+async function generatePrizeRoast() {
+  const prompt = 'You are The Square Hole. You are a square-shaped hole and you are APPALLED. Someone just clicked "CLAIM PRIZE" on one of your fake ads. The ad clearly said "1,000,000th visitor" in the most obviously fake scam font imaginable. They fell for it. They thought they won something. From YOU. A HOLE.\n\nWrite a short email body (under 140 words) absolutely roasting them for this. Speak in first person as the hole itself. Be in disbelief. Be dramatic. Reference that you are literally just a hole — you have nothing to give. Sign off as "— The Hole (I cannot give you anything. I am a hole.)"\n\nNo markdown. No asterisks. Plain text only. Start with "Oh." or "No." or "I genuinely cannot believe this."';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 350,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    return (data.content && data.content.find(function(b){ return b.type==='text'; }) || {}).text
+      || 'No.\n\nI\'m a hole. What did you think you were going to win?\n\n— The Hole (I cannot give you anything. I am a hole.)';
+  } catch (e) {
+    return 'No.\n\nI cannot believe you clicked that. I am a hole. I have nothing.\n\n— The Hole (I cannot give you anything. I am a hole.)';
+  }
+}
+ 
+async function generatePlacementRoast(stats) {
+  stats = stats || {};
+  const placements = stats.placements || parseInt(localStorage.getItem('totalPlacements') || '50');
+  const extra = Math.max(0, placements - 50);
+  const time = stats.time || '???';
+  const wrong = stats.wrong || 0;
+  const prompt = 'You are The Square Hole. You are a square-shaped hole and you are OFFENDED, exhausted, and personally victimized by this player. You speak in first person AS the hole itself. Passive-aggressive ragebait energy.\n\nWrite a short email body roasting the player (under 130 words). Start blunt. Reference your own existence as a hole. Sign off as just "— The Hole".\n\nStats:\n- ' + placements + ' total placements' + (extra > 0 ? ' (they kept going ' + extra + ' extra times after winning)' : '') + '\n- Time: ' + time + '\n- Wrong attempts: ' + wrong + '\n\nNo markdown. No asterisks. Plain text only.';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 350,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    return (data.content && data.content.find(function(b){ return b.type==='text'; }) || {}).text
+      || 'Look. Just put the square in the hole.\n\n— The Hole';
+  } catch (e) {
+    return 'Look. I don\'t know what to tell you.\n\n— The Hole';
+  }
+}
+ 
 // ─── Ad Definitions ───────────────────────────────────────────────────────────
 const fakeAds = [
   {
@@ -6465,7 +7115,8 @@ function showAd(onComplete) {
   content.style.background = ad.bg;
   content.innerHTML = ad.html;
  
-  if (ad.onInject) requestAnimationFrame(() => ad.onInject());
+  // setTimeout 0 is more reliable than rAF for post-innerHTML DOM availability
+  if (ad.onInject) setTimeout(function(){ ad.onInject(); }, 0);
  
   modal.style.display = 'flex';
  
@@ -6475,7 +7126,7 @@ function showAd(onComplete) {
   skipBtn.style.cursor = 'default';
   countdown.textContent = 'Skip in ' + remaining + 's';
  
-  const timer = setInterval(() => {
+  const timer = setInterval(function() {
     remaining--;
     if (remaining > 0) {
       countdown.textContent = 'Skip in ' + remaining + 's';
@@ -6492,9 +7143,11 @@ function showAd(onComplete) {
  
   modal._onComplete = onComplete;
  
-  if (adSeenCount >= 1) unlock('saw-ad');
-  if (adSeenCount >= 5) unlock('watched-five-ads');
-  if (adSeenCount >= fakeAds.length) unlock('watched-all-ads');
+  if (typeof unlock === 'function') {
+    if (adSeenCount >= 1) unlock('saw-ad');
+    if (adSeenCount >= 5) unlock('watched-five-ads');
+    if (adSeenCount >= fakeAds.length) unlock('watched-all-ads');
+  }
 }
  
 function skipAd() {
@@ -6506,9 +7159,10 @@ function skipAd() {
 }
  
 function closeEmail() {
-  document.getElementById('email-modal').style.display = 'none';
+  const modal = document.getElementById('email-modal');
+  if (modal) modal.style.display = 'none';
 }
-
+ 
 function init() {
   updateCount();
   // Restore gold outlines for holes already dunked
