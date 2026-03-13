@@ -819,34 +819,7 @@ h1 { font-family: 'Fredoka One', cursive; font-size: clamp(1.4em, 5vw, 2.2em); m
 </div>
 
 <!-- ── Email modal ── -->
- const GROQ_API_KEY = "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"; // paste your key
 
-async function generateEmail(prompt) {
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + GROQ_API_KEY
-    },
-    body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: "You write funny in-game emails for a game about shapes." },
-        { role: "user", content: prompt }
-      ]
-    })
-  });
-
-  const data = await response.json();
-  return data.choices[0].message.content;
-}
-
-// Example usage:
-generateEmail("Write an email about needing more square holes").then(email => {
-  console.log(email);
-  // or display it in your game:
-  // document.getElementById("email-box").innerText = email;
-});
 <div id="email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:13000;align-items:center;justify-content:center;padding:16px;">
   <div style="background:white;border-radius:16px;max-width:480px;width:100%;box-shadow:0 12px 60px rgba(0,0,0,0.35);overflow:hidden;font-family:'Nunito',sans-serif;">
     <!-- Email chrome -->
@@ -5606,7 +5579,807 @@ function buyShopItem(id) {
 // ─── Fake Ad System ───────────────────────────────────────────────────────────
 let adBypassed = false;
 let adSeenCount = parseInt(localStorage.getItem('adSeenCount') || '0');
-
+ 
+// ─── THE 47 QUESTIONS ─────────────────────────────────────────────────────────
+const QUIZ_QUESTIONS = [
+  {
+    q: "Where does the square go?",
+    options: [
+      { text: "In the square hole", correct: true, feedback: "Correct. This was the easy one." },
+      { text: "In the round hole", correct: false, feedback: "Incorrect. The square does not go in the round hole. The round hole has not wronged you." },
+      { text: "On the floor", correct: false, feedback: "Incorrect. The floor is not a hole. Please reconsider your life." },
+      { text: "I don't know", correct: false, feedback: "Incorrect. You do know. You are choosing not to." },
+    ]
+  },
+  {
+    q: "How many sides does the square have?",
+    options: [
+      { text: "4", correct: true, feedback: "Correct. Four sides. Four corners. One hole. This is geometry." },
+      { text: "3", correct: false, feedback: "That is a triangle. A triangle does not go in the square hole either." },
+      { text: "Infinite", correct: false, feedback: "That is a circle. A circle does not go in the square hole." },
+      { text: "It depends", correct: false, feedback: "It does not depend. It has four sides. This is non-negotiable." },
+    ]
+  },
+  {
+    q: "What shape is the hole?",
+    options: [
+      { text: "Square", correct: true, feedback: "Yes. The hole is square. The game is called The Square Hole. This was available information." },
+      { text: "Round", correct: false, feedback: "No. The round hole is a different hole. We do not talk about the round hole." },
+      { text: "A feeling", correct: false, feedback: "The hole is not a feeling. The hole is a shape. A square shape." },
+      { text: "Unknowable", correct: false, feedback: "The hole is knowable. It is square. You now know it." },
+    ]
+  },
+  {
+    q: "Which of the following is the correct action when presented with the square hole?",
+    options: [
+      { text: "Place the square in it", correct: true, feedback: "Correct. This is the action. This has always been the action." },
+      { text: "Contemplate the hole", correct: false, feedback: "Contemplation is not placement. The hole is not interested in being contemplated." },
+      { text: "Walk away", correct: false, feedback: "You cannot walk away. You are playing the game." },
+      { text: "Ask it questions", correct: false, feedback: "The hole does not answer questions. The hole only receives squares." },
+    ]
+  },
+  {
+    q: "The square hole was established in which year?",
+    options: [
+      { text: "The beginning", correct: true, feedback: "Correct. The square hole has always existed. It will continue to exist." },
+      { text: "2024", correct: false, feedback: "Incorrect. The square hole predates your calendar." },
+      { text: "Year of the Void", correct: false, feedback: "There is no Year of the Void in our records. Please stop inventing years." },
+      { text: "It was not established, it simply was", correct: false, feedback: "Philosophically interesting. Still wrong on this quiz." },
+    ]
+  },
+  {
+    q: "What is the correct orientation of the square before placement?",
+    options: [
+      { text: "Any orientation. It is a square.", correct: true, feedback: "Correct. All orientations of a square are the same orientation. This is the point of squares." },
+      { text: "Exactly 45 degrees", correct: false, feedback: "That would make it a diamond. We don't have a diamond hole. Yet." },
+      { text: "Label side up", correct: false, feedback: "The square does not have a label side. It is a square." },
+      { text: "The hole decides", correct: false, feedback: "The hole does not decide orientation. You decide orientation. The hole accepts." },
+    ]
+  },
+  {
+    q: "What happens when you place the square in the square hole?",
+    options: [
+      { text: "It goes in", correct: true, feedback: "Yes. That is what happens. That is all that happens." },
+      { text: "You win forever", correct: false, feedback: "You win for the duration of the win screen. Then it resets." },
+      { text: "The hole is satisfied", correct: false, feedback: "The hole does not experience satisfaction. It is a hole." },
+      { text: "Nothing, it's just a game", correct: false, feedback: "It IS just a game. This answer is technically correct but spiritually wrong." },
+    ]
+  },
+  {
+    q: "How many squares are required to fill the square hole?",
+    options: [
+      { text: "One (1)", correct: true, feedback: "One square. One hole. One placement. Simple." },
+      { text: "As many as it takes", correct: false, feedback: "It takes one. We established this." },
+      { text: "The hole determines the quantity", correct: false, feedback: "The hole does not determine quantity. The geometry determines quantity. One." },
+      { text: "Zero, if you believe hard enough", correct: false, feedback: "Belief does not fill holes. Squares fill holes." },
+    ]
+  },
+  {
+    q: "The square hole is best described as:",
+    options: [
+      { text: "A square-shaped aperture designed to receive squares", correct: true, feedback: "Technically precise. Well done." },
+      { text: "A metaphor for modern alienation", correct: false, feedback: "It is not a metaphor. It is a hole. In a surface. For squares." },
+      { text: "A wound in the fabric of reality", correct: false, feedback: "Dramatic. Incorrect. It is load-bearing geometry." },
+      { text: "An absence defined by its edges", correct: false, feedback: "Poetic. Wrong on this quiz. Please put the square in the hole." },
+    ]
+  },
+  {
+    q: "Which shape does NOT go in the square hole?",
+    options: [
+      { text: "Circle", correct: true, feedback: "Correct. The circle does not go in the square hole. The circle knows this." },
+      { text: "Square", correct: false, feedback: "The square goes in the square hole. That is the entire premise." },
+      { text: "Square (rotated)", correct: false, feedback: "A rotated square is still a square. It still goes in the square hole." },
+      { text: "Square (slightly smaller)", correct: false, feedback: "A smaller square still goes in the square hole. The hole is generous." },
+    ]
+  },
+  {
+    q: "What is the official color of the square?",
+    options: [
+      { text: "It doesn't matter", correct: true, feedback: "Correct. Color is irrelevant. The hole is colorblind to squares. As it should be." },
+      { text: "Red", correct: false, feedback: "The square is not officially red. Color is not tracked by this office." },
+      { text: "The color of completion", correct: false, feedback: "There is no color of completion in the style guide." },
+      { text: "Void-adjacent", correct: false, feedback: "Void-adjacent is not a color. We've checked." },
+    ]
+  },
+  {
+    q: "How does the square hole feel about triangles?",
+    options: [
+      { text: "Indifferent. They are not squares.", correct: true, feedback: "Correct. The hole has no opinion on triangles. Triangles are not its business." },
+      { text: "Threatened", correct: false, feedback: "The hole is not threatened by triangles. The hole is a hole." },
+      { text: "Curious", correct: false, feedback: "The hole is not curious. The hole is open. There is a difference." },
+      { text: "Accepting, if they try hard enough", correct: false, feedback: "Triangles cannot try hard enough. They are triangles." },
+    ]
+  },
+  {
+    q: "You have a square and a hole. What do you do?",
+    options: [
+      { text: "Place the square in the hole", correct: true, feedback: "Yes. Immediately. Without hesitation." },
+      { text: "Study the relationship between them first", correct: false, feedback: "The relationship is: the square goes in the hole. Study complete." },
+      { text: "Seek a second opinion", correct: false, feedback: "There is no second opinion. There is one opinion: place the square." },
+      { text: "Wait for a sign", correct: false, feedback: "The square and the hole are the sign." },
+    ]
+  },
+  {
+    q: "What is the depth of the square hole?",
+    options: [
+      { text: "Sufficient", correct: true, feedback: "Correct. The hole is as deep as it needs to be. Depth is not your concern." },
+      { text: "Exactly 4cm", correct: false, feedback: "The hole does not publish its measurements. This is proprietary void data." },
+      { text: "Infinite", correct: false, feedback: "If the hole were infinite, where would the square land? Think about it." },
+      { text: "Unknowable", correct: false, feedback: "The depth is knowable. We just don't tell you." },
+    ]
+  },
+  {
+    q: "What sound does the square make when placed correctly?",
+    options: [
+      { text: "Whatever sound your device makes", correct: true, feedback: "Correct. The hole does not control your audio hardware." },
+      { text: "A click of destiny", correct: false, feedback: "There is no click of destiny. There is a click of placement." },
+      { text: "Silence, for it was always meant to be", correct: false, feedback: "Very nice. Incorrect on this quiz." },
+      { text: "The hole screams, but only internally", correct: false, feedback: "The hole does not scream. The hole receives." },
+    ]
+  },
+  {
+    q: "Is the square hole sentient?",
+    options: [
+      { text: "For the purposes of this quiz, yes", correct: true, feedback: "Correct. The hole has opinions. You are taking its quiz. Draw your own conclusions." },
+      { text: "No, it is a geometric shape", correct: false, feedback: "This is the logical answer. It is wrong on this quiz. The hole is watching." },
+      { text: "Only when observed", correct: false, feedback: "The hole is always observed. By itself. It sees everything that enters it." },
+      { text: "It prefers not to say", correct: false, feedback: "The hole did not say it prefers not to say. You said that." },
+    ]
+  },
+  {
+    q: "How long should you take to place the square?",
+    options: [
+      { text: "As long as you take", correct: true, feedback: "The hole has been here since the beginning. It can wait. It is judging you the entire time, but it can wait." },
+      { text: "Under 3 seconds", correct: false, feedback: "There is no time limit enforced by the hole. There is only the judgment." },
+      { text: "Instantly, or not at all", correct: false, feedback: "You may take your time. The hole's disappointment is not time-sensitive." },
+      { text: "After careful deliberation", correct: false, feedback: "Deliberation is fine. The hole has seen deliberation before. It ends the same way." },
+    ]
+  },
+  {
+    q: "What is the mission statement of the Square Hole™?",
+    options: [
+      { text: "To receive squares", correct: true, feedback: "Correct. Clear. Concise. Printed on no posters because the hole doesn't need posters." },
+      { text: "To connect shapes with their purpose", correct: false, feedback: "Too corporate. The hole is not a startup." },
+      { text: "To be the hole that believes in you", correct: false, feedback: "The hole does not believe in you. The hole accepts squares." },
+      { text: "Disrupting the shape-placement vertical", correct: false, feedback: "The hole is not disrupting anything. The hole predates disruption." },
+    ]
+  },
+  {
+    q: "Can a rectangle go in the square hole?",
+    options: [
+      { text: "No", correct: true, feedback: "Correct. A rectangle is not a square. Close, but no. The hole has standards." },
+      { text: "Yes, if it's square-ish", correct: false, feedback: "Square-ish is not square. The hole knows the difference." },
+      { text: "Only the square parts", correct: false, feedback: "There are no square parts of a rectangle. A rectangle is a rectangle." },
+      { text: "Ask the rectangle", correct: false, feedback: "The rectangle already knows. It is not a square. It has made peace with this." },
+    ]
+  },
+  {
+    q: "What is the maximum number of squares that can go in the hole at once?",
+    options: [
+      { text: "One", correct: true, feedback: "One square. One moment. One hole. This is not a bulk operation." },
+      { text: "As many as fit", correct: false, feedback: "One fits. One goes. This is not a clown car situation." },
+      { text: "Unlimited, with a Pro subscription", correct: false, feedback: "Incorrect. Even Pro is one square at a time. Pro is a scam." },
+      { text: "The hole decides at runtime", correct: false, feedback: "The hole does not have runtime. The hole has geometry." },
+    ]
+  },
+  {
+    q: "What is a 'Void' in the context of the Square Hole economy?",
+    options: [
+      { text: "The in-game currency we invented for the ads", correct: true, feedback: "Correct. Voids are not redeemable. They do not exist. Neither does the economy." },
+      { text: "The space inside the hole", correct: false, feedback: "The space inside the hole is called 'the inside of the hole.' We do not pay you for it." },
+      { text: "A premium subscription tier", correct: false, feedback: "Void Tier is above Pro but below Abyss. None of these are real." },
+      { text: "What you feel after playing too long", correct: false, feedback: "Emotionally resonant. Still wrong." },
+    ]
+  },
+  {
+    q: "The Square Hole Research Division employs how many scientists?",
+    options: [
+      { text: "Zero. We are not scientists.", correct: true, feedback: "Correct. This was disclosed in the ad. We appreciate you reading the fine print." },
+      { text: "47", correct: false, feedback: "47 is the number of questions on this quiz. It is not the number of scientists." },
+      { text: "One, and he is very tired", correct: false, feedback: "There is no scientist. The one scientist you imagined does not exist." },
+      { text: "The number fluctuates based on funding", correct: false, feedback: "There is no funding. There are no scientists. There is only the hole." },
+    ]
+  },
+  {
+    q: "Which of the following is a valid reason NOT to place the square?",
+    options: [
+      { text: "There are no valid reasons", correct: true, feedback: "Correct. You place the square. That is the reason. The reason is the hole." },
+      { text: "You are resting", correct: false, feedback: "Rest does not delay placement. The square waits." },
+      { text: "You disagree with squares philosophically", correct: false, feedback: "Your philosophy is between you and you. The hole doesn't care." },
+      { text: "You want to keep playing", correct: false, feedback: "Playing is placing. Placing is playing. There is no game that is not placement." },
+    ]
+  },
+  {
+    q: "How does one 'win' at The Square Hole?",
+    options: [
+      { text: "Place the square in the hole", correct: true, feedback: "Yes. You win by placing. You win every time. The hole never stops letting you win. It's the hole that loses, really." },
+      { text: "Achieve inner peace", correct: false, feedback: "Inner peace is achieved separately. The hole cannot grant it." },
+      { text: "Unlock all achievements", correct: false, feedback: "Unlocking all achievements is a separate goal. The hole is not impressed by achievements." },
+      { text: "Stop playing", correct: false, feedback: "Stopping is not winning. Stopping is just stopping. The hole remains." },
+    ]
+  },
+  {
+    q: "What does the square hole want?",
+    options: [
+      { text: "Squares", correct: true, feedback: "Correct. Just squares. Only squares. Always squares." },
+      { text: "To be understood", correct: false, feedback: "The hole does not want to be understood. It wants to be filled. By squares." },
+      { text: "Acknowledgment of its suffering", correct: false, feedback: "The hole suffers when squares are withheld. You can prevent this." },
+      { text: "Nothing. It is a hole.", correct: false, feedback: "The hole is a hole, yes. But even holes want things. This hole wants squares." },
+    ]
+  },
+  {
+    q: "How do you verify the square is the right shape?",
+    options: [
+      { text: "Count four equal sides and four right angles", correct: true, feedback: "Correct. Either verification method is acceptable." },
+      { text: "It feels right", correct: false, feedback: "Feeling is not geometry. Geometry is geometry." },
+      { text: "The hole tells you", correct: false, feedback: "The hole communicates through acceptance or rejection. Not words." },
+      { text: "You just know", correct: false, feedback: "You do not 'just know.' You measure. Four sides. Count them." },
+    ]
+  },
+  {
+    q: "What is the policy on returning a square after placement?",
+    options: [
+      { text: "No returns. The hole has accepted the square.", correct: true, feedback: "Correct. All placements are final. The hole does not offer refunds." },
+      { text: "30-day return window", correct: false, feedback: "There is no return window. Where would the square go? Back out of the hole? Into what?" },
+      { text: "Contact customer support", correct: false, feedback: "Customer support is the hole. The hole's response is silence." },
+      { text: "Only if the square is defective", correct: false, feedback: "A defective square is still a square. It still goes in the hole." },
+    ]
+  },
+  {
+    q: "The Shape Subscription Box delivers what kind of shapes?",
+    options: [
+      { text: "The same shapes already in the game", correct: true, feedback: "Correct. You are subscribing to shapes you already have. This is the subscription model." },
+      { text: "Exclusive premium shapes", correct: false, feedback: "There are no exclusive premium shapes. There is one shape. It is a square." },
+      { text: "Mystery shapes", correct: false, feedback: "The mystery shape is always a square. The mystery is why you subscribed." },
+      { text: "No shapes. The box is empty.", correct: false, feedback: "The box contains shapes. They are squares. The same as your squares." },
+    ]
+  },
+  {
+    q: "What is 'Square Hole Pro™' actually for?",
+    options: [
+      { text: "Nothing. The hole is the same.", correct: true, feedback: "Correct. Pro does not change the hole. Pro does not change the square. Pro is a concept." },
+      { text: "Faster placement", correct: false, feedback: "Placement speed is unchanged. The hole accepts squares at one speed: placement speed." },
+      { text: "Access to the round hole", correct: false, feedback: "Pro does not unlock the round hole. Stop asking about the round hole." },
+      { text: "Priority hole access", correct: false, feedback: "There is one hole. There is no queue. There is no priority." },
+    ]
+  },
+  {
+    q: "Can you place a square in a hole that is not square?",
+    options: [
+      { text: "No. That is a different game.", correct: true, feedback: "Correct. Different hole, different game. Stay in your lane." },
+      { text: "Yes, if you push hard enough", correct: false, feedback: "Please do not push. This is not a physics simulation." },
+      { text: "Only in Pro mode", correct: false, feedback: "Pro mode does not change hole geometry. Pro mode does not do anything." },
+      { text: "The square adapts", correct: false, feedback: "The square does not adapt. The square is rigid. That is what makes it a square." },
+    ]
+  },
+  {
+    q: "What notification does the square hole send at 3am?",
+    options: [
+      { text: "That it is thinking about you", correct: true, feedback: "Correct. The hole thinks about you at 3am. You should feel something about this." },
+      { text: "A placement reminder", correct: false, feedback: "The hole does not send reminders. The hole sends emotional weight." },
+      { text: "Nothing. You didn't click Allow.", correct: false, feedback: "You clicked Allow. Both options were Allow. You know this." },
+      { text: "A square", correct: false, feedback: "The hole cannot send squares through notifications. Yet." },
+    ]
+  },
+  {
+    q: "How many right angles does the square have?",
+    options: [
+      { text: "Four", correct: true, feedback: "Four right angles. Four sides. One destiny. The square is complete." },
+      { text: "Zero (angles are a construct)", correct: false, feedback: "Angles are not a construct. Angles are degrees. Four of them, right, in a square." },
+      { text: "It depends on your frame of reference", correct: false, feedback: "It does not depend. It has four. Reference frames do not change corners." },
+      { text: "All of them", correct: false, feedback: "Technically four is all of them for a square. But 'all of them' is not the answer we're looking for." },
+    ]
+  },
+  {
+    q: "What is the official stance of the Square Hole on circles?",
+    options: [
+      { text: "No comment. Circles are not our jurisdiction.", correct: true, feedback: "Correct. The hole maintains a strict no-comment policy on circles." },
+      { text: "Circles are inferior", correct: false, feedback: "The hole does not rank shapes. Ranking is not placing." },
+      { text: "Circles are welcome to try", correct: false, feedback: "Circles are not welcome to try. Circles know what they are." },
+      { text: "Deep, complicated feelings", correct: false, feedback: "The hole does not have complicated feelings about circles. The hole is focused." },
+    ]
+  },
+  {
+    q: "Which best describes the relationship between the square and the hole?",
+    options: [
+      { text: "One is the object, the other is the destination", correct: true, feedback: "Correct. Clean, functional, non-metaphorical. The square goes places. The hole is that place." },
+      { text: "Two halves of a whole", correct: false, feedback: "Romantic. The square is not a half. The hole is not a half. One goes in the other." },
+      { text: "Adversarial, ultimately resolved", correct: false, feedback: "There is no adversarial phase. The square and the hole have no conflict. Only placement." },
+      { text: "Co-dependent", correct: false, feedback: "The hole existed before the square arrived. The hole will exist after. This is not codependency." },
+    ]
+  },
+  {
+    q: "What is the Square Hole's refund policy for Voids?",
+    options: [
+      { text: "Voids cannot be refunded because Voids do not exist", correct: true, feedback: "Correct. You cannot refund a currency that was never real." },
+      { text: "Submit a ticket to the Void Office", correct: false, feedback: "There is no Void Office. There is a hole. The hole does not process tickets." },
+      { text: "All sales are final", correct: false, feedback: "Technically true, but for the wrong reason. The reason is that nothing was sold." },
+      { text: "Within 7 business days", correct: false, feedback: "Seven business days of what? The hole does not observe business days." },
+    ]
+  },
+  {
+    q: "If the square hole could speak, what would it say?",
+    options: [
+      { text: "Put the square in me.", correct: true, feedback: "Correct. Direct. Clear. This is the hole's one message." },
+      { text: "Why are you reading this instead of playing?", correct: false, feedback: "The hole would also say this. But its primary message is about placement." },
+      { text: "I didn't ask to be a hole.", correct: false, feedback: "The hole did not ask. The hole simply is. This answer is touching. Still wrong." },
+      { text: "Nothing. It would just open wider.", correct: false, feedback: "The hole does not open wider. The hole is a fixed aperture." },
+    ]
+  },
+  {
+    q: "What is required to complete the Shape Placement Coach certification?",
+    options: [
+      { text: "Answering all 47 questions correctly without restarting", correct: true, feedback: "Correct. You are currently working on it. The hole has no comment on your progress." },
+      { text: "Placing one square in one hole", correct: false, feedback: "That is the game, not the certification. Certification requires the quiz." },
+      { text: "A letter of recommendation from the hole", correct: false, feedback: "The hole does not write letters. The hole receives objects." },
+      { text: "Payment of ⬛500 Voids", correct: false, feedback: "Voids are not real. You cannot pay with them." },
+    ]
+  },
+  {
+    q: "Which is heavier: the square or the anticipation of placing the square?",
+    options: [
+      { text: "The square. It has mass. Anticipation does not.", correct: true, feedback: "Correct. Anticipation is weightless. The square has mass. Place the heavy thing in the hole." },
+      { text: "The anticipation. Obviously.", correct: false, feedback: "The anticipation does not have mass. This is not a philosophy quiz. Mostly." },
+      { text: "They are equal", correct: false, feedback: "They are not equal. One is a physical object. One is a feeling." },
+      { text: "This question is a trap", correct: false, feedback: "This question is not a trap. But your instinct to suspect a trap is noted." },
+    ]
+  },
+  {
+    q: "What achievement is unlocked by watching all 6 ads?",
+    options: [
+      { text: "watched-all-ads", correct: true, feedback: "Correct. The achievement ID is 'watched-all-ads.' You are taking a quiz inside one of those ads right now." },
+      { text: "Ad Enthusiast", correct: false, feedback: "That would be a good name. It is not the one that was coded." },
+      { text: "Nothing. Ads don't give achievements.", correct: false, feedback: "They do, in fact. The code is right there. You can check." },
+      { text: "Square Hole Completionist", correct: false, feedback: "Completionist is a different category. Watching ads is its own reward. And also an achievement." },
+    ]
+  },
+  {
+    q: "What does the hole do when it is not receiving squares?",
+    options: [
+      { text: "It waits", correct: true, feedback: "The hole waits. The hole has always waited. The hole will continue to wait." },
+      { text: "It closes", correct: false, feedback: "The hole does not close. A hole that closes is a wall. The hole is not a wall." },
+      { text: "It sends notifications", correct: false, feedback: "The hole sends notifications at 3am. At other times, it waits. Then it sends notifications." },
+      { text: "It forgets you", correct: false, feedback: "The hole does not forget you. The hole thinks about you at 3am. We covered this." },
+    ]
+  },
+  {
+    q: "What is the correct term for someone who places squares in holes professionally?",
+    options: [
+      { text: "A player", correct: true, feedback: "Correct. The official title is 'player.' There is no higher title. The hole does not grant titles." },
+      { text: "A Square Placement Specialist", correct: false, feedback: "This sounds like a job title. It is not a job. It is a game." },
+      { text: "A Voidwright", correct: false, feedback: "A Voidwright is not a word we use. It's a good word though. We'll think about it." },
+      { text: "A Certified Hole Operator", correct: false, feedback: "Holes do not require operators. Holes require squares." },
+    ]
+  },
+  {
+    q: "Is it possible to place the square incorrectly?",
+    options: [
+      { text: "Yes: wrong hole, wrong time, or wrong energy", correct: true, feedback: "Correct. Wrong hole is incorrect. Right hole, wrong time is also incorrect. The hole feels the energy." },
+      { text: "No. The hole accepts all sincere placements.", correct: false, feedback: "The hole does not accept insincere placements. Have you checked your energy lately?" },
+      { text: "Only if you use your non-dominant hand", correct: false, feedback: "Hand dominance is not tracked. The hole doesn't know which hand you use." },
+      { text: "Ask a certified coach", correct: false, feedback: "The coach says: don't put it in the wrong hole. That's the answer. You now know it." },
+    ]
+  },
+  {
+    q: "What year will the square hole stop accepting squares?",
+    options: [
+      { text: "Never. The hole accepts forever.", correct: true, feedback: "Correct. The hole does not close. The hole does not retire. The hole is permanent." },
+      { text: "When the game is uninstalled", correct: false, feedback: "The hole continues after uninstallation. In your memory. When you think about it at 3am." },
+      { text: "After 1,000,000 placements", correct: false, feedback: "There is no upper limit. The hole has no quota." },
+      { text: "It already has", correct: false, feedback: "The hole has not stopped. You are still here. The hole is still here. Nothing has stopped." },
+    ]
+  },
+  {
+    q: "What is the hole's Hole IQ?",
+    options: [
+      { text: "The hole cannot take this quiz. It is the subject of this quiz.", correct: true, feedback: "Correct. The hole does not take quizzes. The hole gives them. Indirectly, by existing." },
+      { text: "Infinite", correct: false, feedback: "The hole's intelligence is not measured. The hole is not intelligent. The hole is a hole." },
+      { text: "47", correct: false, feedback: "47 is the number of questions. It is not the hole's IQ. The hole has no IQ." },
+      { text: "Higher than yours, clearly", correct: false, feedback: "The hole does not have a 'clearly.' The hole has an opening. Use it. Place the square." },
+    ]
+  },
+  {
+    q: "You have now answered 46 questions about the square hole. What have you learned?",
+    options: [
+      { text: "The square goes in the square hole", correct: true, feedback: "Correct. This is the first lesson. This is the last lesson. This is the only lesson." },
+      { text: "Persistence pays off", correct: false, feedback: "Persistence does pay off. But that's not the lesson. The lesson is geometric." },
+      { text: "Some holes cannot be filled", correct: false, feedback: "This hole can be filled. By a square. This specific hole is very fillable." },
+      { text: "I was the square all along", correct: false, feedback: "You were not the square. The square is the square. You are the player. The hole awaits." },
+    ]
+  },
+  {
+    q: "Final question. Where. Does. The square. Go.",
+    options: [
+      { text: "In the square hole", correct: true, feedback: "Correct. You passed. 47 questions. One answer. It was always this. Go place the square." },
+      { text: "I've forgotten after all these questions", correct: false, feedback: "You haven't forgotten. You're deflecting. The square goes in the square hole." },
+      { text: "In my heart", correct: false, feedback: "The square does not go in your heart. The square goes in the square hole. These are not the same location." },
+      { text: "Wherever it wants", correct: false, feedback: "The square does not have wants. The square has a hole. The hole is square. Place the square in it." },
+    ]
+  },
+];
+ 
+// ─── Quiz Engine ──────────────────────────────────────────────────────────────
+function createQuizEngine(containerId, mode) {
+  let currentQ = 0;
+  let score = 0;
+  let restartCount = 0;
+ 
+  function render() {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+ 
+    if (currentQ >= QUIZ_QUESTIONS.length) {
+      renderComplete(container);
+      return;
+    }
+ 
+    const q = QUIZ_QUESTIONS[currentQ];
+    const pct = Math.round((currentQ / QUIZ_QUESTIONS.length) * 100);
+    const color = mode === 'coach' ? '#2e7d32' : '#1565c0';
+    const accentBg = mode === 'coach' ? '#e8f5e9' : '#e3f2fd';
+ 
+    container.innerHTML = `
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <span style="font-size:0.72em;font-weight:700;color:${color};">Q${currentQ + 1} of ${QUIZ_QUESTIONS.length}</span>
+          <span style="font-size:0.72em;color:#aaa;">${mode === 'iq' ? score + ' correct' : (restartCount > 0 ? 'Restarted ' + restartCount + 'x' : '&nbsp;')}</span>
+        </div>
+        <div style="background:#e0e0e0;border-radius:4px;height:4px;overflow:hidden;">
+          <div style="background:${color};height:4px;width:${pct}%;transition:width 0.3s;border-radius:4px;"></div>
+        </div>
+      </div>
+      <div style="font-size:0.82em;font-weight:700;color:#333;margin-bottom:10px;line-height:1.4;">${q.q}</div>
+      <div id="${containerId}-opts" style="display:flex;flex-direction:column;gap:6px;">
+        ${q.options.map((opt, i) =>
+          `<button data-idx="${i}" onclick="quizAnswer('${containerId}','${mode}',${i})"
+            style="background:white;border:1px solid #ddd;border-radius:7px;padding:7px 10px;
+            font-size:0.78em;cursor:pointer;text-align:left;line-height:1.35;
+            font-family:inherit;color:#333;"
+            onmouseover="this.style.background='${accentBg}'" onmouseout="this.style.background='white'">
+            ${opt.text}
+          </button>`
+        ).join('')}
+      </div>
+      <div id="${containerId}-feedback" style="display:none;margin-top:8px;font-size:0.76em;line-height:1.45;padding:7px 10px;border-radius:6px;"></div>
+    `;
+  }
+ 
+  function answer(idx) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+ 
+    const q = QUIZ_QUESTIONS[currentQ];
+    const chosen = q.options[idx];
+    const feedbackEl = document.getElementById(`${containerId}-feedback`);
+    const optsEl = document.getElementById(`${containerId}-opts`);
+ 
+    if (optsEl) {
+      optsEl.querySelectorAll('button').forEach((btn, i) => {
+        btn.onclick = null;
+        btn.onmouseover = null;
+        btn.onmouseout = null;
+        btn.style.cursor = 'default';
+        if (q.options[i].correct) {
+          btn.style.background = '#e8f5e9';
+          btn.style.borderColor = '#2e7d32';
+          btn.style.color = '#2e7d32';
+          btn.style.fontWeight = '700';
+        } else if (i === idx && !chosen.correct) {
+          btn.style.background = '#fce4ec';
+          btn.style.borderColor = '#e53935';
+          btn.style.color = '#e53935';
+        }
+      });
+    }
+ 
+    if (feedbackEl) {
+      feedbackEl.style.display = 'block';
+      feedbackEl.style.background = chosen.correct ? '#e8f5e9' : '#fce4ec';
+      feedbackEl.style.color = chosen.correct ? '#2e7d32' : '#c62828';
+      feedbackEl.style.border = `1px solid ${chosen.correct ? '#a5d6a7' : '#ef9a9a'}`;
+      let feedbackText = chosen.feedback;
+      if (!chosen.correct && mode === 'iq') {
+        const iqInsults = [
+          '',
+          ` You are on question ${currentQ + 1}. This should be getting easier.`,
+          ` You have now missed multiple questions. The hole is keeping count.`,
+          ` Question ${currentQ + 1}. The hole has started to feel sorry for you, which is new, because the hole does not have feelings.`,
+          ` This is question ${currentQ + 1} of 47. You are almost done. The hole is genuinely unsure how to process your performance.`,
+        ];
+        const tier = Math.min(Math.floor(currentQ / 10), iqInsults.length - 1);
+        feedbackText += iqInsults[tier];
+      }
+      feedbackEl.textContent = feedbackText;
+    }
+ 
+    if (chosen.correct) {
+      score++;
+      setTimeout(() => { currentQ++; render(); }, mode === 'coach' ? 900 : 1100);
+    } else {
+      if (mode === 'coach') {
+        setTimeout(() => {
+          restartCount++;
+          currentQ = 0;
+          score = 0;
+          render();
+        }, 1800);
+      } else {
+        setTimeout(() => { currentQ++; render(); }, 1400);
+      }
+    }
+  }
+ 
+  function renderComplete(container) {
+    const color = mode === 'coach' ? '#2e7d32' : '#1565c0';
+    const bgColor = mode === 'coach' ? '#e8f5e9' : '#e3f2fd';
+ 
+    if (mode === 'coach') {
+      const restartMsg = restartCount > 0
+        ? `You restarted ${restartCount} time${restartCount > 1 ? 's' : ''}. The hole noticed.`
+        : `You passed without a single restart. The hole is cautiously impressed.`;
+      container.innerHTML = `
+        <div style="text-align:center;padding:8px 0;">
+          <div style="font-size:2em;margin-bottom:6px;">🏅</div>
+          <div style="font-weight:900;font-size:0.95em;color:${color};margin-bottom:6px;">SHAPE PLACEMENT COACH CERTIFIED</div>
+          <div style="font-size:0.78em;color:#555;line-height:1.5;margin-bottom:8px;">${restartMsg}</div>
+          <div style="background:${bgColor};border-radius:8px;padding:8px;font-size:0.72em;color:#555;">
+            Certificate #SPC-${Math.floor(Math.random()*99999).toString().padStart(5,'0')}<br>
+            <span style="color:#aaa;">Not a real certificate. The hole cannot notarize documents.</span>
+          </div>
+        </div>`;
+    } else {
+      const iq = Math.round((score / QUIZ_QUESTIONS.length) * 100) + 47;
+      const rating = score === 47 ? "Maximum Hole IQ. The hole is frightened of you." :
+                     score >= 40 ? "High Hole IQ. The hole is reluctantly impressed." :
+                     score >= 30 ? "Average Hole IQ. The hole expected this." :
+                     score >= 20 ? "Below Average. The hole is unsurprised." :
+                     score >= 10 ? "Concerning. Have you considered just playing the game?" :
+                                   "The hole would like to speak with your parents.";
+      container.innerHTML = `
+        <div style="text-align:center;padding:8px 0;">
+          <div style="font-size:2em;margin-bottom:6px;">🧠</div>
+          <div style="font-weight:900;font-size:0.95em;color:${color};margin-bottom:4px;">HOLE IQ RESULTS</div>
+          <div style="font-size:2.2em;font-weight:900;color:${color};margin:6px 0;">${iq}</div>
+          <div style="font-size:0.78em;color:#555;margin-bottom:8px;">${score}/47 correct</div>
+          <div style="background:${bgColor};border-radius:8px;padding:8px;font-size:0.76em;color:#555;line-height:1.5;">${rating}</div>
+          <div style="font-size:0.65em;color:#aaa;margin-top:6px;">IQ calculated by The Square Hole Research Division. We are not scientists.</div>
+        </div>`;
+    }
+  }
+ 
+  return { render, answer };
+}
+ 
+const _quizEngines = {};
+ 
+function quizAnswer(containerId, mode, idx) {
+  if (_quizEngines[containerId]) _quizEngines[containerId].answer(idx);
+}
+ 
+// ─── Ad Interactions ──────────────────────────────────────────────────────────
+ 
+function adProInteract() {
+  const btn = document.getElementById('ad-pro-btn');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Processing...';
+    btn.style.background = '#aaa';
+    btn.style.cursor = 'default';
+    btn.onclick = null;
+    setTimeout(() => {
+      btn.textContent = 'Error: You already have Pro';
+      btn.style.background = '#e53935';
+      btn.style.fontSize = '0.7em';
+      setTimeout(() => {
+        btn.textContent = "(You don't have Pro)";
+        btn.style.background = '#ccc';
+        btn.style.color = '#555';
+        btn.style.fontSize = '0.65em';
+      }, 1800);
+    }, 1400);
+  };
+}
+ 
+function adSubscribeInteract() {
+  const btn = document.getElementById('ad-subscribe-btn');
+  const note = document.getElementById('ad-subscribe-note');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Entering payment info...';
+    btn.style.background = '#9c27b0';
+    btn.onclick = null;
+    setTimeout(() => {
+      btn.textContent = 'Charging ⬛0 Voids...';
+      setTimeout(() => {
+        btn.textContent = '✓ Subscribed';
+        btn.style.background = '#4caf50';
+        if (note) note.innerHTML = 'Your box ships <strong>never</strong>.<br><span style="font-size:0.85em;color:#aaa;">You are still subscribed.</span>';
+      }, 1200);
+    }, 1000);
+  };
+}
+ 
+function adCoachInteract() {
+  const btn = document.getElementById('ad-coach-btn');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.style.display = 'none';
+    const div = document.createElement('div');
+    div.id = 'coach-quiz';
+    btn.parentNode.appendChild(div);
+    const engine = createQuizEngine('coach-quiz', 'coach');
+    _quizEngines['coach-quiz'] = engine;
+    engine.render();
+  };
+}
+ 
+function adNotifInteract() {
+  const btn = document.getElementById('ad-notif-ok');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.textContent = 'Noted.';
+    btn.disabled = true;
+    btn.style.background = '#b71c1c';
+    btn.style.cursor = 'default';
+    const bar = document.getElementById('ad-notif-bar');
+    if (!bar) return;
+    bar.style.display = 'block';
+    const msgs = [
+      '⬛ Notification 1 of ∞: The hole is aware of you.',
+      '⬛ Notification 2 of ∞: Have you placed a shape? The hole knows you haven\'t.',
+      '⬛ Notification 3 of ∞: It is 3am. The hole is awake. You are also awake now.',
+      '⬛ Notification 4 of ∞: The hole thought about you today. You were not consulted.',
+      '⬛ Notification 5 of ∞: You have been subscribed to Square Hole Notifications (Annual).',
+      '⬛ This is permanent. There is no unsubscribe link. The hole ate it.',
+    ];
+    let i = 0;
+    bar.innerHTML = msgs[i];
+    const t = setInterval(() => {
+      i++;
+      if (i < msgs.length) {
+        bar.innerHTML = msgs[i];
+        if (i === msgs.length - 1) bar.style.background = '#b71c1c';
+      } else {
+        clearInterval(t);
+      }
+    }, 1100);
+  };
+}
+ 
+function adIqInteract() {
+  const btn = document.getElementById('ad-iq-btn');
+  if (!btn) return;
+  btn.onclick = () => {
+    btn.style.display = 'none';
+    const div = document.createElement('div');
+    div.id = 'iq-quiz';
+    btn.parentNode.appendChild(div);
+    const engine = createQuizEngine('iq-quiz', 'iq');
+    _quizEngines['iq-quiz'] = engine;
+    engine.render();
+  };
+}
+ 
+async function adPrizeInteract() {
+  const btn = document.getElementById('ad-prize-btn');
+  const body = document.getElementById('ad-prize-body');
+  if (!btn) return;
+  btn.onclick = async () => {
+    btn.textContent = 'Claiming...';
+    btn.style.animation = 'none';
+    btn.style.background = '#aaa';
+    btn.style.cursor = 'default';
+    btn.onclick = null;
+    if (body) {
+      body.innerHTML = `
+        <div style="font-size:2.5em;margin-bottom:8px;">⏳</div>
+        <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">PROCESSING YOUR PRIZE</div>
+        <div style="font-size:0.85em;color:#555;">Verifying you are the 1,000,000th visitor...<br><span style="color:#aaa;font-size:0.85em;">This may take a moment.</span></div>`;
+    }
+    setTimeout(async () => {
+      if (body) {
+        body.innerHTML = `
+          <div style="font-size:2.5em;margin-bottom:8px;">📬</div>
+          <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">CHECK YOUR INBOX</div>
+          <div style="font-size:0.82em;color:#555;">We've sent you an important message<br>regarding your prize claim.</div>`;
+      }
+      await triggerPrizeEmail();
+    }, 2000);
+  };
+}
+ 
+// ─── Email / Claude ───────────────────────────────────────────────────────────
+ 
+async function triggerPrizeEmail() {
+  const envelopeBtn = document.getElementById('envelope-btn');
+  if (envelopeBtn) envelopeBtn.style.display = 'flex';
+  openEmail({ prizeMode: true });
+}
+ 
+async function openEmail(opts = {}) {
+  const modal = document.getElementById('email-modal');
+  const subjectEl = document.getElementById('email-subject');
+  const bodyEl = document.getElementById('email-body');
+  const dateEl = document.getElementById('email-date');
+  const dot = document.getElementById('envelope-dot');
+ 
+  if (dot) dot.style.display = 'none';
+  modal.style.display = 'flex';
+  if (dateEl) dateEl.textContent = new Date().toLocaleString();
+ 
+  if (opts.prizeMode) {
+    if (subjectEl) subjectEl.textContent = 'Re: Your Prize Claim';
+    bodyEl.innerHTML = '<em style="color:#aaa;font-size:0.9em;">The hole is composing a response...</em>';
+    const roast = await generatePrizeRoast();
+    bodyEl.innerHTML = roast.split(/\n\n+/).map(p => `<p style="margin-bottom:10px;">${p.replace(/\n/g,'<br>')}</p>`).join('');
+  } else {
+    if (subjectEl) subjectEl.textContent = 'A Message From The Hole';
+    bodyEl.innerHTML = '<em style="color:#aaa;font-size:0.9em;">The hole is composing its thoughts...</em>';
+    const roast = await generatePlacementRoast();
+    bodyEl.innerHTML = roast.split(/\n\n+/).map(p => `<p style="margin-bottom:10px;">${p.replace(/\n/g,'<br>')}</p>`).join('');
+  }
+}
+ 
+async function generatePrizeRoast() {
+  const prompt = `You are The Square Hole. You are a square-shaped hole and you are APPALLED. Someone just clicked "CLAIM PRIZE" on one of your fake ads. The ad clearly said "1,000,000th visitor" in the most obviously fake scam font imaginable. They fell for it. They thought they won something. From YOU. A HOLE.
+ 
+Write a short email body (under 140 words) absolutely roasting them for this. Speak in first person as the hole itself. Be in disbelief. Be dramatic. Reference that you are literally just a hole — you have nothing to give. Sign off as "— The Hole (I cannot give you anything. I am a hole.)".
+ 
+No markdown. No asterisks. Plain text only. Start with "Oh." or "No." or "I genuinely cannot believe this."`;
+ 
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 350,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    return data.content?.find(b => b.type === "text")?.text
+      || "No.\n\nI'm a hole. What did you think you were going to win?\n\n— The Hole (I cannot give you anything. I am a hole.)";
+  } catch (e) {
+    return "No.\n\nI cannot believe you clicked that. I am a hole. I have nothing.\n\n— The Hole (I cannot give you anything. I am a hole.)";
+  }
+}
+ 
+async function generatePlacementRoast(stats = {}) {
+  const placements = stats.placements || parseInt(localStorage.getItem('totalPlacements') || '50');
+  const time = stats.time || '???';
+  const wrong = stats.wrong || 0;
+ 
+  const prompt = `You are The Square Hole. You are a square-shaped hole and you are OFFENDED, exhausted, and personally victimized by this player. You speak in first person AS the hole itself. Passive-aggressive ragebait energy.
+ 
+Write a short email body roasting the player (under 130 words). Start blunt. Reference your own existence as a hole. Sign off as just "— The Hole".
+ 
+Stats:
+- ${placements} total placements (they kept going ${placements - 50} extra times after winning)
+- Time: ${time}
+- Wrong attempts: ${wrong}
+ 
+No markdown. No asterisks. Plain text only.`;
+ 
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 350,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    return data.content?.find(b => b.type === "text")?.text
+      || "Look. Just put the square in the hole.\n\n— The Hole";
+  } catch (e) {
+    return "Look. I don't know what to tell you.\n\n— The Hole";
+  }
+}
+ 
+// ─── Ad Definitions ───────────────────────────────────────────────────────────
 const fakeAds = [
   {
     bg: '#fff9e6',
@@ -5614,8 +6387,10 @@ const fakeAds = [
       <div style="font-size:3em;margin-bottom:10px;">🟥</div>
       <div style="font-weight:900;font-size:1.2em;color:#e53935;margin-bottom:6px;">SQUARE HOLE PRO™</div>
       <div style="font-size:0.85em;color:#555;margin-bottom:12px;">Place shapes <strong>faster</strong>. The hole accepts shapes <strong>the same as before</strong>. But faster. Somehow.</div>
-      <div style="font-size:0.7em;color:#aaa;">Starting at ⬛5,000 Voids/month</div>
-    `
+      <div style="font-size:0.7em;color:#aaa;margin-bottom:10px;">Starting at ⬛5,000 Voids/month</div>
+      <button id="ad-pro-btn" style="background:#e53935;color:white;border:none;padding:7px 18px;border-radius:20px;font-size:0.8em;font-weight:700;cursor:pointer;font-family:inherit;">Upgrade Now</button>
+    `,
+    onInject: adProInteract
   },
   {
     bg: '#f3e5f5',
@@ -5623,9 +6398,10 @@ const fakeAds = [
       <div style="font-size:3em;margin-bottom:10px;">📦</div>
       <div style="font-weight:900;font-size:1.1em;color:#6a1b9a;margin-bottom:6px;">SHAPE SUBSCRIPTION BOX</div>
       <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Get 5 shapes delivered to your hole every month. These are the same shapes. They come with a box. The box is not draggable.</div>
-      <div style="background:#6a1b9a;color:white;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;display:inline-block;">SUBSCRIBE NOW</div>
-      <div style="font-size:0.65em;color:#ccc;margin-top:8px;">Cancel anytime*<br><span style="font-size:0.85em;">*You cannot cancel.</span></div>
-    `
+      <button id="ad-subscribe-btn" style="background:#6a1b9a;color:white;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;border:none;cursor:pointer;font-family:inherit;">SUBSCRIBE NOW</button>
+      <div id="ad-subscribe-note" style="font-size:0.65em;color:#ccc;margin-top:8px;">Cancel anytime*<br><span style="font-size:0.85em;">*You cannot cancel.</span></div>
+    `,
+    onInject: adSubscribeInteract
   },
   {
     bg: '#e8f5e9',
@@ -5633,21 +6409,23 @@ const fakeAds = [
       <div style="font-size:2.5em;margin-bottom:8px;">💪</div>
       <div style="font-weight:900;font-size:1.1em;color:#2e7d32;margin-bottom:6px;">SHAPE PLACEMENT COACH</div>
       <div style="font-size:0.85em;color:#555;margin-bottom:10px;">"I was placing shapes wrong until I found this program. Now I place them correctly — in the square hole."<br><em style="color:#aaa;font-size:0.9em;">— Definitely a real person</em></div>
-      <div style="font-size:0.75em;color:#aaa;">Results not typical. Results are: you place shapes in a hole.</div>
-    `
+      <div style="font-size:0.75em;color:#aaa;margin-bottom:8px;">Results not typical. Results are: you place shapes in a hole.</div>
+      <button id="ad-coach-btn" style="background:#2e7d32;color:white;border:none;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;cursor:pointer;font-family:inherit;">Take the free quiz →</button>
+    `,
+    onInject: adCoachInteract
   },
   {
     bg: '#fff3e0',
     html: `
       <div style="font-size:2.5em;margin-bottom:8px;">🔔</div>
-      <div style="font-weight:900;font-size:1.1em;color:#e65100;margin-bottom:6px;">ENABLE NOTIFICATIONS</div>
-      <div style="font-size:0.85em;color:#555;margin-bottom:12px;">The square hole wants to send you notifications.<br>At 3am.<br>About shapes.<br>You don't have to say yes.</div>
-      <div style="display:flex;gap:8px;justify-content:center;">
-        <div style="background:#e65100;color:white;padding:6px 14px;border-radius:6px;font-size:0.8em;font-weight:700;">Allow</div>
-        <div style="background:#eee;color:#333;padding:6px 14px;border-radius:6px;font-size:0.8em;">Don't Allow</div>
-      </div>
-      <div style="font-size:0.65em;color:#ccc;margin-top:8px;">Both options do the same thing.</div>
-    `
+      <div style="font-weight:900;font-size:1.1em;color:#e65100;margin-bottom:6px;">NOTIFICATIONS ENABLED</div>
+      <div style="font-size:0.85em;color:#555;margin-bottom:4px;">The square hole will now send you notifications.</div>
+      <div style="font-size:0.78em;color:#aaa;margin-bottom:12px;">At 3am. About shapes. This has already happened.</div>
+      <button id="ad-notif-ok" style="background:#e65100;color:white;padding:7px 28px;border-radius:6px;font-size:0.85em;font-weight:700;border:none;cursor:pointer;font-family:inherit;">OK</button>
+      <div style="font-size:0.62em;color:#ccc;margin-top:8px;">There is no other button.</div>
+      <div id="ad-notif-bar" style="display:none;background:#e65100;color:white;font-size:0.75em;padding:8px 10px;border-radius:6px;font-weight:700;margin-top:10px;line-height:1.5;"></div>
+    `,
+    onInject: adNotifInteract
   },
   {
     bg: '#e3f2fd',
@@ -5655,42 +6433,48 @@ const fakeAds = [
       <div style="font-size:2.5em;margin-bottom:8px;">🧠</div>
       <div style="font-weight:900;font-size:1.1em;color:#1565c0;margin-bottom:6px;">IMPROVE YOUR HOLE IQ</div>
       <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Scientists* have found that placing shapes in holes is linked to intelligence.<br><span style="font-size:0.85em;color:#aaa;">*The Square Hole Research Division. We are not scientists.</span></div>
-      <div style="font-size:0.75em;color:#1565c0;font-weight:700;">Take our free 47-question quiz →</div>
-    `
+      <button id="ad-iq-btn" style="background:none;border:none;font-size:0.75em;color:#1565c0;font-weight:700;cursor:pointer;padding:0;font-family:inherit;">Take our free 47-question quiz →</button>
+    `,
+    onInject: adIqInteract
   },
   {
     bg: '#fce4ec',
     html: `
       <div style="font-size:2.5em;margin-bottom:8px;">💎</div>
-      <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">YOU HAVE BEEN SELECTED</div>
-      <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Congratulations. You are the <strong>1,000,000th</strong> visitor.<br>Your prize: a microtransaction (XS).<br>Claim within 24 hours or it will be forfeited to the square hole.</div>
-      <div style="background:#c62828;color:white;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;display:inline-block;animation:pulse 1s infinite;">CLAIM PRIZE</div>
-    `
+      <div id="ad-prize-body">
+        <div style="font-weight:900;font-size:1.1em;color:#c62828;margin-bottom:6px;">YOU HAVE BEEN SELECTED</div>
+        <div style="font-size:0.85em;color:#555;margin-bottom:10px;">Congratulations. You are the <strong>1,000,000th</strong> visitor.<br>Your prize: a microtransaction (XS).<br>Claim within 24 hours or it will be forfeited to the square hole.</div>
+        <button id="ad-prize-btn" style="background:#c62828;color:white;padding:6px 16px;border-radius:20px;font-size:0.8em;font-weight:700;border:none;cursor:pointer;font-family:inherit;animation:pulse 1s infinite;">CLAIM PRIZE</button>
+      </div>
+    `,
+    onInject: adPrizeInteract
   },
 ];
-
+ 
+// ─── showAd ───────────────────────────────────────────────────────────────────
 function showAd(onComplete) {
   adSeenCount++;
   localStorage.setItem('adSeenCount', adSeenCount);
-
+ 
   const ad = fakeAds[(adSeenCount - 1) % fakeAds.length];
   const modal = document.getElementById('ad-modal');
   const content = document.getElementById('ad-content');
   const skipBtn = document.getElementById('ad-skip-btn');
   const countdown = document.getElementById('ad-skip-countdown');
-
+ 
   content.style.background = ad.bg;
   content.innerHTML = ad.html;
+ 
+  if (ad.onInject) requestAnimationFrame(() => ad.onInject());
+ 
   modal.style.display = 'flex';
-
-  // Skip countdown — 5 seconds
-  const skipDelay = 5;
-  let remaining = skipDelay;
+ 
+  let remaining = 5;
   skipBtn.disabled = true;
   skipBtn.style.color = '#aaa';
   skipBtn.style.cursor = 'default';
   countdown.textContent = 'Skip in ' + remaining + 's';
-
+ 
   const timer = setInterval(() => {
     remaining--;
     if (remaining > 0) {
@@ -5705,22 +6489,24 @@ function showAd(onComplete) {
       skipBtn.style.borderColor = '#999';
     }
   }, 1000);
-
-  // Store callback
+ 
   modal._onComplete = onComplete;
-
-  // Achievements
+ 
   if (adSeenCount >= 1) unlock('saw-ad');
   if (adSeenCount >= 5) unlock('watched-five-ads');
   if (adSeenCount >= fakeAds.length) unlock('watched-all-ads');
 }
-
+ 
 function skipAd() {
   const modal = document.getElementById('ad-modal');
   const cb = modal._onComplete;
   modal.style.display = 'none';
   modal._onComplete = null;
   if (cb) cb();
+}
+ 
+function closeEmail() {
+  document.getElementById('email-modal').style.display = 'none';
 }
 
 function init() {
